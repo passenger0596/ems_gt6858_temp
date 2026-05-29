@@ -1,0 +1,283 @@
+{
+  "timestamp": "",
+  "自动模式充电功率":{"value":0,"datatype":"INT16","mag":1,"offset":0,"desc":"自动模式充电功率(kW)"},
+  "停止充电SOC": {"value": 99,"datatype": "INT16","mag":1,"offset":0,"desc":"停止充电SOC(%)"},
+  "停止充电SOC回差": {"value": 5,"datatype": "INT16","mag":1,"offset":0,"desc":"停止充电SOC回差(%)"},
+  "停止放电SOC": {"value": 20,"datatype": "INT16","mag":1,"offset":0,"desc":"停止放电SOC(%)"},
+  "停止放电SOC回差": {"value": 5,"datatype": "INT16","mag":1,"offset":0,"desc":"停止放电SOC回差(%)"},
+  "自动启动": {"value": 0,"datatype": "INT16","mag":1,"offset":0,"desc":"自动启动"},
+  "PCS额定功率":{"value": 105,"datatype": "INT16","mag":1,"offset":0,"desc":"PCS额定功率(kW)"},
+  "PCS最大充电功率":{"value": 110,"datatype": "INT16","mag":1,"offset":0,"desc":"PCS最大充电功率(kW)"},
+  "PCS最大放电功率":{"value": 110,"datatype": "INT16","mag":1,"offset":0,"desc":"PCS最大放电功率(kW)"},
+  "电网输入额定功率":{"value": 100,"datatype": "INT16","mag":1,"offset":0,"desc":"输入额定功率(kW)"},
+  "电网输入最大功率":{"value": 100,"datatype": "INT16","mag":1,"offset":0,"desc":"输入最大功率(kW)"},
+  "停止充电单体电压":{"value": 3.65,"datatype": "FLOAT","mag":1000,"offset":0,"desc":"停止充电单体电压(V)"},
+  "停止充电单体电压回差":{"value": 0.3,"datatype": "FLOAT","mag":1000,"offset":0,"desc":"停止充电单体电压回差(V)"},
+  "停止放电单体电压":{"value": 2.6,"datatype": "FLOAT","mag":1000,"offset":0,"desc":"停止放电单体电压(V)"},
+  "停止放电单体电压回差":{"value": 0.3,"datatype": "FLOAT","mag":1000,"offset":0,"desc":"停止放电单体电压回差(V)"},
+  "停止充电电压":{"value": 800,"datatype": "INT16","mag":1,"offset":0,"desc":"停止充电电压(V)"},
+  "停止放电电压":{"value": 500,"datatype": "INT16","mag":1,"offset":0,"desc":"停止放电电压(V)"},
+  "使能SOC保护": {"value": true,"datatype": "BOOL","mag":1,"offset":0,"desc":"使能SOC保护"},
+  "使能单体电压保护": {"value": true,"datatype": "BOOL","mag":1,"offset":0,"desc":"使能单体电压保护"},
+
+  "重过载治理功率": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"重过载治理功率(kW)"},
+  "重过载确认时间": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"重过载确认时间(s)"},
+  "重过载调整间隔": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"重过载调整间隔(s)"},
+  "重过载步长": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"重过载步长(kW)"},
+  "重过载最大放电功率": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"重过载最大放电功率(kW)"},
+  "重过载治理降点功率": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"重过载治理降点功率(kW)"},
+  "补点允许功率": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"补点允许功率(kW)"},
+  "重载补点步长": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"补点步长(kW)"},
+  "补点降低点功率": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"补点降低点功率(kW)"},
+  "补点最大充电功率": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"补点最大充电功率(kW)"},
+
+  "低电压确认阈值": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"低电压治理电压(V)"},
+  "低电压确认时间": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"低压治理确认时间(s)"},
+  "低压治理调整间隔": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"低压治理调整间隔(s)"},
+  "无功调节步长": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"无功调节步长(kVar)"},
+  "低压治理最大无功功率": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"低压治理最大无功功率(kVar)"},
+  "有功调节步长": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"有功调节步长(kW)"},
+  "低压治理最大有功功率": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"低压治理最大有功功率(kW)"},
+  "低压治理目标电压阈值": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"低电压治理目标电压(V)"},
+
+  "高电压动作值": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"高电压动作值"},
+  "动作调整步长": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"动作调整步长(kW)"},
+  "高电压最大充电功率": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"高电压治理最大充电功率(kW)"},
+  "高电压恢复电压": {"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"高电压治理恢复电压(V)"},
+
+  "远程使能": {"value": true,"datatype": "BOOL","mag":1,"offset":0,"desc":"使能远程控制"},
+  "防逆流使能": {"value": true,"datatype": "BOOL","mag":1,"offset":0,"desc":"防逆流使能"},
+  "防逆流死区":{"value": 0,"datatype": "FLOAT","mag":10,"offset":0,"desc":"防逆流死区(kW)"},
+
+
+  "timingModeSet": {
+    "chargeTimeList": [
+      {
+        "endTime": "23:59",
+        "startTime": "00:00",
+        "power": 0,
+        "weekday": [
+          0,0,0,0,0,0,0
+        ]
+      },
+      {
+        "startTime": "00:00",
+        "endTime": "23:59",
+        "power": 0,
+        "weekday": [
+          0,0,0,0,0,0,0
+        ]
+      },
+      {
+        "startTime": "00:00",
+        "endTime": "23:59",
+        "power": 0,
+        "weekday": [
+          0,0,0,0,0,0,0
+        ]
+      },
+      {
+        "startTime": "00:00",
+        "endTime": "23:59",
+        "power": 0,
+        "weekday": [
+          0,0,0,0,0,0,0
+        ]
+      },
+      {
+        "startTime": "00:00",
+        "endTime": "23:59",
+        "power": 0,
+        "weekday": [
+          0,0,0,0,0,0,0
+        ]
+      },
+            {
+        "startTime": "00:00",
+        "endTime": "23:59",
+        "power": 0,
+        "weekday": [
+          0,0,0,0,0,0,0
+        ]
+      },
+            {
+        "startTime": "00:00",
+        "endTime": "23:59",
+        "power": 0,
+        "weekday": [
+          0,0,0,0,0,0,0
+        ]
+      },
+            {
+        "startTime": "00:00",
+        "endTime": "23:59",
+        "power": -15,
+        "weekday": [
+          0,0,0,0,0,0,0
+        ]
+      },
+            {
+        "startTime": "00:00",
+        "endTime": "23:59",
+        "power": 0,
+        "weekday": [
+          0,0,0,0,0,0,0
+        ]
+      },
+            {
+        "startTime": "00:00",
+        "endTime": "23:59",
+        "power": -2,
+        "weekday": [
+          0,0,0,0,0,0,0
+        ]
+      },
+            {
+        "startTime": "00:00",
+        "endTime": "23:59",
+        "power": 0,
+        "weekday": [
+          0,0,0,0,0,0,0
+        ]
+      },
+            {
+        "startTime": "00:00",
+        "endTime": "23:59",
+        "power": 11,
+        "weekday": [
+          0,0,0,0,0,0,0
+        ]
+      }
+    ],
+
+
+    "dischargeTimeList": [
+            {
+        "endTime": "00:00",
+        "startTime": "23:59",
+        "power": 0,
+        "weekday": [
+          0,0,0,0,0,0,0
+        ]
+      },
+      {
+        "endTime": "00:00",
+        "startTime": "23:59",
+        "power": 0,
+        "weekday": [
+          0,0,0,0,0,0,0
+        ]
+      },
+      {
+        "endTime": "00:00",
+        "startTime": "23:59",
+        "power": 0,
+        "weekday": [
+          0,0,0,0,0,0,0
+        ]
+      },
+      {
+        "endTime": "00:00",
+        "startTime": "23:59",
+        "power": 0,
+        "weekday": [
+          0,0,0,0,0,0,0
+        ]
+      },
+      {
+        "endTime": "00:00",
+        "startTime": "23:59",
+        "power": 0,
+        "weekday": [
+          0,0,0,0,0,0,0
+        ]
+      }
+    ]
+  },
+  "demandResponseModeSet": [
+    {
+      "startDatetime": "2026-01-01 00:00",
+      "endDatetime": "2026-01-01 00:00",
+      "activePower": 5,
+      "reactivePower": -110
+    },
+    {
+      "startDatetime": "2026-01-01 00:00",
+      "endDatetime": "2026-01-01 00:00",
+      "activePower": 0,
+      "reactivePower": 0
+    },
+    {
+      "startDatetime": "2026-01-01 00:00",
+      "endDatetime": "2026-01-01 00:00",
+      "activePower": 0,
+      "reactivePower": 0
+    },
+    {
+      "startDatetime": "2026-01-01 00:00",
+      "endDatetime": "2026-01-01 00:00",
+      "activePower": 0,
+      "reactivePower": 0
+    },
+    {
+      "startDatetime": "2026-01-01 00:00",
+      "endDatetime": "2026-01-01 00:00",
+      "activePower": 0,
+      "reactivePower": 0
+    },
+    {
+      "startDatetime": "2026-01-01 00:00",
+      "endDatetime": "2026-01-01 00:00",
+      "activePower": 0,
+      "reactivePower": 0
+    },
+    {
+      "startDatetime": "2026-01-01 00:00",
+      "endDatetime": "2026-01-01 00:00",
+      "activePower": 0,
+      "reactivePower": 0
+    },
+    {
+      "startDatetime": "2026-01-01 00:00",
+      "endDatetime": "2026-01-01 00:00",
+      "activePower": 0,
+      "reactivePower": 0
+    },
+    {
+      "startDatetime": "2026-01-01 00:00",
+      "endDatetime": "2026-01-01 00:00",
+      "activePower": 0,
+      "reactivePower": 0
+    },
+    {
+      "startDatetime": "2026-01-01 00:00",
+      "endDatetime": "2026-01-01 00:00",
+      "activePower": 0,
+      "reactivePower": 0
+    },
+    {
+      "startDatetime": "2026-01-01 00:00",
+      "endDatetime": "2026-01-01 00:00",
+      "activePower": 0,
+      "reactivePower": 0
+    },
+    {
+      "startDatetime": "2026-01-01 00:00",
+      "endDatetime": "2026-01-01 00:00",
+      "activePower": 0,
+      "reactivePower": 0
+    },
+    {
+      "startDatetime": "2026-01-01 00:00",
+      "endDatetime": "2026-01-01 00:00",
+      "activePower": 0,
+      "reactivePower": 0
+    },
+    {
+      "startDatetime": "2026-01-01 00:00",
+      "endDatetime": "2026-01-01 00:00",
+      "activePower": 0,
+      "reactivePower": 0
+    }
+  ]
+}

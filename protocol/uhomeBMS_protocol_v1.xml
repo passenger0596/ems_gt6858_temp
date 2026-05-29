@@ -1,0 +1,188 @@
+<?xml version='1.0' encoding='utf-8'?>
+<uhomeBMS_protocol_v1 device="uhomeBMS">
+	<function_code01 code="0x01" description="Read Coils" />
+	<function_code02 code="0x02" description="Read Discrete Input" />
+	<function_code03 code="0x03" description="Read Holding Registers" />
+	<function_code04 code="0x04" description="Read Input Registers">
+		<iRegister address="1" name="电池系统电压" datatype="UINT16" unit="V" mag="100.0" offset="0.0" />
+		<iRegister address="2" name="电池系统电流" datatype="INT16" unit="A" mag="10.0" offset="0.0" />
+		<iRegister address="3" name="电池平均温度" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<iRegister address="4" name="电池SOC" datatype="UINT16" unit="%" mag="1.0" offset="0.0" />
+		<iRegister address="5" name="电池SOH" datatype="UINT16" unit="%" mag="1.0" offset="0.0" />
+		<iRegister address="6" name="最大单体电压" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="7" name="最小单体电压" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="8" name="最大单体电压序号" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="9" name="最小单体电压序号" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="10" name="电池最高温度" datatype="INT16" unit="℃" mag="10.0" offset="50.0" />
+		<iRegister address="11" name="电池最低温度" datatype="INT16" unit="℃" mag="10.0" offset="50.0" />
+		<iRegister address="12" name="电池最高温度序号" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="13" name="电池最低温度序号" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="14" name="电池充电电压限值" datatype="UINT16" unit="V" mag="10.0" offset="0.0" />
+		<iRegister address="15" name="电池最大充电电流" datatype="INT16" unit="A" mag="10.0" offset="0.0" />
+		<iRegister address="16" name="电池放电电压限值" datatype="UINT16" unit="V" mag="10.0" offset="0.0" />
+		<iRegister address="17" name="电池最大放电电流" datatype="INT16" unit="A" mag="10.0" offset="0.0" />
+		<iRegister address="18" name="电池剩余电量" datatype="UINT16" unit="kWh" mag="10.0" offset="0.0" />
+		<iRegister address="19" name="充电使能" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="20" name="放电使能" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="21" name="强制充电使能" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="22" name="充满电使能" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="23" name="继电器1开关状态" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="24" name="继电器2开关状态" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="25" name="SOC校准" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="26" name="紧急充电" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="27" name="单体电压1" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="28" name="单体电压2" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="29" name="单体电压3" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="30" name="单体电压4" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="31" name="单体电压5" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="32" name="单体电压6" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="33" name="单体电压7" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="34" name="单体电压8" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="35" name="单体电压9" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="36" name="单体电压10" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="37" name="单体电压11" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="38" name="单体电压12" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="39" name="单体电压13" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="40" name="单体电压14" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="41" name="单体电压15" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="42" name="单体电压16" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="43" name="单体电压17" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="44" name="单体电压18" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="45" name="单体电压19" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="46" name="单体电压20" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="47" name="单体电压21" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="48" name="单体电压22" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="49" name="单体电压23" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="50" name="单体电压24" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="51" name="单体电压25" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="52" name="单体电压26" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="53" name="单体电压27" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="54" name="单体电压28" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="55" name="单体电压29" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="56" name="单体电压30" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="57" name="单体电压31" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="58" name="单体电压32" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="59" name="单体电压33" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="60" name="单体电压34" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="61" name="单体电压35" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="62" name="单体电压36" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="63" name="单体电压37" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="64" name="单体电压38" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="65" name="单体电压39" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="66" name="单体电压40" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="67" name="单体电压41" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="68" name="单体电压42" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="69" name="单体电压43" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="70" name="单体电压44" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="71" name="单体电压45" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="72" name="单体电压46" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="73" name="单体电压47" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="74" name="单体电压48" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="75" name="单体电压49" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="76" name="单体电压50" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="77" name="单体电压51" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="78" name="单体电压52" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="79" name="单体电压53" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="80" name="单体电压54" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="81" name="单体电压55" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="82" name="单体电压56" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="83" name="单体电压57" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="84" name="单体电压58" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="85" name="单体电压59" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="86" name="单体电压60" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="87" name="单体电压61" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="88" name="单体电压62" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="89" name="单体电压63" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="90" name="单体电压64" datatype="UINT16" unit="V" mag="1000.0" offset="0.0" />
+		<iRegister address="91" name="单体温度1" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="92" name="单体温度2" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="93" name="单体温度3" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="94" name="单体温度4" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="95" name="单体温度5" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="96" name="单体温度6" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="97" name="单体温度7" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="98" name="单体温度8" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="99" name="单体温度9" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="100" name="单体温度10" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="101" name="单体温度11" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="102" name="单体温度12" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="103" name="单体温度13" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="104" name="单体温度14" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="105" name="单体温度15" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="106" name="单体温度16" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="107" name="单体温度17" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="108" name="单体温度18" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="109" name="单体温度19" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="110" name="单体温度20" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="111" name="单体温度21" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="112" name="单体温度22" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="113" name="单体温度23" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="114" name="单体温度24" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="115" name="单体温度25" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="116" name="单体温度26" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="117" name="单体温度27" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="118" name="单体温度28" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="119" name="单体温度29" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="120" name="单体温度30" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="121" name="单体温度31" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="122" name="单体温度32" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="123" name="单体温度33" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="124" name="单体温度34" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="125" name="单体温度35" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="126" name="单体温度36" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="127" name="单体温度37" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="128" name="单体温度38" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="129" name="单体温度39" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="130" name="单体温度40" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="131" name="单体温度41" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="132" name="单体温度42" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="133" name="单体温度43" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="134" name="单体温度44" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="135" name="单体温度45" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="136" name="单体温度46" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="137" name="单体温度47" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="138" name="单体温度48" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="139" name="单体温度49" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="140" name="单体温度50" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="141" name="单体温度51" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="142" name="单体温度52" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="143" name="单体温度53" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="144" name="单体温度54" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="145" name="单体温度55" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="146" name="单体温度56" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="147" name="单体温度57" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="148" name="单体温度58" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="149" name="单体温度59" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="150" name="单体温度60" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="151" name="单体温度61" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="152" name="单体温度62" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="153" name="单体温度63" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+		<iRegister address="154" name="单体温度64" datatype="UINT16" unit="℃" mag="1.0" offset="50.0" />
+	</function_code04>
+	<function_code05 code="0x05" description="Write Single Coil" />
+	<function_code06 code="0x06" description="Write Single Registers" />
+	<dido code="" description="Parse dido">
+		<subdido name="放电过流一级" level="1" />
+		<subdido name="电池欠温一级" level="1" />
+		<subdido name="电池过温一级" level="1" />
+		<subdido name="电池欠压一级" level="1" />
+		<subdido name="电池过压一级" level="1" />
+		<subdido name="单体不均衡一级" level="1" />
+		<subdido name="BMS_Internal一级" level="1" />
+		<subdido name="充电过流一级" level="1" />
+		<subdido name="电池低温一级" level="1" />
+		<subdido name="单体过压一级" level="1" />
+		<subdido name="单体欠压一级" level="1" />
+		<subdido name="放电过流二级" level="2" />
+		<subdido name="电池欠温二级" level="2" />
+		<subdido name="电池过温二级" level="2" />
+		<subdido name="电池欠压二级" level="2" />
+		<subdido name="电池过压二级" level="2" />
+		<subdido name="单体不均衡二级" level="2" />
+		<subdido name="BMS_Internal二级" level="2" />
+		<subdido name="充电过流二级" level="2" />
+		<subdido name="电池低温二级" level="2" />
+		<subdido name="单体过压二级" level="2" />
+		<subdido name="单体欠压二级" level="2" />
+	</dido>
+</uhomeBMS_protocol_v1>

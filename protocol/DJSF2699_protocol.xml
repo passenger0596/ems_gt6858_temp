@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<DJSF2699_protocol device="DJSF2699">
+	<function_code01 code="0x01" description="Read Coils" />
+	<function_code02 code="0x02" description="Read Discrete Input" />
+	<function_code03 code="0x03" description="Read Holding Registers">
+		<hRegister address="0" name="1路电压" datatype="INT32" unit="V" mag="100" offset="0" />
+		<hRegister address="2" name="2路电压" datatype="INT32" unit="V" mag="100" offset="0" />
+		<hRegister address="4" name="1路电流" datatype="INT32" unit="A" mag="1000" offset="0" />
+		<hRegister address="6" name="2路电流" datatype="INT32" unit="A" mag="1000" offset="0" />
+		<hRegister address="8" name="1路功率" datatype="INT32" unit="W" mag="10" offset="0" />
+		<hRegister address="10" name="2路功率" datatype="INT32" unit="W" mag="10" offset="0" />
+		<hRegister address="12" name="1路电能" datatype="UINT32" unit="kWh" mag="100" offset="0" />
+		<hRegister address="14" name="2路电能" datatype="UINT32" unit="kWh" mag="100" offset="0" />
+		<hRegister address="8000" name="第一路正向电能" datatype="UINT64" unit="kWh" mag="10000" offset="0" />
+		<hRegister address="8004" name="第一路反向电能" datatype="UINT64" unit="kWh" mag="10000" offset="0" />
+		<hRegister address="8136" name="第二路正向电能" datatype="UINT64" unit="kWh" mag="10000" offset="0" />
+		<hRegister address="8140" name="第二路正向电能" datatype="UINT64" unit="kWh" mag="10000" offset="0" />
+	</function_code03>
+	<function_code04 code="0x04" description="Read Input Registers" />
+	<function_code05 code="0x05" description="Write Single Coil" />
+	<function_code06 code="0x06" description="Write Single Registers" />
+	<dido code="" description="Parse dido" />
+</DJSF2699_protocol>

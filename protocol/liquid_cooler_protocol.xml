@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='utf-8'?>
+<liquid_cooler_protocol device="liquid_cooler">
+	<function_code01 code="0x01" description="Read Coils" />
+	<function_code02 code="0x02" description="Read Discrete Input" />
+	<function_code03 code="0x03" description="Read Holding Registers">
+		<hRegister address="200" name="液冷机组控制模式" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="201" name="机组开关使能" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="205" name="机组设定温度" datatype="FLOAT" unit="℃" mag="10.0" offset="0.0" />
+	</function_code03>
+	<function_code04 code="0x04" description="Read Input Registers">
+		<iRegister address="0" name="水泵运行状态" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="1" name="#1压缩机运行状态" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="2" name="#2压缩机运行状态" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="3" name="电加热运行状态" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="4" name="冷凝风机运行状态" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="5" name="机组出水温度" datatype="FLOAT" unit="℃" mag="10.0" offset="0.0" />
+		<iRegister address="6" name="机组回水温度" datatype="FLOAT" unit="℃" mag="10.0" offset="0.0" />
+		<iRegister address="7" name="机组出水压力" datatype="FLOAT" unit="bar" mag="100.0" offset="0.0" />
+		<iRegister address="8" name="机组回水压力" datatype="FLOAT" unit="bar" mag="100.0" offset="0.0" />
+		<iRegister address="9" name="机组外环境温度" datatype="FLOAT" unit="℃" mag="10.0" offset="0.0" />
+		<iRegister address="10" name="补液水泵状态" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="11" name="故障告警代码" datatype="INT" unit="" mag="1.0" offset="0.0" />
+	</function_code04>
+	<function_code05 code="0x05" description="Write Single Coil" />
+	<function_code06 code="0x06" description="Write Single Registers" />
+	<dido code="" description="Parse dido">
+		<subdido name="参数错误故障(控制板)" level="1" />
+		<subdido name="输入相序检测故障" level="1" />
+		<subdido name="三相检测缺相故障" level="1" />
+		<subdido name="超速保护" level="1" />
+		<subdido name="回水温度传感器故障" level="1" />
+		<subdido name="出水温度传感器故障" level="1" />
+		<subdido name="外环境温度传感器故障" level="1" />
+		<subdido name="排气温度传感器故障" level="1" />
+		<subdido name="吸气温度传感器故障" level="1" />
+		<subdido name="485通讯故障" level="1" />
+		<subdido name="主板与驱动板通讯故障" level="1" />
+		<subdido name="出水压力传感器故障" level="1" />
+		<subdido name="进水压力传感器故障" level="1" />
+		<subdido name="压机电流过流保护" level="1" />
+		<subdido name="进出水压差过小保护" level="1" />
+	</dido>
+</liquid_cooler_protocol>

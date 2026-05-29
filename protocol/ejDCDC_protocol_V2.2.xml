@@ -1,0 +1,195 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ejDCDC_protocol_V2.2 device="ejDCDC">
+	<function_code01 code="0x01" description="Read Coils" />
+	<function_code02 code="0x02" description="Read Discrete Input" />
+	<function_code03 code="0x03" description="Read Holding Registers">
+		<hRegister address="24576" name="DSP版本V" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24577" name="DSP版本B" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24578" name="DSP版本D" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24579" name="CPLD版本V" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24580" name="CPLD版本B" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24581" name="CPLD版本D" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24582" name="工作状态" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24583" name="散热器温度" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<hRegister address="24584" name="高压侧总电压" datatype="INT16" unit="V" mag="10.0" offset="0.0" />
+		<hRegister address="24585" name="高压侧正母线电压" datatype="INT16" unit="V" mag="10.0" offset="0.0" />
+		<hRegister address="24586" name="高压侧负母线电压" datatype="INT16" unit="V" mag="10.0" offset="0.0" />
+		<hRegister address="24587" name="高压侧正负母线压差" datatype="INT16" unit="V" mag="10.0" offset="0.0" />
+		<hRegister address="24588" name="低压侧电压" datatype="INT16" unit="V" mag="10.0" offset="0.0" />
+		<hRegister address="24589" name="低压侧电流" datatype="INT16" unit="A" mag="10.0" offset="0.0" />
+		<hRegister address="24590" name="低压侧直流功率" datatype="INT16" unit="kW" mag="10.0" offset="0.0" />
+		<hRegister address="24591" name="模块环境温度" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<hRegister address="24592" name="环境温度限额功率" datatype="INT16" unit="kW" mag="10.0" offset="0.0" />
+		<hRegister address="24594" name="除湿模式运行标志" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24595" name="正对地绝缘电阻" datatype="INT16" unit="kΩ" mag="1.0" offset="0.0" />
+		<hRegister address="24596" name="负对地绝缘电阻" datatype="INT16" unit="kΩ" mag="1.0" offset="0.0" />
+		<hRegister address="24597" name="绝缘检测运行时间" datatype="INT16" unit="s" mag="1.0" offset="0.0" />
+		<hRegister address="24598" name="绝缘检测运行标志" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24599" name="DCDC并机在线标志" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24600" name="DCDC并机故障标志" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24601" name="DCDC并机运行标志" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24602" name="模块地址" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24604" name="总充电电量低位" datatype="UINT16" unit="" mag="10.0" offset="0.0" />
+		<hRegister address="24605" name="总充电电量高位" datatype="UINT16" unit="" mag="10.0" offset="0.0" />
+		<hRegister address="24606" name="总放电电量低位" datatype="UINT16" unit="" mag="10.0" offset="0.0" />
+		<hRegister address="24607" name="总放电电量高位" datatype="UINT16" unit="" mag="10.0" offset="0.0" />
+		<hRegister address="24608" name="硬件故障字1" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24609" name="硬件故障字2" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24610" name="DCDC故障字" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24611" name="高压侧故障字" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24612" name="并机故障字" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24613" name="系统故障字" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24614" name="开关故障字" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24615" name="其他故障字" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24618" name="日充电量" datatype="INT16" unit="kWh" mag="10.0" offset="0.0" />
+		<hRegister address="24619" name="日放电量" datatype="INT16" unit="kWh" mag="10.0" offset="0.0" />
+		<hRegister address="24832" name="低压侧恒压充电电压设置值" datatype="UINT16" unit="V" mag="10.0" offset="0.0" />
+		<hRegister address="24833" name="低压侧过压保护点" datatype="UINT16" unit="V" mag="10.0" offset="0.0" />
+		<hRegister address="24834" name="低压侧欠压保护点" datatype="UINT16" unit="V" mag="10.0" offset="0.0" />
+		<hRegister address="24835" name="高压侧恒压充电电压设置值" datatype="UINT16" unit="V" mag="10.0" offset="0.0" />
+		<hRegister address="24836" name="高压侧过压保护点" datatype="UINT16" unit="V" mag="10.0" offset="0.0" />
+		<hRegister address="24837" name="高压侧欠压保护点" datatype="UINT16" unit="V" mag="10.0" offset="0.0" />
+		<hRegister address="24838" name="下设充放电功率" datatype="INT16" unit="kW" mag="10.0" offset="0.0" />
+		<hRegister address="24839" name="下设充放电电流（默认）" datatype="INT16" unit="A" mag="10.0" offset="0.0" />
+		<hRegister address="24840" name="光伏板开口电压设置" datatype="UINT16" unit="V" mag="10.0" offset="0.0" />
+		<hRegister address="24841" name="模块自启动使能" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24842" name="模块开关机设置" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24843" name="硬件调试命令" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24844" name="DCDC运行模式设置" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24845" name="DCDC模块最大功率限定" datatype="UINT16" unit="kW" mag="10.0" offset="0.0" />
+		<hRegister address="24846" name="DCDC模块最大电流限定" datatype="UINT16" unit="A" mag="10.0" offset="0.0" />
+		<hRegister address="24847" name="PC控制命令" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24853" name="控制配置字" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24854" name="EMS控单次绝缘检测使能" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24855" name="绝缘检测启动电压设置" datatype="INT16" unit="" mag="10.0" offset="0.0" />
+		<hRegister address="24856" name="绝缘检测自动检测使能位" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24859" name="并机数量设置" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24860" name="并机主从机设置" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24861" name="DCDC快速模式设置" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24864" name="硬件故障字屏蔽字1" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24865" name="硬件故障字屏蔽字2" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24866" name="DCDC故障字屏蔽字" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24867" name="高压侧故障字屏蔽字" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24868" name="并机故障字屏蔽字" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24869" name="系统故障字屏蔽字" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24870" name="开关故障字屏蔽字" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="24871" name="其他故障字屏蔽字" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+	</function_code03>
+	<function_code04 code="0x04" description="Read Input Registers" />
+	<function_code05 code="0x05" description="Write Single Coil" />
+	<function_code06 code="0x06" description="Write Single Registers" />
+	<dido code="" description="Parse dido">
+		<subdido name="EPO故障标志" level="2" />
+		<subdido name="IGBTOCP标志" level="2" />
+		<subdido name="高压侧硬件过压标志" level="2" />
+		<subdido name="高压侧硬件过流标志" level="2" />
+		<subdido name="IGBT硬件过流标志" level="2" />
+		<subdido name="保留位0X6020.5" level="2" />
+		<subdido name="保留位0X6020.6" level="2" />
+		<subdido name="保留位0X6020.7" level="2" />
+		<subdido name="保留位0X6020.8" level="2" />
+		<subdido name="保留位0X6020.9" level="2" />
+		<subdido name="保留位0X6020.10" level="2" />
+		<subdido name="保留位0X6020.11" level="2" />
+		<subdido name="保留位0X6020.12" level="2" />
+		<subdido name="保留位0X6020.13" level="2" />
+		<subdido name="保留位0X6020.14" level="2" />
+		<subdido name="保留位0X6020.15" level="2" />
+		<subdido name="24V电源故障标志" level="2" />
+		<subdido name="风扇故障标志" level="2" />
+		<subdido name="连接故障标志" level="2" />
+		<subdido name="保留位0X6021.3" level="2" />
+		<subdido name="保留位0X6021.4" level="2" />
+		<subdido name="保留位0X6021.5" level="2" />
+		<subdido name="保留位0X6021.6" level="2" />
+		<subdido name="保留位0X6021.7" level="2" />
+		<subdido name="功率模块过温标志" level="2" />
+		<subdido name="保留位0X6021.9" level="2" />
+		<subdido name="15V辅源故障标志" level="2" />
+		<subdido name="保留位0X6021.11" level="2" />
+		<subdido name="保留位0X6021.12" level="2" />
+		<subdido name="保留位0X6021.13" level="2" />
+		<subdido name="保留位0X6021.14" level="2" />
+		<subdido name="保留位0X6021.15" level="2" />
+		<subdido name="预充电超时故障标志" level="2" />
+		<subdido name="保留位0X6022.1" level="2" />
+		<subdido name="保留位0X6022.2" level="2" />
+		<subdido name="保留位0X6022.3" level="2" />
+		<subdido name="保留位0X6022.4" level="2" />
+		<subdido name="保留位0X6022.5" level="2" />
+		<subdido name="保留位0X6022.6" level="2" />
+		<subdido name="保留位0X6022.7" level="2" />
+		<subdido name="保留位0X6022.8" level="2" />
+		<subdido name="低压侧A相软件过流标志" level="2" />
+		<subdido name="低压侧B相软件过流标志" level="2" />
+		<subdido name="低压侧C相软件过流标志" level="2" />
+		<subdido name="低压侧负端软件过流标志" level="2" />
+		<subdido name="模块内部短路故障标志" level="2" />
+		<subdido name="保留位0X6022.14" level="2" />
+		<subdido name="保留位0X6022.15" level="2" />
+		<subdido name="高压侧预充过压标志" level="2" />
+		<subdido name="高压侧极性反接故障标志" level="2" />
+		<subdido name="高压侧短路故障标志" level="2" />
+		<subdido name="保留位0X6023.3" level="2" />
+		<subdido name="高压侧运行过压标志" level="2" />
+		<subdido name="高压侧运行欠压标志" level="2" />
+		<subdido name="高压侧正负母线不平衡标志" level="2" />
+		<subdido name="保留位0X6023.7" level="2" />
+		<subdido name="保留位0X6023.8" level="2" />
+		<subdido name="保留位0X6023.9" level="2" />
+		<subdido name="保留位0X6023.10" level="2" />
+		<subdido name="保留位0X6023.11" level="2" />
+		<subdido name="保留位0X6023.12" level="2" />
+		<subdido name="保留位0X6023.13" level="2" />
+		<subdido name="保留位0X6023.14" level="2" />
+		<subdido name="保留位0X6023.15" level="2" />
+		<subdido name="保留位0X6024.0" level="2" />
+		<subdido name="与主机模式设置不匹配" level="2" />
+		<subdido name="保留位0X6024.2" level="2" />
+		<subdido name="保留位0X6024.3" level="2" />
+		<subdido name="保留位0X6024.4" level="2" />
+		<subdido name="保留位0X6024.5" level="2" />
+		<subdido name="保留位0X6024.6" level="2" />
+		<subdido name="保留位0X6024.7" level="2" />
+		<subdido name="保留位0X6024.8" level="2" />
+		<subdido name="保留位0X6024.9" level="2" />
+		<subdido name="保留位0X6024.10" level="2" />
+		<subdido name="保留位0X6024.11" level="2" />
+		<subdido name="保留位0X6024.12" level="2" />
+		<subdido name="保留位0X6024.13" level="2" />
+		<subdido name="保留位0X6024.14" level="2" />
+		<subdido name="保留位0X6024.15" level="2" />
+		<subdido name="保留位0X6025.0" level="2" />
+		<subdido name="控制板EEROM故障标志位" level="2" />
+		<subdido name="保留位0X6025.2" level="2" />
+		<subdido name="保留位0X6025.3" level="2" />
+		<subdido name="保留位0X6025.4" level="2" />
+		<subdido name="保留位0X6025.5" level="2" />
+		<subdido name="保留位0X6025.6" level="2" />
+		<subdido name="保留位0X6025.7" level="2" />
+		<subdido name="保留位0X6025.8" level="2" />
+		<subdido name="保留位0X6025.9" level="2" />
+		<subdido name="保留位0X6025.10" level="2" />
+		<subdido name="保留位0X6025.11" level="2" />
+		<subdido name="保留位0X6025.12" level="2" />
+		<subdido name="保留位0X6025.13" level="2" />
+		<subdido name="从机CAN通信故障标志位" level="2" />
+		<subdido name="与EMS通信故障标志位" level="2" />
+		<subdido name="绝缘电阻过低故障" level="2" />
+		<subdido name="保留位0X6027.1" level="2" />
+		<subdido name="保留位0X6027.2" level="2" />
+		<subdido name="保留位0X6027.3" level="2" />
+		<subdido name="低压侧欠压" level="2" />
+		<subdido name="保留位0X6027.5" level="2" />
+		<subdido name="软件瞬态过流" level="2" />
+		<subdido name="保留位0X6027.7" level="2" />
+		<subdido name="保留位0X6027.8" level="2" />
+		<subdido name="保留位0X6027.9" level="2" />
+		<subdido name="低压侧过压" level="2" />
+		<subdido name="低压侧过流" level="2" />
+		<subdido name="低压侧极性反接" level="2" />
+		<subdido name="保留位0X6027.13" level="2" />
+		<subdido name="保留位0X6027.14" level="2" />
+		<subdido name="保留位0X6027.15" level="2" />
+	</dido>
+</ejDCDC_protocol_V2.2>

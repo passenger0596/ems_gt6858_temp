@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hydrogen_sensor_protocol device="hydrogen_sensor">
+	<function_code01 code="0x01" description="Read Coils" />
+	<function_code02 code="0x02" description="Read Discrete Input" />
+	<function_code03 code="0x03" description="Read Holding Registers">
+		<hRegister address="0" name="氢气浓度" datatype="FLOAT" unit="%LEL" mag="100.0" offset="0.0" />
+		<hRegister address="1" name="小数点" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="2" name="单位" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="3" name="有效性" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="4" name="报警状态" datatype="INT" unit="" mag="1.0" offset="0.0" />
+	</function_code03>
+	<function_code04 code="0x04" description="Read Input Registers" />
+	<function_code05 code="0x05" description="Write Single Coil" />
+	<function_code06 code="0x06" description="Write Single Registers" />
+	<dido code="" description="Parse dido">
+		<subdido name="氢气浓度报警" level="2" />
+	</dido>
+</hydrogen_sensor_protocol>

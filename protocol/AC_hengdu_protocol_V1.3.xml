@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='utf-8'?>
+<AC_hengdu_protocol_V1.3 device="AC_hengdu">
+	<function_code01 code="0x01" description="Read Coils">
+		<coil address="0" name="机组运行状态" datatype="bool" unit="" />
+		<coil address="1" name="自检状态" datatype="bool" unit="" />
+		<coil address="2" name="制冷运行状态" datatype="bool" unit="" />
+		<coil address="3" name="制热运行状态" datatype="bool" unit="" />
+		<coil address="4" name="内风机运行状态" datatype="bool" unit="" />
+		<coil address="5" name="外风机运行状态" datatype="bool" unit="" />
+		<coil address="6" name="除湿状态" datatype="bool" unit="" />
+		<coil address="7" name="排氢运行状态" datatype="bool" unit="" />
+		<coil address="8" name="预留" datatype="bool" unit="" />
+		<coil address="9" name="干接点告警输出状态" datatype="bool" unit="" />
+	</function_code01>
+	<function_code02 code="0x02" description="Read Discrete Input">
+		<di address="0" name="柜内温度传感器故障" datatype="bool" unit="" />
+		<di address="1" name="冷凝盘管温度传感器故障" datatype="bool" unit="" />
+		<di address="2" name="柜外温度传感器故障" datatype="bool" unit="" />
+		<di address="3" name="湿度传感器故障" datatype="bool" unit="" />
+		<di address="4" name="压缩机欠流告警" datatype="bool" unit="" />
+		<di address="5" name="压缩机过流告警" datatype="bool" unit="" />
+		<di address="6" name="加热器欠流告警" datatype="bool" unit="" />
+		<di address="7" name="加热器过流告警" datatype="bool" unit="" />
+		<di address="8" name="内风机告警" datatype="bool" unit="" />
+		<di address="9" name="外风机告警" datatype="bool" unit="" />
+		<di address="10" name="高压力告警" datatype="bool" unit="" />
+		<di address="11" name="低压力告警" datatype="bool" unit="" />
+		<di address="12" name="柜内高温告警" datatype="bool" unit="" />
+		<di address="13" name="柜内低温告警" datatype="bool" unit="" />
+		<di address="14" name="柜外高温告警" datatype="bool" unit="" />
+		<di address="15" name="柜外低温告警" datatype="bool" unit="" />
+		<di address="16" name="预留" datatype="bool" unit="" />
+		<di address="17" name="外部输入（门禁）告警" datatype="bool" unit="" />
+		<di address="18" name="预留" datatype="bool" unit="" />
+		<di address="19" name="预留" datatype="bool" unit="" />
+		<di address="20" name="蒸发盘管温度传感器故障" datatype="bool" unit="" />
+		<di address="21" name="高湿告警" datatype="bool" unit="" />
+		<di address="22" name="低电压告警" datatype="bool" unit="" />
+		<di address="23" name="高电压告警" datatype="bool" unit="" />
+		<di address="24" name="变频压缩机故障" datatype="bool" unit="" />
+		<di address="25" name="预留" datatype="bool" unit="" />
+		<di address="26" name="预留" datatype="bool" unit="" />
+		<di address="27" name="蒸发器冻结告警" datatype="bool" unit="" />
+		<di address="28" name="高压力频繁告警" datatype="bool" unit="" />
+		<di address="29" name="低压力频繁告警" datatype="bool" unit="" />
+		<di address="30" name="冷凝高温告警" datatype="bool" unit="" />
+		<di address="31" name="制冷剂泄漏告警" datatype="bool" unit="" />
+		<di address="32" name="变频压缩机通信故障" datatype="bool" unit="" />
+	</function_code02>
+	<function_code03 code="0x03" description="Read Holding Registers">
+		<hRegister address="0" name="制冷设定温度" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<hRegister address="1" name="制冷回差温度" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<hRegister address="2" name="制热启动温度" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<hRegister address="3" name="制热停止回差值" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<hRegister address="4" name="高温告警温度值" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<hRegister address="5" name="低温告警温度值" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<hRegister address="6" name="除湿开启湿度值" datatype="UINT16" unit="%" mag="10.0" offset="0.0" />
+		<hRegister address="7" name="除湿停止回差" datatype="UINT16" unit="%" mag="10.0" offset="0.0" />
+		<hRegister address="8" name="高湿告警值" datatype="UINT16" unit="%" mag="10.0" offset="0.0" />
+		<hRegister address="9" name="除湿使能" datatype="UINT16" unit="" mag="10.0" offset="0.0" />
+		<hRegister address="10" name="预留" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="11" name="预留" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="12" name="内风机提前运转温度" datatype="UINT16" unit="℃" mag="10.0" offset="0.0" />
+		<hRegister address="13" name="待机模式内风机状态" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="14" name="通信波特率" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="15" name="外部告警选项" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="16" name="排氢间隔时间" datatype="UINT16" unit="h" mag="1.0" offset="0.0" />
+		<hRegister address="17" name="排氢工作时间" datatype="UINT16" unit="min" mag="1.0" offset="0.0" />
+		<hRegister address="18" name="电压告警高限 (可选)" datatype="UINT16" unit="V" mag="10.0" offset="0.0" />
+		<hRegister address="19" name="电压告警低限 (可选)" datatype="UINT16" unit="V" mag="10.0" offset="0.0" />
+		<hRegister address="20" name="设备通信地址" datatype="UINT16" unit="" mag="1.0" offset="0.0" />
+	</function_code03>
+	<function_code04 code="0x04" description="Read Input Registers">
+		<iRegister address="0" name="回风温度" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<iRegister address="1" name="冷凝盘管温度" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<iRegister address="2" name="压缩机/加热器电流" datatype="UINT16" unit="A" mag="100.0" offset="0.0" />
+		<iRegister address="3" name="内风机电流" datatype="UINT16" unit="A" mag="100.0" offset="0.0" />
+		<iRegister address="4" name="外风机电流" datatype="UINT16" unit="A" mag="100.0" offset="0.0" />
+		<iRegister address="5" name="电源电压" datatype="UINT16" unit="V" mag="10.0" offset="0.0" />
+		<iRegister address="6" name="柜外环境温度" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<iRegister address="7" name="柜内湿度" datatype="UINT16" unit="%" mag="10.0" offset="0.0" />
+		<iRegister address="8" name="蒸发盘管温度" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<iRegister address="9" name="内风机转速" datatype="UINT16" unit="RPM" mag="1.0" offset="0.0" />
+		<iRegister address="10" name="外风机转速" datatype="UINT16" unit="RPM" mag="1.0" offset="0.0" />
+		<iRegister address="11" name="变频压缩机转速" datatype="UINT16" unit="RPM" mag="1.0" offset="0.0" />
+	</function_code04>
+	<function_code05 code="0x05" description="Write Single Coil" />
+	<function_code06 code="0x06" description="Write Single Registers" />
+	<dido code="" description="Parse dido">
+		<subdido name="冷凝盘管温度传感器故障" level="1" />
+		<subdido name="柜外温度传感器故障" level="1" />
+		<subdido name="湿度传感器故障" level="1" />
+		<subdido name="压缩机欠流告警" level="1" />
+		<subdido name="压缩机过流告警" level="1" />
+		<subdido name="加热器欠流告警" level="1" />
+		<subdido name="加热器过流告警" level="1" />
+		<subdido name="内风机告警" level="1" />
+		<subdido name="外风机告警" level="1" />
+		<subdido name="高压力告警" level="1" />
+		<subdido name="低压力告警" level="1" />
+		<subdido name="柜内高温告警" level="1" />
+		<subdido name="柜内低温告警" level="1" />
+		<subdido name="柜外高温告警" level="1" />
+		<subdido name="柜外低温告警" level="1" />
+		<subdido name="预留" level="1" />
+		<subdido name="外部输入（门禁）告警" level="1" />
+		<subdido name="预留" level="1" />
+		<subdido name="预留" level="1" />
+		<subdido name="蒸发盘管温度传感器故障" level="1" />
+		<subdido name="高湿告警" level="1" />
+		<subdido name="低电压告警" level="1" />
+		<subdido name="高电压告警" level="1" />
+		<subdido name="变频压缩机故障" level="1" />
+		<subdido name="预留" level="1" />
+		<subdido name="预留" level="1" />
+		<subdido name="蒸发器冻结告警" level="1" />
+		<subdido name="高压力频繁告警" level="1" />
+		<subdido name="低压力频繁告警" level="1" />
+		<subdido name="冷凝高温告警" level="1" />
+		<subdido name="制冷剂泄漏告警" level="1" />
+		<subdido name="变频压缩机通信故障" level="1" />
+	</dido>
+</AC_hengdu_protocol_V1.3>

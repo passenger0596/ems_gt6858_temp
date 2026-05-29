@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<WEA1610_protocol device="WEA1610">
+	<function_code01 code="0x01" description="Read Coils" />
+	<function_code02 code="0x02" description="Read Discrete Input" />
+	<function_code03 code="0x03" description="Read Holding Registers">
+		<hRegister address="0" name="柜温" datatype="INT16" unit="℃" mag="1" offset="0" />
+		<hRegister address="1" name="风机温度" datatype="INT16" unit="℃" mag="1" offset="0" />
+		<hRegister address="2" name="加热继电器输出状态" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="3" name="报警状态" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="4" name="制冷设定温度" datatype="INT16" unit="℃" mag="1" offset="0" />
+		<hRegister address="5" name="回差温度值" datatype="INT16" unit="℃" mag="1" offset="0" />
+		<hRegister address="6" name="压缩机延时时间" datatype="UINT16" unit="S" mag="1" offset="0" />
+		<hRegister address="7" name="强制制冷时间" datatype="INT16" unit="min" mag="1" offset="0" />
+		<hRegister address="8" name="柜内温度校正" datatype="INT16" unit="℃" mag="1" offset="0" />
+		<hRegister address="9" name="设置温度最小值" datatype="INT16" unit="℃" mag="1" offset="0" />
+		<hRegister address="10" name="设置温度最大值" datatype="INT16" unit="℃" mag="1" offset="0" />
+		<hRegister address="11" name="加热设定温度值" datatype="INT16" unit="℃" mag="1" offset="0" />
+		<hRegister address="12" name="低温报警值" datatype="INT16" unit="℃" mag="1" offset="0" />
+		<hRegister address="13" name="高温报警值" datatype="INT16" unit="℃" mag="1" offset="0" />
+		<hRegister address="14" name="从机地址" datatype="UINT16" unit="" mag="1" offset="0" />
+	</function_code03>
+	<function_code04 code="0x04" description="Read Input Registers" />
+	<function_code05 code="0x05" description="Write Single Coil" />
+	<function_code06 code="0x06" description="Write Single Registers" />
+	<dido code="" description="Parse dido">
+		<subdido name="报警状态" level="1" />
+		<subdido name="低温报警" level="1" />
+		<subdido name="高温报警" level="1" />
+	</dido>
+</WEA1610_protocol>

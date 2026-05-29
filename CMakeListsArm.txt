@@ -1,0 +1,128 @@
+cmake_minimum_required(VERSION 3.10)
+project(hello_modbus_server LANGUAGES CXX)
+
+# ==================== C++ 标准 ====================
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# ==================== 编译选项 ====================
+# 抑制 GCC 7.1 ABI 兼容性警告（来自 nlohmann/json 和 STL 容器）
+add_compile_options(-Wno-psabi)
+
+# ==================== 交叉编译工具链 ====================
+set(ARM_TOOLCHAIN_PREFIX "arm-htnice-linux-gnueabihf")
+
+set(CMAKE_C_COMPILER   ${ARM_TOOLCHAIN_PREFIX}-gcc)
+set(CMAKE_CXX_COMPILER ${ARM_TOOLCHAIN_PREFIX}-g++)
+
+set(CMAKE_SYSTEM_NAME    Linux)
+set(CMAKE_SYSTEM_PROCESSOR arm)
+
+# ==================== libmodbus 路径（开发机） ====================
+set(MODBUS_ROOT $ENV{HOME}/arm-modbus)
+set(HIREDIS_ROOT $ENV{HOME}/hiredis-arm)
+
+# ==================== 输出目录 ====================
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+file(MAKE_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
+# ==================== 可执行文件 ====================
+# 方式一：使用 GLOB_RECURSE 自动查找所有源文件（不推荐，可能会有意外文件被包含）
+# file(GLOB_RECURSE PROJECT_SOURCES 
+#     "${CMAKE_SOURCE_DIR}/src/*.cpp"
+# )
+
+# 手动指定源文件列表，方便自定义编译哪些文件
+
+# 主程序入口
+set(MAIN_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/main.cpp
+)
+
+# 设备驱动层
+set(DEVICE_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/devices/acmeter_3366.cpp
+    ${CMAKE_SOURCE_DIR}/src/devices/dcdc.cpp
+    ${CMAKE_SOURCE_DIR}/src/devices/devicemanager.cpp
+    ${CMAKE_SOURCE_DIR}/src/devices/ems.cpp
+    ${CMAKE_SOURCE_DIR}/src/devices/iomodule.cpp
+    ${CMAKE_SOURCE_DIR}/src/devices/pcs.cpp
+    # ${CMAKE_SOURCE_DIR}/src/devices/pcs_15am.cpp
+)
+
+# 控制策略层
+set(CONTROL_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/control/ejdcdc.cpp
+    ${CMAKE_SOURCE_DIR}/src/control/ejpcscmd.cpp
+    ${CMAKE_SOURCE_DIR}/src/control/iomodulecmd.cpp
+    ${CMAKE_SOURCE_DIR}/src/control/qtcontroller.cpp
+    ${CMAKE_SOURCE_DIR}/src/control/strategy.cpp
+    ${CMAKE_SOURCE_DIR}/src/control/xmcooler.cpp
+)
+
+# 工具类
+set(UTILS_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/utils/log.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/modbusclient.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/modbusserver.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/unixsocketserver.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/utils.cpp
+)
+
+# Modbus 透传功能（可选，注释掉则不编译）
+# set(PASSTHROUGH_SOURCES
+#     ${CMAKE_SOURCE_DIR}/src/utils/modbuspassthrough.cpp
+# )
+
+# 示例程序（默认不编译，需要时取消注释）
+# set(EXAMPLE_SOURCES
+#     ${CMAKE_SOURCE_DIR}/src/examples/modbus_passthrough_demo.cpp
+#     ${CMAKE_SOURCE_DIR}/src/examples/modbus_passthrough_production.cpp
+# )
+
+# 添加 pugixml 源文件
+set(PUGIXML_SRC "/home/boring/arm-modbus/include/pugixml/src/pugixml.cpp")
+
+# 组合所有源文件（根据需要注释/取消注释某些模块）
+set(PROJECT_SOURCES
+    ${MAIN_SOURCES}
+    ${DEVICE_SOURCES}
+    ${CONTROL_SOURCES}
+    ${UTILS_SOURCES}
+    # ${PASSTHROUGH_SOURCES}      # 取消注释以启用透传功能
+    # ${EXAMPLE_SOURCES}          # 取消注释以编译示例程序
+    ${PUGIXML_SRC}
+)
+
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
+
+# ==================== ✅ 静态链接 libmodbus ====================
+# 方式一（最稳妥，推荐）
+target_link_libraries(${PROJECT_NAME}
+    ${MODBUS_ROOT}/lib/libmodbus.a
+    ${HIREDIS_ROOT}/lib/libhiredis.a  # 静态链接 hiredis
+    pthread
+    m
+)
+
+# ==================== 可选：静态链接 C++ 运行库 ====================
+# 如果你仍担心 GLIBCXX 问题，可打开这一行
+# target_link_options(${PROJECT_NAME} PRIVATE -static-libstdc++)
+
+# ==================== 头文件 ====================
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${MODBUS_ROOT}/include
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/include/devices
+    ${CMAKE_SOURCE_DIR}/include/nlohmann
+    ${CMAKE_SOURCE_DIR}/include/pugixml
+    ${CMAKE_SOURCE_DIR}/include/settings
+    ${CMAKE_SOURCE_DIR}/include/utils
+    ${CMAKE_SOURCE_DIR}/include/control
+    ${HIREDIS_ROOT}/include  # hiredis 头文件
+)
+
+# ==================== 信息输出 ====================
+message(STATUS "Compiler: ${CMAKE_CXX_COMPILER}")
+message(STATUS "Modbus static lib: ${MODBUS_ROOT}/lib/libmodbus.a")
+message(STATUS "Output: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")

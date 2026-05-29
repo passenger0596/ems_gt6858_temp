@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='utf-8'?>
+<DTSD3366D_protocol device="DTSD3366D">
+	<function_code01 code="0x01" description="Read Coils" />
+	<function_code02 code="0x02" description="Read Discrete Input" />
+	<function_code03 code="0x03" description="Read Holding Registers">
+		<hRegister address="366" name="A相电压" datatype="UINT32" unit="V" mag="10000" offset="0" />
+		<hRegister address="368" name="B相电压" datatype="UINT32" unit="V" mag="10000" offset="0" />
+		<hRegister address="370" name="C相电压" datatype="UINT32" unit="V" mag="10000" offset="0" />
+		<hRegister address="372" name="A相电流" datatype="UINT32" unit="A" mag="10000" offset="0" />
+		<hRegister address="374" name="B相电流" datatype="UINT32" unit="A" mag="10000" offset="0" />
+		<hRegister address="376" name="C相电流" datatype="UINT32" unit="A" mag="10000" offset="0" />
+		<hRegister address="378" name="有功总功率" datatype="INT32" unit="kW" mag="10000" offset="0" />
+		<hRegister address="380" name="A相有功总功率" datatype="INT32" unit="kW" mag="10000" offset="0" />
+		<hRegister address="382" name="B相有功总功率" datatype="INT32" unit="kW" mag="10000" offset="0" />
+		<hRegister address="384" name="C相有功总功率" datatype="INT32" unit="kW" mag="10000" offset="0" />
+		<hRegister address="386" name="无功总功率" datatype="INT32" unit="kvar" mag="10000" offset="0" />
+		<hRegister address="388" name="A相无功总功率" datatype="INT32" unit="kvar" mag="10000" offset="0" />
+		<hRegister address="390" name="B相无功总功率" datatype="INT32" unit="kvar" mag="10000" offset="0" />
+		<hRegister address="392" name="C相无功总功率" datatype="INT32" unit="kvar" mag="10000" offset="0" />
+		<hRegister address="394" name="总视在功率" datatype="UINT32" unit="kVA" mag="10000" offset="0" />
+		<hRegister address="396" name="A相视在功率" datatype="UINT32" unit="kVA" mag="10000" offset="0" />
+		<hRegister address="398" name="B相视在功率" datatype="UINT32" unit="kVA" mag="10000" offset="0" />
+		<hRegister address="400" name="C相视在功率" datatype="UINT32" unit="kVA" mag="10000" offset="0" />
+		<hRegister address="402" name="总功率因数" datatype="INT16" unit="" mag="1000" offset="0" />
+		<hRegister address="403" name="A相功率因数" datatype="INT16" unit="" mag="1000" offset="0" />
+		<hRegister address="404" name="B相功率因数" datatype="INT16" unit="" mag="1000" offset="0" />
+		<hRegister address="405" name="C相功率因数" datatype="INT16" unit="" mag="1000" offset="0" />
+		<hRegister address="406" name="A相相角" datatype="UINT16" unit="°" mag="100" offset="0" />
+		<hRegister address="407" name="B相相角" datatype="UINT16" unit="°" mag="100" offset="0" />
+		<hRegister address="408" name="C相相角" datatype="UINT16" unit="°" mag="100" offset="0" />
+		<hRegister address="409" name="电网频率" datatype="UINT16" unit="Hz" mag="100" offset="0" />
+		<hRegister address="39424" name="组合有功总电能" datatype="FLOAT" unit="kWh" mag="100" offset="0" />
+		<hRegister address="39426" name="组合有功尖电能" datatype="FLOAT" unit="kWh" mag="100" offset="0" />
+		<hRegister address="39428" name="组合有功峰电能" datatype="FLOAT" unit="kWh" mag="100" offset="0" />
+		<hRegister address="39430" name="组合有功平电能" datatype="FLOAT" unit="kWh" mag="100" offset="0" />
+		<hRegister address="39432" name="组合有功谷电能" datatype="FLOAT" unit="kWh" mag="100" offset="0" />
+		<hRegister address="39434" name="正向有功总电能" datatype="FLOAT" unit="kWh" mag="100" offset="0" />
+		<hRegister address="39436" name="正向有功尖电能" datatype="FLOAT" unit="kWh" mag="100" offset="0" />
+		<hRegister address="39438" name="正向有功峰电能" datatype="FLOAT" unit="kWh" mag="100" offset="0" />
+		<hRegister address="39440" name="正向有功平电能" datatype="FLOAT" unit="kWh" mag="100" offset="0" />
+		<hRegister address="39442" name="正向有功谷电能" datatype="FLOAT" unit="kWh" mag="100" offset="0" />
+		<hRegister address="39444" name="反向有功总电能" datatype="FLOAT" unit="kWh" mag="100" offset="0" />
+		<hRegister address="39446" name="反向有功尖电能" datatype="FLOAT" unit="kWh" mag="100" offset="0" />
+		<hRegister address="39448" name="反向有功峰电能" datatype="FLOAT" unit="kWh" mag="100" offset="0" />
+		<hRegister address="39450" name="反向有功平电能" datatype="FLOAT" unit="kWh" mag="100" offset="0" />
+		<hRegister address="39452" name="反向有功谷电能" datatype="FLOAT" unit="kWh" mag="100" offset="0" />
+		<hRegister address="39454" name="组合无功1总电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39456" name="组合无功1尖电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39458" name="组合无功1峰电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39460" name="组合无功1平电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39462" name="组合无功1谷电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39464" name="组合无功2总电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39466" name="组合无功2尖电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39468" name="组合无功2峰电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39470" name="组合无功2平电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39472" name="组合无功2谷电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39474" name="一象限无功总电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39476" name="一象限无功尖电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39478" name="一象限无功峰电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39480" name="一象限无功平电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39482" name="一象限无功谷电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39484" name="二象限无功总电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39486" name="二象限无功尖电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39488" name="二象限无功峰电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39490" name="二象限无功平电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39492" name="二象限无功谷电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39494" name="三象限无功总电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39496" name="三象限无功尖电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39498" name="三象限无功峰电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39500" name="三象限无功平电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39502" name="三象限无功谷电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39504" name="四象限无功总电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39506" name="四象限无功尖电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39508" name="四象限无功峰电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39510" name="四象限无功平电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39512" name="四象限无功谷电能" datatype="FLOAT" unit="kvarh" mag="100" offset="0" />
+		<hRegister address="39514" name="正向视在总电能" datatype="FLOAT" unit="kVAh" mag="100" offset="0" />
+		<hRegister address="39516" name="正向视在尖电能" datatype="FLOAT" unit="kVAh" mag="100" offset="0" />
+		<hRegister address="39518" name="正向视在峰电能" datatype="FLOAT" unit="kVAh" mag="100" offset="0" />
+		<hRegister address="39520" name="正向视在平电能" datatype="FLOAT" unit="kVAh" mag="100" offset="0" />
+		<hRegister address="39522" name="正向视在谷电能" datatype="FLOAT" unit="kVAh" mag="100" offset="0" />
+		<hRegister address="39524" name="反向视在总电能" datatype="FLOAT" unit="kVAh" mag="100" offset="0" />
+		<hRegister address="39526" name="反向视在尖电能" datatype="FLOAT" unit="kVAh" mag="100" offset="0" />
+		<hRegister address="39528" name="反向视在峰电能" datatype="FLOAT" unit="kVAh" mag="100" offset="0" />
+		<hRegister address="39530" name="反向视在平电能" datatype="FLOAT" unit="kVAh" mag="100" offset="0" />
+		<hRegister address="39532" name="反向视在谷电能" datatype="FLOAT" unit="kVAh" mag="100" offset="0" />
+	</function_code03>
+	<function_code04 code="0x04" description="Read Input Registers" />
+	<function_code05 code="0x05" description="Write Single Coil" />
+	<function_code06 code="0x06" description="Write Single Registers" />
+	<dido code="" description="Parse dido" />
+</DTSD3366D_protocol>

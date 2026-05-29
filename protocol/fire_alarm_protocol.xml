@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<fire_alarm_protocol device="fire_alarm">
+	<function_code01 code="0x01" description="Read Coils" />
+	<function_code02 code="0x02" description="Read Discrete Input" />
+	<function_code03 code="0x03" description="Read Holding Registers" />
+	<function_code04 code="0x04" description="Read Input Registers">
+		<iRegister address="4097" name="系统故障码" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="4098" name="系统预警最高等级" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="4099" name="系统启动类型" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="4100" name="探测器1：预警等级" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="4101" name="探测器1：故障码" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="4102" name="探测器1：启动类型" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="4103" name="探测器1：温度" datatype="INT" unit="℃" mag="1.0" offset="-50.0" />
+		<iRegister address="4104" name="探测器1：CO" datatype="INT" unit="ppm" mag="1.0" offset="0.0" />
+		<iRegister address="4105" name="探测器1：烟雾" datatype="INT" unit="db/m" mag="1.0" offset="0.0" />
+		<iRegister address="4106" name="探测器1：VOC" datatype="INT" unit="%" mag="1.0" offset="0.0" />
+		<iRegister address="4107" name="探测器2：预警等级" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="4108" name="探测器2：故障码" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="4109" name="探测器2：启动类型" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="4110" name="探测器2：温度" datatype="INT" unit="℃" mag="1.0" offset="-50.0" />
+		<iRegister address="4111" name="探测器2：CO" datatype="INT" unit="ppm" mag="1.0" offset="0.0" />
+		<iRegister address="4112" name="探测器2：烟雾" datatype="INT" unit="db/m" mag="1.0" offset="0.0" />
+		<iRegister address="4113" name="探测器2：VOC" datatype="INT" unit="%" mag="1.0" offset="0.0" />
+		<iRegister address="4114" name="探测器3：预警等级" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="4115" name="探测器3：故障码" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="4116" name="探测器3：启动类型" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="4117" name="探测器3：温度" datatype="INT" unit="℃" mag="1.0" offset="-50.0" />
+		<iRegister address="4118" name="探测器3：CO" datatype="INT" unit="ppm" mag="1.0" offset="0.0" />
+		<iRegister address="4119" name="探测器3：烟雾" datatype="INT" unit="db/m" mag="1.0" offset="0.0" />
+		<iRegister address="4120" name="探测器3：VOC" datatype="INT" unit="%" mag="1.0" offset="0.0" />
+		<iRegister address="4121" name="探测器4：预警等级" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="4122" name="探测器4：故障码" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="4123" name="探测器4：启动类型" datatype="INT" unit="" mag="1.0" offset="0.0" />
+		<iRegister address="4124" name="探测器4：温度" datatype="INT" unit="℃" mag="1.0" offset="-50.0" />
+		<iRegister address="4125" name="探测器4：CO" datatype="INT" unit="ppm" mag="1.0" offset="0.0" />
+		<iRegister address="4126" name="探测器4：烟雾" datatype="INT" unit="db/m" mag="1.0" offset="0.0" />
+		<iRegister address="4127" name="探测器4：VOC" datatype="INT" unit="%" mag="1.0" offset="0.0" />
+	</function_code04>
+	<function_code05 code="0x05" description="Write Single Coil" />
+	<function_code06 code="0x06" description="Write Single Registers" />
+	<dido code="" description="Parse dido">
+		<subdido name="系统预警最高等级" level="2" />
+		<subdido name="探测器1：预警等级" level="2" />
+		<subdido name="探测器2：预警等级" level="2" />
+		<subdido name="探测器3：预警等级" level="2" />
+		<subdido name="探测器4：预警等级" level="2" />
+	</dido>
+</fire_alarm_protocol>

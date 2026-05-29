@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dehumidifier_protocol device="dehumidifier">
+	<function_code01 code="0x01" description="Read Coils" />
+	<function_code02 code="0x02" description="Read Discrete Input" />
+	<function_code03 code="0x03" description="Read Holding Registers">
+		<hRegister address="0" name="当前温度" datatype="FLOAT" unit="℃" mag="10" offset="0" />
+		<hRegister address="1" name="当前湿度" datatype="FLOAT" unit="%" mag="10" offset="0" />
+		<hRegister address="2" name="湿度启动值" datatype="INT" unit="%" mag="1" offset="0" />
+		<hRegister address="3" name="湿度停止值" datatype="INT" unit="%" mag="1" offset="0" />
+		<hRegister address="4" name="加热启动值" datatype="INT" unit="℃" mag="1" offset="0" />
+		<hRegister address="5" name="温度报警值" datatype="INT" unit="℃" mag="1" offset="0" />
+		<hRegister address="6" name="湿度报警值" datatype="INT" unit="%" mag="1" offset="0" />
+		<hRegister address="7" name="加热状态" datatype="INT" unit="" mag="1" offset="0" />
+		<hRegister address="8" name="除湿机工作状态" datatype="INT" unit="" mag="1" offset="0" />
+		<hRegister address="9" name="除湿手自动切换" datatype="INT" unit="" mag="1" offset="0" />
+		<hRegister address="10" name="手动输出加湿" datatype="INT" unit="" mag="1" offset="0" />
+		<hRegister address="11" name="手动输出加热" datatype="INT" unit="" mag="1" offset="0" />
+		<hRegister address="12" name="超温提示" datatype="INT" unit="" mag="1" offset="0" />
+		<hRegister address="13" name="超湿提示" datatype="INT" unit="" mag="1" offset="0" />
+	</function_code03>
+	<function_code04 code="0x04" description="Read Input Registers" />
+	<function_code05 code="0x05" description="Write Single Coil" />
+	<function_code06 code="0x06" description="Write Single Registers" />
+	<dido code="" description="Parse dido" />
+</dehumidifier_protocol>

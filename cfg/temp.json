@@ -1,0 +1,16 @@
+{
+  "dcdc1": {"com": 4,"id": 6,"name":"dcdc1"},
+  "dcdc2": {"com": 4,"id": 6,"name":"dcdc2"},
+  "dcdc3": {"com": 4,"id": 6,"name":"dcdc3"},
+  "dcdc4": {"com": 4,"id": 6,"name":"dcdc4"},
+  "pcs1": {"com": 4,"id": 6,"name":"pcs1"},
+  "pcs2": {"com": 4,"id": 6,"name":"pcs2"},
+  "交流电表1":{"com": 4,"id": 6,"name":"ac_meter1"},
+  "交流电表2":{"com": 4,"id": 6,"name":"ac_meter2"},
+  "直流电表1":{"com": 4,"id": 6,"name":"dc_meter1"},
+  "直流电表2":{"com": 4,"id": 6,"name":"dc_meter2"},
+  "液冷机":{"com": 4,"id": 6,"name":"liquid_cooler1"},
+  "空调":{"com": 4,"id": 6,"name":"air_condition1"},
+  "烟雾传感器":{"com": 4,"id": 6,"name":"smoke_sensor1"},
+  "氢气传感器":{"com": 4,"id": 6,"name":"hydrogen_sersor1"}
+}

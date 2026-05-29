@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ems_dido device="ems_dido">
+	<function_code01 code="0x01" description="Read Coils" />
+	<function_code02 code="0x02" description="Read Discrete Input" />
+	<function_code03 code="0x03" description="Read Holding Registers">
+		<hRegister address="1" name="开机" datatype="BOOL" unit="" mag="1" offset="0" />
+		<hRegister address="2" name="系统运行模式" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="3" name="系统状态" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="4" name="系统告警等级" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="5" name="DI1" datatype="BOOL" unit="" mag="1" offset="0" />
+		<hRegister address="6" name="DI2" datatype="BOOL" unit="" mag="1" offset="0" />
+		<hRegister address="7" name="DI3" datatype="BOOL" unit="" mag="1" offset="0" />
+		<hRegister address="8" name="DI4" datatype="BOOL" unit="" mag="1" offset="0" />
+		<hRegister address="9" name="DO1" datatype="BOOL" unit="" mag="1" offset="0" />
+		<hRegister address="10" name="DO2" datatype="BOOL" unit="" mag="1" offset="0" />
+		<hRegister address="11" name="DO3" datatype="BOOL" unit="" mag="1" offset="0" />
+		<hRegister address="12" name="DO4" datatype="BOOL" unit="" mag="1" offset="0" />
+		<hRegister address="13" name="有功功率设置" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="14" name="系统故障复归" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="15" name="停止充电SOC" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="16" name="停止充电SOC回差" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="17" name="停止放电SOC" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="18" name="停止放电SOC回差" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="19" name="PCS额定功率" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="20" name="PCS最大充电功率" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="21" name="PCS最大放电功率" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="22" name="电网输入额定功率" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="23" name="电网输入最大功率" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="24" name="停止充电单体电压" datatype="FLOAT" unit="" mag="1" offset="0" />
+		<hRegister address="25" name="停止充电单体电压回差" datatype="FLOAT" unit="" mag="1" offset="0" />
+		<hRegister address="26" name="停止放电单体电压" datatype="FLOAT" unit="" mag="1" offset="0" />
+		<hRegister address="27" name="停止放电单体电压回差" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="28" name="停止充电电压" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="29" name="停止放电电压" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="30" name="使能SOC保护" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="31" name="使能单体电压保护" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="32" name="防逆流使能" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="33" name="防逆流死区" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="34" name="重过载治理功率" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="35" name="重过载确认时间" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="36" name="重过载调整间隔" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="37" name="重过载步长" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="38" name="重过载最大放电功率" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="39" name="重过载治理降点功率" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="40" name="补点允许功率" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="41" name="重载补点步长" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="42" name="补点降低点功率" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="43" name="补点最大充电功率" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="44" name="低电压确认阈值" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="45" name="低电压确认时间" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="46" name="低压治理调整间隔" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="47" name="无功调节步长" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="48" name="低压治理最大无功功率" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="49" name="有功调节步长" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="50" name="低压治理最大有功功率" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="51" name="低压治理目标电压阈值" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="52" name="高电压动作值" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="53" name="动作调整步长" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="54" name="高电压最大充电功率" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="55" name="高电压恢复电压" datatype="INT16" unit="" mag="1" offset="0" />
+	</function_code03>
+	<function_code04 code="0x04" description="Read Input Registers" />
+	<function_code05 code="0x05" description="Write Single Coil" />
+	<function_code06 code="0x06" description="Write Single Registers" />
+	<dido code="" description="Parse dido">
+		<subdido name="急停" level="3" />
+		<subdido name="水浸" level="3" />
+		<subdido name="消防二级故障" level="2" />
+		<subdido name="消防喷淋反馈" level="3" />
+		<subdido name="A相低电压" level="1" />
+		<subdido name="B相低电压" level="1" />
+		<subdido name="C相低电压" level="1" />
+		<subdido name="A相重过载" level="1" />
+		<subdido name="B相重过载" level="1" />
+		<subdido name="C相重过载" level="1" />
+	</dido>
+</ems_dido>

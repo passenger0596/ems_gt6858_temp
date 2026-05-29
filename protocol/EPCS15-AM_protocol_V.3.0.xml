@@ -1,0 +1,483 @@
+<?xml version='1.0' encoding='utf-8'?>
+<EPCS15-AM_protocol_V.3.0 device="EPCS15-AM">
+	<function_code01 code="0x01" description="Read Coils" />
+	<function_code02 code="0x02" description="Read Discrete Input" />
+	<function_code03 code="0x03" description="Read Holding Registers">
+		<hRegister address="24576" name="低压侧恒压充电电压设置" datatype="UINT16" unit="V" mag="10" offset="0" />
+		<hRegister address="24577" name="低压侧过压保护点" datatype="UINT16" unit="V" mag="10" offset="0" />
+		<hRegister address="24578" name="低压侧欠压保护点" datatype="UINT16" unit="V" mag="10" offset="0" />
+		<hRegister address="24579" name="高压侧恒压充电电压设置" datatype="UINT16" unit="V" mag="10" offset="0" />
+		<hRegister address="24580" name="高压侧过压保护点" datatype="UINT16" unit="V" mag="10" offset="0" />
+		<hRegister address="24581" name="高压侧欠压保护点" datatype="UINT16" unit="V" mag="10" offset="0" />
+		<hRegister address="24582" name="下设充放电功率" datatype="INT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="24583" name="下设充放电电流" datatype="INT16" unit="A" mag="10" offset="0" />
+		<hRegister address="24586" name="开机、关机指令" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24589" name="DC部分最大功率" datatype="UINT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="24590" name="DC部分最大电流" datatype="UINT16" unit="A" mag="10" offset="0" />
+		<hRegister address="24597" name="控制配置字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24598" name="绝缘检测EMS控制单次检测使能" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="24599" name="绝缘检测启动电压设置" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="24600" name="绝缘检测使能位" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="24605" name="DC快速模式设置" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="24606" name="EPO故障触发(DC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24624" name="硬件故障字屏蔽字1(DC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24625" name="硬件故障字屏蔽字2(DC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24626" name="电池侧故障字屏蔽字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24627" name="母线侧故障字屏蔽字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24628" name="并机故障字屏蔽字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24629" name="系统故障字屏蔽字(DC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24630" name="开关故障字屏蔽字(DC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24631" name="其他故障字屏蔽字(DC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24656" name="DSP版本V(DC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24657" name="DSP版本B(DC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24658" name="DSP版本D(DC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24662" name="工作状态(DC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24663" name="散热器温度" datatype="INT16" unit="℃" mag="10" offset="0" />
+		<hRegister address="24664" name="母线总电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="24665" name="正母线电压(DCDC)" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="24666" name="负母线电压(DCDC)" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="24667" name="正负母线压差" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="24668" name="电池电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="24669" name="电池电流" datatype="INT16" unit="A" mag="10" offset="0" />
+		<hRegister address="24670" name="电池功率" datatype="INT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="24671" name="DC部分环境温度" datatype="INT16" unit="℃" mag="10" offset="0" />
+		<hRegister address="24672" name="DC环境温度限额功率" datatype="INT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="24675" name="电池侧正对地绝缘电阻" datatype="INT16" unit="kΩ" mag="1" offset="0" />
+		<hRegister address="24676" name="电池侧负对地绝缘电阻" datatype="INT16" unit="kΩ" mag="1" offset="0" />
+		<hRegister address="24677" name="绝缘检测运行时间计数器" datatype="INT16" unit="s" mag="1" offset="0" />
+		<hRegister address="24678" name="绝缘检测运行" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24684" name="总充电电量" datatype="UINT32" unit="kWh" mag="10" offset="0" />
+		<hRegister address="24686" name="总放电电量" datatype="UINT32" unit="kWh" mag="10" offset="0" />
+		<hRegister address="24688" name="日充电电量" datatype="UINT16" unit="kWh" mag="10" offset="0" />
+		<hRegister address="24689" name="日放电电量" datatype="UINT16" unit="kWh" mag="10" offset="0" />
+		<hRegister address="24690" name="累计运行年" datatype="UINT16" unit="年" mag="1" offset="0" />
+		<hRegister address="24691" name="累计运行天" datatype="UINT16" unit="天" mag="1" offset="0" />
+		<hRegister address="24692" name="累计运行时" datatype="UINT16" unit="小时" mag="1" offset="0" />
+		<hRegister address="24693" name="累计运行分" datatype="UINT16" unit="分" mag="1" offset="0" />
+		<hRegister address="24694" name="累计运行秒" datatype="UINT16" unit="秒" mag="1" offset="0" />
+		<hRegister address="24698" name="硬件故障字1(DC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24699" name="硬件故障字2(DC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24700" name="电池侧故障字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24701" name="母线侧故障字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24702" name="并机故障字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24703" name="系统故障字(DC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24704" name="开关故障字(DC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="24705" name="其他故障字(DC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28672" name="DSP版本V(AC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28673" name="DSP版本B(AC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28674" name="DSP版本D(AC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28675" name="CPLD版本V(AC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28676" name="CPLD版本B(AC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28677" name="CPLD版本D(AC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28678" name="ARM版本V" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28679" name="ARM版本B" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28680" name="ARM版本D" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28696" name="交流历史充电总量" datatype="UINT32" unit="kWh" mag="1" offset="0" />
+		<hRegister address="28698" name="交流当日充电量" datatype="UINT32" unit="kWh" mag="1" offset="0" />
+		<hRegister address="28700" name="交流历史放电总量" datatype="UINT32" unit="kWh" mag="1" offset="0" />
+		<hRegister address="28702" name="交流日放电总量" datatype="UINT32" unit="kWh" mag="1" offset="0" />
+		<hRegister address="28704" name="模块交流总有功功率" datatype="INT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="28705" name="模块交流A相有功功率" datatype="INT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="28706" name="模块交流B相有功功率" datatype="INT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="28707" name="模块交流C相有功功率" datatype="INT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="28708" name="模块交流总无功功率" datatype="INT16" unit="kvar" mag="10" offset="0" />
+		<hRegister address="28709" name="模块交流A相无功功率" datatype="INT16" unit="kvar" mag="10" offset="0" />
+		<hRegister address="28710" name="模块交流B相无功功率" datatype="INT16" unit="kvar" mag="10" offset="0" />
+		<hRegister address="28711" name="模块交流C相无功功率" datatype="INT16" unit="kvar" mag="10" offset="0" />
+		<hRegister address="28712" name="模块交流总视在功率" datatype="INT16" unit="kVA" mag="10" offset="0" />
+		<hRegister address="28713" name="模块交流A相视在功率" datatype="INT16" unit="kVA" mag="10" offset="0" />
+		<hRegister address="28714" name="模块交流B相视在功率" datatype="INT16" unit="kVA" mag="10" offset="0" />
+		<hRegister address="28715" name="模块交流C相视在功率" datatype="INT16" unit="kVA" mag="10" offset="0" />
+		<hRegister address="28716" name="模块交流总功率因数" datatype="INT16" unit="" mag="100" offset="0" />
+		<hRegister address="28717" name="模块交流A相功率因数" datatype="INT16" unit="" mag="100" offset="0" />
+		<hRegister address="28718" name="模块交流B相功率因数" datatype="INT16" unit="" mag="100" offset="0" />
+		<hRegister address="28719" name="模块交流C相功率因数" datatype="INT16" unit="" mag="100" offset="0" />
+		<hRegister address="28720" name="负载电压频率" datatype="INT16" unit="Hz" mag="100" offset="0" />
+		<hRegister address="28721" name="负载电压相序" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="28722" name="负载AB线电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28723" name="负载BC线电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28724" name="负载CA线电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28725" name="负载A相电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28726" name="负载B相电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28727" name="负载C相电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28728" name="逆变AB线电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28729" name="逆变BC线电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28730" name="逆变CA线电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28731" name="逆变A相电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28732" name="逆变B相电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28733" name="逆变C相电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28734" name="电感A相电流" datatype="INT16" unit="A" mag="10" offset="0" />
+		<hRegister address="28735" name="电感B相电流" datatype="INT16" unit="A" mag="10" offset="0" />
+		<hRegister address="28736" name="电感C相电流" datatype="INT16" unit="A" mag="10" offset="0" />
+		<hRegister address="28737" name="电感N相电流" datatype="INT16" unit="A" mag="10" offset="0" />
+		<hRegister address="28738" name="输出A相电流" datatype="INT16" unit="A" mag="10" offset="0" />
+		<hRegister address="28739" name="输出B相电流" datatype="INT16" unit="A" mag="10" offset="0" />
+		<hRegister address="28740" name="输出C相电流" datatype="INT16" unit="A" mag="10" offset="0" />
+		<hRegister address="28741" name="输出N相电流" datatype="INT16" unit="A" mag="10" offset="0" />
+		<hRegister address="28742" name="负载A相电流" datatype="INT16" unit="A" mag="10" offset="0" />
+		<hRegister address="28743" name="负载B相电流" datatype="INT16" unit="A" mag="10" offset="0" />
+		<hRegister address="28744" name="负载C相电流" datatype="INT16" unit="A" mag="10" offset="0" />
+		<hRegister address="28745" name="电网A相电流" datatype="INT16" unit="A" mag="10" offset="0" />
+		<hRegister address="28746" name="电网B相电流" datatype="INT16" unit="A" mag="10" offset="0" />
+		<hRegister address="28747" name="电网C相电流" datatype="INT16" unit="A" mag="10" offset="0" />
+		<hRegister address="28748" name="交流负载总有功功率" datatype="INT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="28749" name="交流负载A相有功功率" datatype="INT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="28750" name="交流负载B相有功功率" datatype="INT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="28751" name="交流负载C相有功功率" datatype="INT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="28752" name="总母线电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28753" name="正母线电压(ACDC)" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28754" name="负母线电压(ACDC)" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28767" name="并网/离网状态" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28768" name="工作状态(AC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28769" name="硬件故障字1(AC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28770" name="硬件故障字2(AC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28771" name="电网故障字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28772" name="母线故障字(AC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28773" name="交流电容故障字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28774" name="系统故障字(AC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28775" name="开关故障字(AC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28776" name="其他故障字(AC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28777" name="系统运行模式" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="28778" name="并网运行模式数量" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="28779" name="离网运行模块数量" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="28780" name="当前模块功率CANID" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="28781" name="设备温度降额运行系数" datatype="INT16" unit="" mag="4096" offset="0" />
+		<hRegister address="28782" name="设备温度降额运行中" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="28783" name="设备IGBT温度" datatype="INT16" unit="℃" mag="10" offset="0" />
+		<hRegister address="28784" name="环境温度" datatype="INT16" unit="℃" mag="10" offset="0" />
+		<hRegister address="28786" name="数字输入1" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="28787" name="数字输入2" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="28788" name="数字输入3" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="28789" name="数字输入4(DRM0)" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="28790" name="数字输入5(EPO)" datatype="INT16" unit="" mag="1" offset="0" />
+		<hRegister address="28791" name="离网运行状态" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28792" name="STS告警字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28793" name="STS并离网状态" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28804" name="负载总无功功率" datatype="INT16" unit="kvar" mag="10" offset="0" />
+		<hRegister address="28805" name="负载A相无功功率" datatype="INT16" unit="kvar" mag="10" offset="0" />
+		<hRegister address="28806" name="负载B相无功功率" datatype="INT16" unit="kvar" mag="10" offset="0" />
+		<hRegister address="28807" name="负载C相无功功率" datatype="INT16" unit="kvar" mag="10" offset="0" />
+		<hRegister address="28808" name="负载总视在功率" datatype="INT16" unit="kVA" mag="10" offset="0" />
+		<hRegister address="28809" name="负载A相视在功率" datatype="INT16" unit="kVA" mag="10" offset="0" />
+		<hRegister address="28810" name="负载B相视在功率" datatype="INT16" unit="kVA" mag="10" offset="0" />
+		<hRegister address="28811" name="负载C相视在功率" datatype="INT16" unit="kVA" mag="10" offset="0" />
+		<hRegister address="28812" name="负载A相功率因数" datatype="INT16" unit="" mag="100" offset="0" />
+		<hRegister address="28813" name="负载B相功率因数" datatype="INT16" unit="" mag="100" offset="0" />
+		<hRegister address="28814" name="负载C相功率因数" datatype="INT16" unit="" mag="100" offset="0" />
+		<hRegister address="28815" name="负载总功率因数" datatype="INT16" unit="" mag="100" offset="0" />
+		<hRegister address="28819" name="电网A相电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28820" name="电网B相电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28821" name="电网C相电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28822" name="电网AB线电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28823" name="电网BC线电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28824" name="电网CA线电压" datatype="INT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28934" name="有功功率设置" datatype="INT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="28935" name="无功补偿功率设置" datatype="INT16" unit="kvar" mag="10" offset="0" />
+		<hRegister address="28939" name="离网模式设置" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28940" name="模块运行模式设置" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28941" name="并网单相功率独立控制设置" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28942" name="模块主机设置" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28943" name="模块电流源并联使能设置" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28944" name="PCS除湿使能" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28945" name="模块并联台数设置" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28946" name="离网电压设置" datatype="INT16" unit="V" mag="1" offset="0" />
+		<hRegister address="28947" name="离网频率设置" datatype="INT16" unit="Hz" mag="100" offset="0" />
+		<hRegister address="28948" name="A相有功功率设置" datatype="INT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="28949" name="A相无功功率设置" datatype="INT16" unit="kvar" mag="10" offset="0" />
+		<hRegister address="28950" name="B相有功功率设置" datatype="INT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="28951" name="B相无功功率设置" datatype="INT16" unit="kvar" mag="10" offset="0" />
+		<hRegister address="28952" name="C相有功功率设置" datatype="INT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="28953" name="C相无功功率设置" datatype="INT16" unit="kvar" mag="10" offset="0" />
+		<hRegister address="28954" name="DC源母线电压设置" datatype="UINT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28955" name="母线电压设置" datatype="UINT16" unit="V" mag="10" offset="0" />
+		<hRegister address="28956" name="电量清零指令" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="28957" name="EPO故障触发(AC)" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="29025" name="硬件故障字1屏蔽字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="29026" name="硬件故障字2屏蔽字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="29027" name="电网故障字屏蔽字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="29028" name="母线故障字屏蔽字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="29029" name="交流电容故障字屏蔽字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="29030" name="系统故障字屏蔽字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="29031" name="开关故障字屏蔽字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="29032" name="其他故障字屏蔽字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="29033" name="FPGA故障锁存屏蔽字" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="29056" name="电网过频保护" datatype="UINT16" unit="Hz" mag="100" offset="0" />
+		<hRegister address="29057" name="电网欠频保护" datatype="UINT16" unit="Hz" mag="100" offset="0" />
+		<hRegister address="29058" name="孤岛过频保护" datatype="UINT16" unit="Hz" mag="100" offset="0" />
+		<hRegister address="29059" name="孤岛欠频保护" datatype="UINT16" unit="Hz" mag="100" offset="0" />
+		<hRegister address="29060" name="交流线电压过压保护点" datatype="UINT16" unit="V" mag="10" offset="0" />
+		<hRegister address="29061" name="交流线电压欠压保护点" datatype="UINT16" unit="V" mag="10" offset="0" />
+		<hRegister address="29062" name="交流过流保护点" datatype="UINT16" unit="A" mag="10" offset="0" />
+		<hRegister address="29063" name="电池过压保护点" datatype="UINT16" unit="V" mag="10" offset="0" />
+		<hRegister address="29064" name="电池欠压保护点" datatype="UINT16" unit="V" mag="10" offset="0" />
+		<hRegister address="29065" name="母线过压保护点" datatype="UINT16" unit="V" mag="10" offset="0" />
+		<hRegister address="29066" name="母线欠压保护点" datatype="UINT16" unit="V" mag="10" offset="0" />
+		<hRegister address="29067" name="直流过流保护点" datatype="UINT16" unit="A" mag="10" offset="0" />
+		<hRegister address="29068" name="模块过温保护点" datatype="UINT16" unit="℃" mag="10" offset="0" />
+		<hRegister address="29069" name="最大充电功率" datatype="INT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="29070" name="最大放电功率" datatype="INT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="29071" name="电池侧最大充电电流" datatype="INT16" unit="A" mag="10" offset="0" />
+		<hRegister address="29072" name="电池侧最大放电电流" datatype="INT16" unit="A" mag="10" offset="0" />
+	</function_code03>
+	<function_code04 code="0x04" description="Read Input Registers" />
+	<function_code05 code="0x05" description="Write Single Coil" />
+	<function_code06 code="0x06" description="Write Single Registers" />
+	<dido code="" description="Parse dido">
+		<subdido name="EPO故障(AC)" level="2" />
+		<subdido name="IGBT硬件过流(AC)" level="2" />
+		<subdido name="母线硬件过压(AC)" level="2" />
+		<subdido name="保留位0X7061.3" level="2" />
+		<subdido name="功率模块逐波限流(AC)" level="2" />
+		<subdido name="平衡模块硬件过流(AC)" level="2" />
+		<subdido name="保留位0X7061.6" level="2" />
+		<subdido name="保留位0X7061.7" level="2" />
+		<subdido name="保留位0X7061.8" level="2" />
+		<subdido name="保留位0X7061.9" level="2" />
+		<subdido name="保留位0X7061.10" level="2" />
+		<subdido name="保留位0X7061.11" level="2" />
+		<subdido name="保留位0X7061.12" level="2" />
+		<subdido name="保留位0X7061.13" level="2" />
+		<subdido name="保留位0X7061.14" level="2" />
+		<subdido name="保留位0X7061.15" level="2" />
+		<subdido name="24V电源故障(AC)" level="2" />
+		<subdido name="风扇故障(AC)" level="2" />
+		<subdido name="连接故障(AC)" level="2" />
+		<subdido name="保留位0X7062.3" level="2" />
+		<subdido name="保留位0X7062.4" level="2" />
+		<subdido name="保留位0X7062.5" level="2" />
+		<subdido name="防雷器故障(AC)" level="2" />
+		<subdido name="电感过温故障(AC)" level="2" />
+		<subdido name="功率模块过温(AC)" level="2" />
+		<subdido name="平衡模块过温(AC)" level="2" />
+		<subdido name="15V电源故障(AC)" level="2" />
+		<subdido name="系统火警故障(AC)" level="2" />
+		<subdido name="电池干接点故障(AC)" level="2" />
+		<subdido name="干接点过载故障(AC)" level="2" />
+		<subdido name="环境温度过温故障(AC)" level="2" />
+		<subdido name="干接点过温故障(AC)" level="2" />
+		<subdido name="A相过压故障" level="2" />
+		<subdido name="B相过压故障" level="2" />
+		<subdido name="C相过压故障" level="2" />
+		<subdido name="A相欠压故障" level="2" />
+		<subdido name="B相欠压故障" level="2" />
+		<subdido name="C相欠压故障" level="2" />
+		<subdido name="电网过频" level="2" />
+		<subdido name="电网欠频" level="2" />
+		<subdido name="电网相序错误" level="2" />
+		<subdido name="A相软件过流" level="2" />
+		<subdido name="B相软件过流" level="2" />
+		<subdido name="C相软件过流" level="2" />
+		<subdido name="电网电压不平衡" level="2" />
+		<subdido name="电网电流不平衡" level="2" />
+		<subdido name="电网缺相" level="2" />
+		<subdido name="N线过流" level="2" />
+		<subdido name="预充母线过压" level="2" />
+		<subdido name="预充母线欠压" level="2" />
+		<subdido name="不控整流母线过压" level="2" />
+		<subdido name="不控整流母线欠压" level="2" />
+		<subdido name="运行母线过压" level="2" />
+		<subdido name="运行母线欠压" level="2" />
+		<subdido name="正负母线不平衡" level="2" />
+		<subdido name="电池欠压" level="2" />
+		<subdido name="电流模式母线欠压" level="2" />
+		<subdido name="电池过压" level="2" />
+		<subdido name="直流预充电过流" level="2" />
+		<subdido name="直流过流" level="2" />
+		<subdido name="保留位0X7064.12" level="2" />
+		<subdido name="保留位0X7064.13" level="2" />
+		<subdido name="平衡模块软件过流" level="2" />
+		<subdido name="电池反接" level="2" />
+		<subdido name="预充电超时" level="2" />
+		<subdido name="预充电A相过流" level="2" />
+		<subdido name="预充电B相过流" level="2" />
+		<subdido name="预充电C相过流" level="2" />
+		<subdido name="保留位0X7065.4" level="2" />
+		<subdido name="保留位0X7065.5" level="2" />
+		<subdido name="保留位0X7065.6" level="2" />
+		<subdido name="保留位0X7065.7" level="2" />
+		<subdido name="保留位0X7065.8" level="2" />
+		<subdido name="保留位0X7065.9" level="2" />
+		<subdido name="保留位0X7065.10" level="2" />
+		<subdido name="保留位0X7065.11" level="2" />
+		<subdido name="保留位0X7065.12" level="2" />
+		<subdido name="保留位0X7065.13" level="2" />
+		<subdido name="保留位0X7065.14" level="2" />
+		<subdido name="保留位0X7065.15" level="2" />
+		<subdido name="保留位0X7066.0" level="2" />
+		<subdido name="控制板EEPROM故障(AC)" level="2" />
+		<subdido name="AD采样零漂故障" level="2" />
+		<subdido name="后台通讯协议故障" level="2" />
+		<subdido name="保留位0X7066.4" level="2" />
+		<subdido name="保留位0X7066.5" level="2" />
+		<subdido name="保留位0X7066.6" level="2" />
+		<subdido name="保留位0X7066.7" level="2" />
+		<subdido name="绝缘检测故障" level="2" />
+		<subdido name="保留位0X7066.9" level="2" />
+		<subdido name="保留位0X7066.10" level="2" />
+		<subdido name="BMS电池系统故障" level="2" />
+		<subdido name="STS通信故障" level="2" />
+		<subdido name="BMS通讯故障" level="2" />
+		<subdido name="从模块CAN通信故障" level="2" />
+		<subdido name="EMS通信故障(AC)" level="2" />
+		<subdido name="预充电继电器闭合失败" level="2" />
+		<subdido name="预充电继电器断开失败" level="2" />
+		<subdido name="预充电继电器闭合状态错误" level="2" />
+		<subdido name="预充电继电器断开状态错误" level="2" />
+		<subdido name="主继电器闭合失败" level="2" />
+		<subdido name="主继电器断开失败" level="2" />
+		<subdido name="主继电器闭合状态错误" level="2" />
+		<subdido name="主继电器断开状态错误" level="2" />
+		<subdido name="交流主继电器粘连故障" level="2" />
+		<subdido name="直流继电器开路故障" level="2" />
+		<subdido name="保留位0X7067.10" level="2" />
+		<subdido name="保留位0X7067.11" level="2" />
+		<subdido name="保留位0X7067.12" level="2" />
+		<subdido name="保留位0X7067.13" level="2" />
+		<subdido name="保留位0X7067.14" level="2" />
+		<subdido name="保留位0X7067.15" level="2" />
+		<subdido name="逆变电压A相过压故障" level="2" />
+		<subdido name="逆变电压B相过压故障" level="2" />
+		<subdido name="逆变电压C相过压故障" level="2" />
+		<subdido name="电网孤岛故障" level="2" />
+		<subdido name="保留位0X7068.4" level="2" />
+		<subdido name="系统谐振故障" level="2" />
+		<subdido name="软件过压过流" level="2" />
+		<subdido name="保留位0X7068.7" level="2" />
+		<subdido name="高电压穿越超时故障" level="2" />
+		<subdido name="逆变电压A相欠压故障" level="2" />
+		<subdido name="逆变电压B相欠压故障" level="2" />
+		<subdido name="逆变电压C相欠压故障" level="2" />
+		<subdido name="离网无同步信号故障" level="2" />
+		<subdido name="保留位0X7068.13" level="2" />
+		<subdido name="离网短路故障" level="2" />
+		<subdido name="低电压穿越超时故障" level="2" />
+		<subdido name="STS在线异常告警" level="2" />
+		<subdido name="电网相序异常告警" level="2" />
+		<subdido name="电网电压有效值异常告警" level="2" />
+		<subdido name="电网频率异常告警" level="2" />
+		<subdido name="电网电压模值异常告警" level="2" />
+		<subdido name="电网电压模值2异常告警" level="2" />
+		<subdido name="保留位0X7078.6" level="2" />
+		<subdido name="保留位0X7078.7" level="2" />
+		<subdido name="保留位0X7078.8" level="2" />
+		<subdido name="保留位0X7078.9" level="2" />
+		<subdido name="保留位0X7078.10" level="2" />
+		<subdido name="保留位0X7078.11" level="2" />
+		<subdido name="保留位0X7078.12" level="2" />
+		<subdido name="保留位0X7078.13" level="2" />
+		<subdido name="保留位0X7078.14" level="2" />
+		<subdido name="保留位0X7078.15" level="2" />
+		<subdido name="EPO故障(DC)" level="2" />
+		<subdido name="IGBTOCP" level="2" />
+		<subdido name="高压侧硬件过压" level="2" />
+		<subdido name="高压侧硬件过流" level="2" />
+		<subdido name="IGBT硬件过流(DC)" level="2" />
+		<subdido name="保留位0X607A.5" level="2" />
+		<subdido name="保留位0X607A.6" level="2" />
+		<subdido name="保留位0X607A.7" level="2" />
+		<subdido name="保留位0X607A.8" level="2" />
+		<subdido name="保留位0X607A.9" level="2" />
+		<subdido name="保留位0X607A.10" level="2" />
+		<subdido name="保留位0X607A.11" level="2" />
+		<subdido name="保留位0X607A.12" level="2" />
+		<subdido name="保留位0X607A.13" level="2" />
+		<subdido name="保留位0X607A.14" level="2" />
+		<subdido name="保留位0X607A.15" level="2" />
+		<subdido name="24V辅助电源故障(DC)" level="2" />
+		<subdido name="风扇故障(DC)" level="2" />
+		<subdido name="连接故障(DC)" level="2" />
+		<subdido name="保留位0X607B.3" level="2" />
+		<subdido name="保留位0X607B.4" level="2" />
+		<subdido name="保留位0X607B.5" level="2" />
+		<subdido name="保留位0X607B.6" level="2" />
+		<subdido name="保留位0X607B.7" level="2" />
+		<subdido name="功率模块过温(DC)" level="2" />
+		<subdido name="保留位0X607B.9" level="2" />
+		<subdido name="15V辅源故障(DC)" level="2" />
+		<subdido name="保留位0X607B.11" level="2" />
+		<subdido name="保留位0X607B.12" level="2" />
+		<subdido name="保留位0X607B.13" level="2" />
+		<subdido name="保留位0X607B.14" level="2" />
+		<subdido name="保留位0X607B.15" level="2" />
+		<subdido name="预充电超时故障" level="2" />
+		<subdido name="保留位0X607C.1" level="2" />
+		<subdido name="保留位0X607C.2" level="2" />
+		<subdido name="保留位0X607C.3" level="2" />
+		<subdido name="保留位0X607C.4" level="2" />
+		<subdido name="保留位0X607C.5" level="2" />
+		<subdido name="保留位0X607C.6" level="2" />
+		<subdido name="保留位0X607C.7" level="2" />
+		<subdido name="保留位0X607C.8" level="2" />
+		<subdido name="电池侧A相软件过流" level="2" />
+		<subdido name="电池侧B相软件过流" level="2" />
+		<subdido name="电池侧负端软件过流" level="2" />
+		<subdido name="模块内部短路故障" level="2" />
+		<subdido name="保留位0X607C.13" level="2" />
+		<subdido name="保留位0X607C.14" level="2" />
+		<subdido name="保留位0X607C.15" level="2" />
+		<subdido name="母线侧预充过压" level="2" />
+		<subdido name="保留位0X607D.1" level="2" />
+		<subdido name="保留位0X607D.2" level="2" />
+		<subdido name="保留位0X607D.3" level="2" />
+		<subdido name="母线侧运行过压" level="2" />
+		<subdido name="母线侧运行欠压" level="2" />
+		<subdido name="母线侧正负母线不平衡" level="2" />
+		<subdido name="保留位0X607D.7" level="2" />
+		<subdido name="保留位0X607D.8" level="2" />
+		<subdido name="保留位0X607D.9" level="2" />
+		<subdido name="保留位0X607D.10" level="2" />
+		<subdido name="保留位0X607D.11" level="2" />
+		<subdido name="保留位0X607D.12" level="2" />
+		<subdido name="保留位0X607D.13" level="2" />
+		<subdido name="保留位0X607D.14" level="2" />
+		<subdido name="保留位0X607D.15" level="2" />
+		<subdido name="与主机模式设置不匹配" level="2" />
+		<subdido name="保留位0X607E.1" level="2" />
+		<subdido name="保留位0X607E.2" level="2" />
+		<subdido name="保留位0X607E.3" level="2" />
+		<subdido name="保留位0X607E.4" level="2" />
+		<subdido name="保留位0X607E.5" level="2" />
+		<subdido name="保留位0X607E.6" level="2" />
+		<subdido name="保留位0X607E.7" level="2" />
+		<subdido name="保留位0X607E.8" level="2" />
+		<subdido name="保留位0X607E.9" level="2" />
+		<subdido name="保留位0X607E.10" level="2" />
+		<subdido name="保留位0X607E.11" level="2" />
+		<subdido name="保留位0X607E.12" level="2" />
+		<subdido name="保留位0X607E.13" level="2" />
+		<subdido name="保留位0X607E.14" level="2" />
+		<subdido name="保留位0X607E.15" level="2" />
+		<subdido name="保留位0X607F.1" level="2" />
+		<subdido name="控制板EEROM故障" level="2" />
+		<subdido name="保留位0X607F.2" level="2" />
+		<subdido name="保留位0X607F.3" level="2" />
+		<subdido name="保留位0X607F.4" level="2" />
+		<subdido name="保留位0X607F.5" level="2" />
+		<subdido name="保留位0X607F.6" level="2" />
+		<subdido name="保留位0X607F.7" level="2" />
+		<subdido name="保留位0X607F.8" level="2" />
+		<subdido name="保留位0X607F.9" level="2" />
+		<subdido name="保留位0X607F.10" level="2" />
+		<subdido name="保留位0X607F.11" level="2" />
+		<subdido name="保留位0X607F.12" level="2" />
+		<subdido name="保留位0X607F.13" level="2" />
+		<subdido name="保留位0X607F.14" level="2" />
+		<subdido name="与EMS通信故障(DC)" level="2" />
+		<subdido name="绝缘电阻过低故障" level="2" />
+		<subdido name="绝缘检测超时故障" level="2" />
+		<subdido name="保留位0X6081.2" level="2" />
+		<subdido name="保留位0X6081.3" level="2" />
+		<subdido name="电池侧欠压" level="2" />
+		<subdido name="保留位0X6081.5" level="2" />
+		<subdido name="软件瞬态过流" level="2" />
+		<subdido name="保留位0X6081.7" level="2" />
+		<subdido name="保留位0X6081.8" level="2" />
+		<subdido name="保留位0X6081.9" level="2" />
+		<subdido name="电池侧过压" level="2" />
+		<subdido name="电池侧过流" level="2" />
+		<subdido name="电池侧极性反接" level="2" />
+		<subdido name="保留位0X6081.13" level="2" />
+		<subdido name="保留位0X6081.14" level="2" />
+		<subdido name="保留位0X6081.15" level="2" />
+	</dido>
+</EPCS15-AM_protocol_V.3.0>

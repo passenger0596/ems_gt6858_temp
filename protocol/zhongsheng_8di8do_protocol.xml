@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<zhongsheng_8di8do_protocol device="zhongsheng_8di8do">
+	<function_code01 code="0x01" description="Read Coils">
+		<coil address="0" name="充电指示灯" datatype="BOOL" unit="" />
+		<coil address="1" name="放电指示灯" datatype="BOOL" unit="" />
+		<coil address="2" name="待机指示灯" datatype="BOOL" unit="" />
+		<coil address="3" name="故障指示灯" datatype="BOOL" unit="" />
+		<coil address="4" name="SOC25%指示灯" datatype="BOOL" unit="" />
+		<coil address="5" name="SOC50%指示灯" datatype="BOOL" unit="" />
+		<coil address="6" name="SOC75%指示灯" datatype="BOOL" unit="" />
+		<coil address="7" name="SOC100%指示灯" datatype="BOOL" unit="" />
+	</function_code01>
+	<function_code02 code="0x02" description="Read Discrete Input">
+		<di address="0" name="系统急停" datatype="BOOL" unit="" />
+		<di address="1" name="电操反馈" datatype="BOOL" unit="" />
+		<di address="2" name="di3" datatype="BOOL" unit="" />
+		<di address="3" name="di4" datatype="BOOL" unit="" />
+		<di address="4" name="di5" datatype="BOOL" unit="" />
+		<di address="5" name="di6" datatype="BOOL" unit="" />
+		<di address="6" name="di7" datatype="BOOL" unit="" />
+		<di address="7" name="di8" datatype="BOOL" unit="" />
+	</function_code02>
+	<function_code03 code="0x03" description="Read Holding Registers" />
+	<function_code04 code="0x04" description="Read Input Registers" />
+	<function_code05 code="0x05" description="Write Single Coil" />
+	<function_code06 code="0x06" description="Write Single Registers" />
+	<dido code="" description="Parse dido">
+		<subdido name="系统急停" level="3" />
+	</dido>
+</zhongsheng_8di8do_protocol>

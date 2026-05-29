@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<kndIO4040_protocol device="kndIO4040">
+	<function_code01 code="0x01" description="Read Coils">
+		<coil address="100" name="do1" datatype="INT" unit="" />
+		<coil address="101" name="do2" datatype="INT" unit="" />
+		<coil address="102" name="do3" datatype="INT" unit="" />
+		<coil address="103" name="do4" datatype="INT" unit="" />
+		<coil address="104" name="do1上电时状态" datatype="INT" unit="" />
+		<coil address="105" name="do2上电时状态" datatype="INT" unit="" />
+		<coil address="106" name="do3上电时状态" datatype="INT" unit="" />
+		<coil address="107" name="do4上电时状态" datatype="INT" unit="" />
+	</function_code01>
+	<function_code02 code="0x02" description="Read Discrete Input">
+		<di address="200" name="di1" datatype="INT" unit="" />
+		<di address="201" name="di2" datatype="INT" unit="" />
+		<di address="202" name="di3" datatype="INT" unit="" />
+		<di address="203" name="di4" datatype="INT" unit="" />
+	</function_code02>
+	<function_code03 code="0x03" description="Read Holding Registers">
+		<hRegister address="1" name="模块型号" datatype="INT" unit="" mag="1" offset="0" />
+		<hRegister address="2" name="模块软件版本" datatype="INT" unit="" mag="1" offset="0" />
+		<hRegister address="3" name="模块名称" datatype="INT" unit="" mag="1" offset="0" />
+	</function_code03>
+	<function_code04 code="0x04" description="Read Input Registers" />
+	<function_code05 code="0x05" description="Write Single Coil" />
+	<function_code06 code="0x06" description="Write Single Registers" />
+	<dido code="" description="Parse dido" />
+</kndIO4040_protocol>

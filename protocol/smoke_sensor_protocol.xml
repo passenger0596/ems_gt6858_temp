@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<smoke_sensor_protocol device="smoke_sensor">
+	<function_code01 code="0x01" description="Read Coils" />
+	<function_code02 code="0x02" description="Read Discrete Input" />
+	<function_code03 code="0x03" description="Read Holding Registers">
+		<hRegister address="0" name="湿度" datatype="FLOAT" unit="%" mag="10.0" offset="0.0" />
+		<hRegister address="1" name="温度" datatype="FLOAT" unit="℃" mag="10.0" offset="0.0" />
+		<hRegister address="2" name="烟雾浓度" datatype="INT" unit="ppm" mag="1.0" offset="0.0" />
+	</function_code03>
+	<function_code04 code="0x04" description="Read Input Registers" />
+	<function_code05 code="0x05" description="Write Single Coil" />
+	<function_code06 code="0x06" description="Write Single Registers" />
+	<dido code="" description="Parse dido">
+		<subdido name="烟雾浓度一级报警" level="1" />
+		<subdido name="烟雾浓度二级报警" level="2" />
+	</dido>
+</smoke_sensor_protocol>

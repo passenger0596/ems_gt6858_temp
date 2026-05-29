@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='utf-8'?>
+<sanhua_cooler_protocol device="sanhua_cooler">
+	<function_code01 code="0x01" description="Read Coils" />
+	<function_code02 code="0x02" description="Read Discrete Input" />
+	<function_code03 code="0x03" description="Read Holding Registers">
+		<hRegister address="256" name="整机状态" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="257" name="外风机1" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="258" name="外风机2" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="259" name="压缩机1" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="260" name="压缩机2" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="261" name="电加热" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="262" name="水泵" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="263" name="补水泵" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="264" name="故障告警" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1280" name="循环出水温度" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<hRegister address="1281" name="循环进水温度" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<hRegister address="1282" name="进水压力" datatype="INT16" unit="bar" mag="100.0" offset="0.0" />
+		<hRegister address="1283" name="出水压力" datatype="INT16" unit="bar" mag="100.0" offset="0.0" />
+		<hRegister address="1284" name="室外环境温度1" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<hRegister address="1285" name="翅片温度1" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<hRegister address="1286" name="吸气温度1" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<hRegister address="1287" name="液管温度1" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<hRegister address="1288" name="排气温度1" datatype="INT16" unit="℃" mag="10.0" offset="0.0" />
+		<hRegister address="1289" name="电流1" datatype="INT16" unit="A" mag="10.0" offset="0.0" />
+		<hRegister address="1290" name="交流电压1" datatype="INT16" unit="V" mag="1.0" offset="0.0" />
+		<hRegister address="1291" name="排气压力1" datatype="INT16" unit="bar" mag="100.0" offset="0.0" />
+		<hRegister address="1292" name="吸气压力1" datatype="INT16" unit="bar" mag="100.0" offset="0.0" />
+		<hRegister address="1293" name="室外风机1转速" datatype="INT16" unit="rpm" mag="1.0" offset="0.0" />
+		<hRegister address="1294" name="室外风机2转速" datatype="INT16" unit="rpm" mag="1.0" offset="0.0" />
+		<hRegister address="1295" name="压缩机频率" datatype="INT16" unit="Hz" mag="1.0" offset="0.0" />
+		<hRegister address="1296" name="膨胀阀开度1" datatype="INT16" unit="pls" mag="1.0" offset="0.0" />
+		<hRegister address="1297" name="水泵转速" datatype="INT16" unit="rpm" mag="1.0" offset="0.0" />
+		<hRegister address="1298" name="补水泵转速" datatype="INT16" unit="rpm" mag="1.0" offset="0.0" />
+		<hRegister address="1536" name="高液位警告" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1537" name="低液位警告" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1538" name="进水压力过低警告" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1539" name="出水压力警告" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1540" name="电加热保护" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1541" name="出水过热警告" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1542" name="循环进水温感失效" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1543" name="循环出水温感失效" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1544" name="室外环境温度失效" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1545" name="翅片温度失效" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1546" name="吸气温度失效" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1547" name="液管温度失效" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1548" name="进水压力传感故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1549" name="出水压力传感故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1550" name="高压传感器故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1551" name="低压传感器故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1552" name="高压保护" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1553" name="低压保护" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1554" name="排气温度过高保护" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1555" name="出水温度过低保护" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1556" name="翅片温度过高保护" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1557" name="进出水温差过高保护" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1558" name="外风机1故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1559" name="外风机1通讯故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1560" name="外风机1过载故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1561" name="外风机2故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1562" name="外风机2通讯故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1563" name="外风机2过载故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1564" name="压缩机1故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1565" name="压缩机1通讯故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1566" name="压缩机2故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1567" name="压缩机2通讯故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1568" name="水泵故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1569" name="水泵通讯故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1570" name="水泵过载故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1571" name="缺逆相保护" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1572" name="补水泵故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1573" name="排气感温包故障" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="1792" name="制冷点" datatype="INT16" unit="℃" mag="1.0" offset="0.0" />
+		<hRegister address="1793" name="制冷关闭回差" datatype="INT16" unit="℃" mag="1.0" offset="0.0" />
+		<hRegister address="1794" name="加热点" datatype="INT16" unit="℃" mag="1.0" offset="0.0" />
+		<hRegister address="1795" name="加热关闭回差" datatype="INT16" unit="℃" mag="1.0" offset="0.0" />
+		<hRegister address="1796" name="水泵转速设定" datatype="INT16" unit="%" mag="1.0" offset="0.0" />
+		<hRegister address="1797" name="补水压力开启点" datatype="INT16" unit="bar" mag="100.0" offset="0.0" />
+		<hRegister address="1798" name="补水压力关闭店" datatype="INT16" unit="bar" mag="100.0" offset="0.0" />
+		<hRegister address="1799" name="出液高温报警点" datatype="INT16" unit="℃" mag="1.0" offset="0.0" />
+		<hRegister address="1800" name="出液低温报警点" datatype="INT16" unit="℃" mag="1.0" offset="0.0" />
+		<hRegister address="1801" name="回水压力过低点" datatype="INT16" unit="bar" mag="100.0" offset="0.0" />
+		<hRegister address="1802" name="出水压力过高点" datatype="INT16" unit="bar" mag="100.0" offset="0.0" />
+		<hRegister address="2048" name="监控开关机" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="2049" name="水温控制模式" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+		<hRegister address="2050" name="补液使能" datatype="INT16" unit="" mag="1.0" offset="0.0" />
+	</function_code03>
+	<function_code04 code="0x04" description="Read Input Registers" />
+	<function_code05 code="0x05" description="Write Single Coil" />
+	<function_code06 code="0x06" description="Write Single Registers" />
+	<dido code="" description="Parse dido">
+		<subdido name="高液位警告" level="1" />
+		<subdido name="低液位警告" level="1" />
+		<subdido name="进水压力过低警告" level="1" />
+		<subdido name="出水压力警告" level="1" />
+		<subdido name="电加热保护" level="1" />
+		<subdido name="出水过热警告" level="1" />
+		<subdido name="循环进水温感失效" level="1" />
+		<subdido name="循环出水温感失效" level="1" />
+		<subdido name="室外环境温度失效" level="1" />
+		<subdido name="翅片温度失效" level="1" />
+		<subdido name="吸气温度失效" level="1" />
+		<subdido name="液管温度失效" level="1" />
+		<subdido name="进水压力传感故障" level="1" />
+		<subdido name="出水压力传感故障" level="1" />
+		<subdido name="高压传感器故障" level="1" />
+		<subdido name="低压传感器故障" level="1" />
+		<subdido name="高压保护" level="1" />
+		<subdido name="低压保护" level="1" />
+		<subdido name="排气温度过高保护" level="1" />
+		<subdido name="出水温度过低保护" level="1" />
+		<subdido name="翅片温度过高保护" level="1" />
+		<subdido name="进出水温差过高保护" level="1" />
+		<subdido name="外风机1故障" level="1" />
+		<subdido name="外风机1通讯故障" level="1" />
+		<subdido name="外风机1过载故障" level="1" />
+		<subdido name="外风机2故障" level="1" />
+		<subdido name="外风机2通讯故障" level="1" />
+		<subdido name="外风机2过载故障" level="1" />
+		<subdido name="压缩机1故障" level="1" />
+		<subdido name="压缩机1通讯故障" level="1" />
+		<subdido name="压缩机2故障" level="1" />
+		<subdido name="压缩机2通讯故障" level="1" />
+		<subdido name="水泵故障" level="1" />
+		<subdido name="水泵通讯故障" level="1" />
+		<subdido name="水泵过载故障" level="1" />
+		<subdido name="缺逆相保护" level="1" />
+		<subdido name="补水泵故障" level="1" />
+		<subdido name="排气感温包故障" level="1" />
+	</dido>
+</sanhua_cooler_protocol>

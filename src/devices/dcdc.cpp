@@ -61,57 +61,83 @@ void Dcdc::init_config(const std::string& config_file) {
 
 void Dcdc::parse_rawdata(const std::vector<uint16_t>& data_list) 
 {
-    // 使用写锁保护 data_to_qt 的更新
-    std::unique_lock<std::shared_mutex> lock(this->data_to_qt_rwlock_);
-    
-    // 更新时间戳
-    auto now = std::chrono::system_clock::now();
-    auto time_t_now = std::chrono::system_clock::to_time_t(now);
-    std::stringstream ss;
-    ss << std::put_time(std::localtime(&time_t_now), "%Y-%m-%d %H:%M:%S");
-    this->data_to_qt["timestamp"] = ss.str();
-    
-    // 设置在线状态
-    this->data_to_qt["online_status"] = true;
+    this->online_status = true;
 
     int index = 0;
-    // 根据地址映射解析数据
+    json data_array = json::array();
+    
+    // ✅ 步骤1: 使用临时变量，无锁处理数据
     for (const uint16_t& buffer_index : this->useful_indexes) {
         // 确保索引不越界
         if (index >= static_cast<int>(this->dev_data_keys_.size()) || buffer_index >= data_list.size()) {
             break;
         }
+        
         const std::string& key = this->dev_data_keys_[index];
-        RegisterData& reg_data = this->data_dict_[key];
-        auto val = data_list[buffer_index] / reg_data.mag + reg_data.offset;
+        
+        // ✅ 线程安全地获取寄存器配置（mag, offset, datatype）
+        double mag = 1.0;
+        uint16_t offset = 0;
+        std::string datatype;
+        
+        if (!this->getRegisterConfig(key, mag, offset, datatype)) {
+            LOG_WARNING_LOC("未找到寄存器配置: " + key);
+            index++;
+            continue;
+        }
+        
+        // 计算实际值
+        double actual_value = 0.0;
+        auto val = data_list[buffer_index] / mag + offset;
         
         // 根据数据类型转换实际值
-        if (reg_data.mag>1.0&&(reg_data.datatype.find("INT16") != std::string::npos)){
-            reg_data.value = val;
-        }else if(reg_data.datatype.find("INT32") != std::string::npos){
+        if (mag > 1.0 && datatype.find("INT16") != std::string::npos) {
+            actual_value = val;
+        } else if (datatype.find("INT32") != std::string::npos) {
             if (buffer_index + 1 < data_list.size()) {
-                reg_data.value = Utils::getUint32num(data_list[buffer_index],data_list[buffer_index+1],Utils::Endian::BIG)/reg_data.mag + reg_data.offset;
+                actual_value = Utils::getUint32num(data_list[buffer_index], data_list[buffer_index+1], Utils::Endian::BIG) / mag + offset;
             }
+        } else {
+            actual_value = static_cast<uint16_t>(val);
         }
-        else{
-            reg_data.value = static_cast<uint16_t>(val);
-        }
-        // 更新JSON数据数组
-        this->data_to_qt["data"][index] = reg_data.value;
+        
+        // ✅ 线程安全地更新寄存器值
+        this->updateRegisterValue(key, actual_value);
+        
+        // 填充临时JSON数组
+        data_array.push_back(actual_value);
+        
         index++;
     }
+    
+    // ✅ 步骤2: 仅在最后原子替换时持锁（极短时间）
+    auto now = std::chrono::system_clock::now();
+    auto time_t_now = std::chrono::system_clock::to_time_t(now);
+    std::stringstream ss;
+    ss << std::put_time(std::localtime(&time_t_now), "%Y-%m-%d %H:%M:%S");
+
+    {
+        std::unique_lock<std::shared_mutex> lock(this->data_to_qt_rwlock_);
+        this->data_to_qt["timestamp"] = ss.str();
+        this->data_to_qt["online_status"] = true;
+        this->data_to_qt["data"] = data_array;
+    }  // 锁立即释放
+    
     update_alarm_status();
 }
 
 void Dcdc::update_alarm_status() 
 {
     this->alarm_bits.clear();
-    for (const auto& fault_name : this->fault_words) {
-        auto it = this->data_dict_.find(fault_name);
-        if (it != this->data_dict_.end()) {
-            uint16_t fault_word_value = static_cast<uint16_t>(it->second.value);
-            std::vector<bool> word_bits = Utils::uint16_to_switches(fault_word_value);
-            this->alarm_bits.insert(this->alarm_bits.end(), word_bits.begin(), word_bits.end());
+    {
+        std::shared_lock<std::shared_mutex> lock(this->data_dict_rwlock_);
+        for (const auto& fault_name : this->fault_words) {
+            auto it = this->data_dict_.find(fault_name);
+            if (it != this->data_dict_.end()) {
+                uint16_t fault_word_value = static_cast<uint16_t>(it->second.value);
+                std::vector<bool> word_bits = Utils::uint16_to_switches(fault_word_value);
+                this->alarm_bits.insert(this->alarm_bits.end(), word_bits.begin(), word_bits.end());
+            }
         }
     }
 
@@ -137,16 +163,6 @@ void Dcdc::read_data(ModbusClient& mb_client)
         LOG_ERROR_LOC("ModbusClient is not connected.");
         return;
     }
-    
-    // 更新时间戳
-    auto now = std::chrono::system_clock::now();
-    auto time_t_now = std::chrono::system_clock::to_time_t(now);
-    std::stringstream ss;
-    ss << std::put_time(std::localtime(&time_t_now), "%Y-%m-%d %H:%M:%S");
-    {
-        std::unique_lock<std::shared_mutex> lock(this->data_to_qt_rwlock_);
-        this->data_to_qt["timestamp"] = ss.str();
-    }
 
     try {
         bool total_read_success = true;
@@ -162,9 +178,6 @@ void Dcdc::read_data(ModbusClient& mb_client)
             
             if (!read_success) {
                 total_read_success = false;
-                // LOG_ERROR_LOC("Modbus read failed for segment " + std::to_string(i + 1) + 
-                //              " (start_addr: " + std::to_string(segment.start_addr) + 
-                //              ", num_regs: " + std::to_string(segment.num_regs) + ")");
                 break;
             }
         }
@@ -178,12 +191,13 @@ void Dcdc::read_data(ModbusClient& mb_client)
             }
             parse_rawdata(this->data_buffer);
 
-            this->data_to_qt["online_status"] = true;
-            this->online_status = true;
         }else{
             this->reconnect_counter++;
             if (this->reconnect_counter>3){
-                this->data_to_qt["online_status"] = false;
+                {
+                    std::unique_lock<std::shared_mutex> lock(this->data_to_qt_rwlock_);
+                    this->data_to_qt["online_status"] = false;
+                }
                 this->online_status = false;
                 this->reconnect_counter = 0;
                 LOG_ERROR_LOC("Modbus read failed: " + get_name());
@@ -192,7 +206,10 @@ void Dcdc::read_data(ModbusClient& mb_client)
         }
     } catch (const std::exception& e) {
         LOG_ERROR_LOC("Modbus read error for PCS " + get_name() + ": " + std::string(e.what()));
-        this->data_to_qt["online_status"] = false;
+        {
+            std::unique_lock<std::shared_mutex> lock(this->data_to_qt_rwlock_);
+            this->data_to_qt["online_status"] = false;
+        }
         this->online_status = false;
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }

@@ -19,7 +19,6 @@ using json = nlohmann::json;
 
 class EMS : public Device {
 public:
-    
 
     static std::shared_ptr<EMS> instance() {
         static std::shared_ptr<EMS> inst(new EMS(), [](EMS*) {});
@@ -141,9 +140,6 @@ public:
     // 数据到QT的映射
     json data_to_qt;
     
-    // 告警缓存
-    std::unordered_map<std::string, bool> alarm_cached;
-    
     // 是否首次解析DI/DO
     bool first_parse_dido;
     
@@ -184,6 +180,9 @@ private:
     
     // 从JSON文件加载TCP命令
     bool load_tcp_cmd_from_json(const std::string& filepath);
+
+    // 从XML文件加载告警
+    void init_config(const std::string& config_file) override;
     
     // 初始化GPIO
     void init_gpio();

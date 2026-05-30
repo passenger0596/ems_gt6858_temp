@@ -121,7 +121,7 @@ void Device::handle_alarm(const std::string& alarm_name,
             this->alarm_cached[alarm_name] = false;
         }
     }
-    
+    std::unique_lock<std::shared_mutex> lock(this->data_to_qt_rwlock_);
     // 更新总数据中的告警状态
     this->data_to_qt[alarm_name] = *alarm_level_json;
 }

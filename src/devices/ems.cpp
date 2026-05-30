@@ -45,11 +45,12 @@ EMS::EMS() : Device("ems", 100, 0) {
     }
     
     // 初始化告警缓存
-    this->alarm_cached = {
-        {"消防主机故障", false},
-        {"消防二级故障", false},
-        {"水浸", false}
-    };
+    init_config(Config::EMS_COMMUNICATION_FILEPATH);  // 从配置文件加载告警信息
+    // this->alarm_cached = {
+    //     {"消防主机故障", false},
+    //     {"消防二级故障", false},
+    //     {"水浸", false}
+    // };
     
     // 初始化命令映射
     
@@ -82,9 +83,6 @@ EMS::EMS() : Device("ems", 100, 0) {
         {"online_status", 1},
         {"timestamp", ""},
         {"data", json::array()},
-        {"消防主机故障", false},
-        {"消防二级故障", false},
-        {"水浸", false},
         {"timingModeSet", this->timingModeSet},
         {"demandResponseModeSet", this->demandResponseModeSet}
     };
@@ -1212,4 +1210,32 @@ std::tuple<bool, int, int> EMS::check_demand_response_status() {
     }
     
     return {false, 0, 0};
+}
+
+
+void EMS::init_config(const std::string& config_file){
+    try{
+        LOG_INFO_LOC("EMS开始初始化告警配置文件: " + config_file);
+        pugi::xml_document doc;
+        pugi::xml_parse_result result = doc.load_file(config_file.c_str());
+
+        if (!result) {
+            LOG_ERROR_LOC(("Failed to load config file: " + config_file + ", Error: " + result.description()).c_str());
+            return;
+        }
+
+        pugi::xml_node root = doc.document_element();
+        if (!root) {
+            LOG_ERROR_LOC("Invalid XML format");
+            return;
+        }
+
+        this->parse_alarm_config(root);
+    }
+    catch (...) {
+        LOG_CRITICAL_LOC("Failed to load alarm from XML file: " + config_file);
+        return;
+    }
+
+
 }

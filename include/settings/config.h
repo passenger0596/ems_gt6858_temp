@@ -39,6 +39,7 @@ namespace Config {
     const std::string DEHUMIDIFIER_V2_COMMUNICATION_FILEPATH = "/home/ubuntu/mnt/ems_cpp/protocol/dehumidifier_protocol_V2.xml";
     const std::string WEA1610_COMMUNICATION_FILEPATH = "/home/ubuntu/mnt/ems_cpp/protocol/WEA1610_protocol.xml";
     const std::string BMS_UHOME_COMMUNICATION_FILEPATH = "/home/boring/code/cfg/bms_uhome_protocol.json";
+    const std::string GTBMS_COMMUNICATION_FILEPATH = "/home/boring/code/cfg/gtBMS_485_protocol_V1.18.xml";
 
 
 }

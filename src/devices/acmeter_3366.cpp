@@ -47,43 +47,67 @@ void ACMeter_3366::init_config(const std::string& config_file) {
 
 void ACMeter_3366::parse_rawdata(const std::vector<uint16_t>& data_list)
 {
-    // 使用写锁保护 data_to_qt 的更新
-    std::unique_lock<std::shared_mutex> lock(this->data_to_qt_rwlock_);
-
-    // 设置在线状态
-    this->data_to_qt["online_status"] = true;
     this->online_status = true;
 
     int index = 0; // 对应dev_data_keys_和json data数组的索引
-
-    // 根据预先计算的有用索引解析数据
+    json data_array = json::array();
+    
+    // ✅ 步骤1: 使用临时变量，无锁处理数据
     for (const uint16_t& buffer_index : useful_indexes) {
         // 确保索引不越界
         if (index >= static_cast<int>(this->dev_data_keys_.size()) || buffer_index >= data_list.size()) {
             break;
         }
+        
         const std::string& key = this->dev_data_keys_[index];
-        RegisterData& reg_data = this->data_dict_[key];
+        
+        // ✅ 线程安全地获取寄存器配置
+        double mag = 1.0;
+        uint16_t offset = 0;
+        std::string datatype;
+        
+        if (!this->getRegisterConfig(key, mag, offset, datatype)) {
+            LOG_WARNING_LOC("未找到寄存器配置: " + key);
+            index++;
+            continue;
+        }
 
         // 根据数据类型转换实际值
-        if (reg_data.datatype.find("INT32") != std::string::npos || 
-            reg_data.datatype.find("UINT32") != std::string::npos) {
+        double actual_value = 0.0;
+        if (datatype.find("INT32") != std::string::npos || 
+            datatype.find("UINT32") != std::string::npos) {
             // 32位数据需要两个寄存器
             if (buffer_index + 1 < data_list.size()) {
-                reg_data.value = Utils::getUint32num(data_list[buffer_index], data_list[buffer_index + 1], Utils::Endian::BIG) / reg_data.mag + reg_data.offset;
+                actual_value = Utils::getUint32num(data_list[buffer_index], data_list[buffer_index + 1], Utils::Endian::BIG) / mag + offset;
             }
-        } else if (reg_data.datatype.find("INT16") != std::string::npos || 
-                   reg_data.datatype.find("UINT16") != std::string::npos) {
+        } else if (datatype.find("INT16") != std::string::npos || 
+                   datatype.find("UINT16") != std::string::npos) {
             // 16位数据
-            reg_data.value = data_list[buffer_index] / reg_data.mag + reg_data.offset;
+            actual_value = data_list[buffer_index] / mag + offset;
         } else {
             // 默认处理为16位数据
-            reg_data.value = data_list[buffer_index] / reg_data.mag + reg_data.offset;
+            actual_value = data_list[buffer_index] / mag + offset;
         }
         
+        // ✅ 线程安全地更新寄存器值
+        this->updateRegisterValue(key, actual_value);
+        
         // 更新JSON数据数组
-        this->data_to_qt["data"][index] = reg_data.value;
+        data_array.push_back(actual_value);
         index++;
+    }
+
+    // ✅ 步骤2: 仅在最后原子替换时持锁
+    auto now = std::chrono::system_clock::now();
+    auto time_t_now = std::chrono::system_clock::to_time_t(now);
+    std::stringstream ss;
+    ss << std::put_time(std::localtime(&time_t_now), "%Y-%m-%d %H:%M:%S");
+
+    {
+        std::unique_lock<std::shared_mutex> lock(this->data_to_qt_rwlock_);
+        this->data_to_qt["timestamp"] = ss.str();
+        this->data_to_qt["online_status"] = true;
+        this->data_to_qt["data"] = data_array;
     }
 }
 
@@ -93,16 +117,6 @@ void ACMeter_3366::read_data(ModbusClient& mb_client)
     if (!mb_client.is_connected()){
         LOG_ERROR_LOC("ModbusClient is not connected.");
         return;
-    }
-
-    // 更新时间戳
-    auto now = std::chrono::system_clock::now();
-    auto time_t_now = std::chrono::system_clock::to_time_t(now);
-    std::stringstream ss;
-    ss << std::put_time(std::localtime(&time_t_now), "%Y-%m-%d %H:%M:%S");
-    {
-        std::unique_lock<std::shared_mutex> lock(this->data_to_qt_rwlock_);
-        this->data_to_qt["timestamp"] = ss.str();
     }
     
     try {
@@ -134,13 +148,14 @@ void ACMeter_3366::read_data(ModbusClient& mb_client)
             }
             parse_rawdata(this->data_buffer);
 
-            this->data_to_qt["online_status"] = true;
-            this->online_status = true;
 
         } else {
             this->reconnect_counter++;
             if (this->reconnect_counter>3){
-                this->data_to_qt["online_status"] = false;
+                {
+                    std::unique_lock<std::shared_mutex> lock(this->data_to_qt_rwlock_);
+                    this->data_to_qt["online_status"] = false;
+                }
                 this->online_status = false;
                 this->reconnect_counter = 0;
                 LOG_ERROR_LOC("Modbus read failed: " + get_name());
@@ -149,7 +164,10 @@ void ACMeter_3366::read_data(ModbusClient& mb_client)
         }
     } catch (const std::exception& e) {
         LOG_ERROR_LOC("Modbus read error for ACMeter_3366 " + get_name() + ": " + std::string(e.what()));
-        this->data_to_qt["online_status"] = false;
+        {
+            std::unique_lock<std::shared_mutex> lock(this->data_to_qt_rwlock_);
+            this->data_to_qt["online_status"] = false;
+        }
         this->online_status = false;
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }

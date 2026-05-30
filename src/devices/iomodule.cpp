@@ -113,37 +113,63 @@ void IOModule::init_config(const std::string& config_file) {
 
 void IOModule::parse_rawdata(const std::vector<uint16_t>& data_list)
 {
-    // 使用写锁保护 data_to_qt 的更新
-    std::unique_lock<std::shared_mutex> lock(this->data_to_qt_rwlock_);
-
-    // 设置在线状态
-    this->data_to_qt["online_status"] = true;
     this->online_status = true;
-
+    
     int index = 0; // 对应dev_data_keys_和json data数组的索引
-
-    // 根据预先计算的有用索引解析数据
+    json data_array = json::array();
+    json temp_updates;  // ✅ 临时存储需要更新的单独键值对
+    
+    // ✅ 步骤1: 使用临时变量，无锁处理数据
     for (const uint16_t& buffer_index : this->useful_indexes) {
         // 确保索引不越界
         if (index >= static_cast<int>(this->dev_data_keys_.size()) || buffer_index >= data_list.size()) {
             break;
         }
+        
         const std::string& key = this->dev_data_keys_[index];
-        RegisterData& reg_data = this->data_dict_[key];
+        
+        // ✅ 线程安全地获取寄存器配置
+        double mag = 1.0;
+        uint16_t offset = 0;
+        std::string datatype;
+        
+        if (!this->getRegisterConfig(key, mag, offset, datatype)) {
+            LOG_WARNING_LOC("未找到寄存器配置: " + key);
+            index++;
+            continue;
+        }
 
         // 对于DI/DO设备，数据类型为BOOL，直接转换为布尔值
         bool status = (data_list[buffer_index] != 0);
-        reg_data.value = status ? 1 : 0;
+        double actual_value = status ? 1 : 0;
         
-        // 更新JSON数据数组
-        this->data_to_qt["data"][index] = reg_data.value;
-        // 同时更新对应的DI/DO状态字段
-        this->data_to_qt[key] = status;
+        // ✅ 线程安全地更新寄存器值
+        this->updateRegisterValue(key, actual_value);
+        
+        // 填充临时JSON数组
+        data_array.push_back(actual_value);
+        
+        // ✅ 收集需要更新的单独键值对
+        temp_updates[key] = status;
         
         index++;
     }
 
-    // 更新告警状态（仍在锁保护下）
+    // ✅ 步骤2: 仅在最后原子替换时持锁
+    {
+        std::unique_lock<std::shared_mutex> lock(this->data_to_qt_rwlock_);
+        
+        // 设置在线状态
+        this->data_to_qt["online_status"] = true;
+        this->data_to_qt["data"] = data_array;
+        
+        // ✅ 批量更新单独的DI/DO状态字段
+        for (auto it = temp_updates.begin(); it != temp_updates.end(); ++it) {
+            this->data_to_qt[it.key()] = it.value();
+        }
+    }  // 锁立即释放
+    
+    // 更新告警状态
     update_di_status();
 }
 

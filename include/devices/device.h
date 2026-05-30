@@ -207,6 +207,7 @@ public:
                     this->alarm_map.push_back({name, level});
                 }
             }
+        LOG_INFO_LOC(("设备 " + name_ + "初始化告警成功: " + std::to_string(this->alarm_map.size()) + " alarms.").c_str());
         }
     }
 
@@ -380,6 +381,44 @@ public:
             }
         }
         return default_value;
+    }
+
+    /**
+     * @brief 线程安全地更新寄存器的value字段
+     * @param key 寄存器名称（键）
+     * @param value 新的数值
+     * @return true 如果更新成功，false 如果键不存在
+     * @note 此方法仅更新 RegisterData 的 value 字段，保持 mag/offset 等配置不变
+     */
+    bool updateRegisterValue(const std::string& key, double value) {
+        std::unique_lock<std::shared_mutex> lock(data_dict_rwlock_);
+        auto it = data_dict_.find(key);
+        if (it != data_dict_.end()) {
+            it->second.value = value;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @brief 线程安全地获取寄存器的配置信息（mag和offset）
+     * @param key 寄存器名称（键）
+     * @param out_mag 输出的缩放系数
+     * @param out_offset 输出的偏移量
+     * @param out_datatype 输出的数据类型
+     * @return true 如果获取成功，false 如果键不存在
+     * @note 使用共享锁，支持并发读取配置
+     */
+    bool getRegisterConfig(const std::string& key, double& out_mag, uint16_t& out_offset, std::string& out_datatype) {
+        std::shared_lock<std::shared_mutex> lock(data_dict_rwlock_);
+        auto it = data_dict_.find(key);
+        if (it != data_dict_.end()) {
+            out_mag = it->second.mag;
+            out_offset = it->second.offset;
+            out_datatype = it->second.datatype;
+            return true;
+        }
+        return false;
     }
 
     

@@ -12,6 +12,7 @@
 #include <chrono>
 #include <iomanip>
 #include <functional>  // 用于 std::function
+#include "gt_bms.h"  // 添加高特BMS头文件
 
 DeviceManager::DeviceManager() {
     // 初始化所有设备实例
@@ -21,7 +22,13 @@ DeviceManager::DeviceManager() {
     this->dehumidifierV2_ = std::make_shared<DehumidifierV2>("dehumidifier", 3, 1);
     this->dtsd3366_ = std::make_shared<ACMeter_3366>("dtsd3366", 4, 1);
     // this->bms_uhome_ = std::make_shared<BmsUhome>("bms_uhome", 16, 1);
-    this->devices_ = {this->ems_, this->pcs_, this->wea1610_, this->dehumidifierV2_, this->dtsd3366_}; 
+    
+    // 创建高特BMS设备（假设使用串口5，Modbus从站地址为1）
+    this->gt_bms_ = std::make_shared<GtBms>("gt_bms", 5, 1);
+    
+    this->devices_ = {this->ems_, this->pcs_, this->wea1610_, this->dehumidifierV2_, 
+                      this->dtsd3366_, this->gt_bms_}; 
+    
     for (auto& device : this->devices_) {
         this->device_map_[device->get_name()] = device;
     }

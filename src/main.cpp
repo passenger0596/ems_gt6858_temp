@@ -68,10 +68,10 @@ int main() {
         });
         
         // 启动Socket服务器（与qt通讯）
-        std::shared_ptr<UnixSocketServer> socket_server = std::make_shared<UnixSocketServer>(Config::SOCKET_PATH, device_manager->devices_);
+        std::unique_ptr<UnixSocketServer> socket_server = std::make_unique<UnixSocketServer>(Config::SOCKET_PATH, device_manager->devices_);
         socket_server->startServer();
         // 启动策略线程
-        std::shared_ptr<Strategy> strategy = std::make_shared<Strategy>(device_manager);
+        std::unique_ptr<Strategy> strategy = std::make_unique<Strategy>(device_manager);
         strategy->runningThread();
 
 

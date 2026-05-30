@@ -4,6 +4,7 @@
 #include "bms_uhome.h"
 #include "wea1610.h"
 #include "dehumidifier_v2.h"
+#include "gt_bms.h"  // 添加高特BMS头文件
 #include "modbusserver.h"
 #include <thread>
 #include <atomic>
@@ -57,7 +58,7 @@ class DeviceManager{
         std::shared_ptr<BmsUhome> bms_uhome_ = nullptr;
         std::shared_ptr<Wea1610> wea1610_ = nullptr;
         std::shared_ptr<DehumidifierV2> dehumidifierV2_ = nullptr;
-
+        std::shared_ptr<GtBms> gt_bms_ = nullptr;  // 高特BMS设备
 
         // 串口号与ModbusClient的映射
         std::unordered_map<int, std::shared_ptr<ModbusClient>> mapComToModbusClient;

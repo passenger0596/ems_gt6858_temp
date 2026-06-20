@@ -25,16 +25,16 @@ DeviceManager::DeviceManager() {
     this->gt_bms_ = std::make_shared<GtBms>("gtbms485", 2, 1);
     this->ac_hengdu_ = std::make_shared<AcHengdu>("air_condition", 3, 1);
     
-    this->dtsd3366_ = std::make_shared<ACMeter_3366>("dtsd3366", 4, 1);
-    this->dg_hgm6100_ = std::make_shared<DgHgm6100n>("dg_hgm6100n", 5, 1);
-    this->iomodule_ = std::make_shared<IOModule>("board_8di8do", 7, 20);
+    // this->dtsd3366_ = std::make_shared<ACMeter_3366>("dtsd3366", 4, 1);
+    // this->dg_hgm6100_ = std::make_shared<DgHgm6100n>("dg_hgm6100n", 5, 1);
+    // this->iomodule_ = std::make_shared<IOModule>("board_8di8do", 7, 20);
 
-    this->chargers_ = std::make_shared<InfyCharger>("chargers", 17, 1);
-    this->chargers_->init_config(Config::INFY_CHARGER_COMMUNICATION_FILEPATH);
+    // this->chargers_ = std::make_shared<InfyCharger>("chargers", 17, 1);
+    // this->chargers_->init_config(Config::INFY_CHARGER_COMMUNICATION_FILEPATH);
     
     
     this->devices_ = {this->ems_, this->pcs_, this->dcdc1_, this->dcdc2_,
-                      this->gt_bms_, this->ac_hengdu_, this->dtsd3366_,this->dg_hgm6100_, this->iomodule_, this->chargers_
+                      this->gt_bms_, this->ac_hengdu_
                       }; 
     
     for (auto& device : this->devices_) {
@@ -1164,7 +1164,7 @@ static double regs_to_value(const uint16_t* regs, int cnt,
 }
 
 // ── 初始化：分配 FC04 地址、建立 FC03 映射、创建数据区 ──
-void DeviceManager::initModbusTcpServer(const std::string& ip, int port) {
+void DeviceManager::initModbusAddressMapping() {
     this->fc04_offsets_.clear();
     this->fc03_map_.clear();
 
@@ -1437,16 +1437,13 @@ void DeviceManager::initModbusTcpServer(const std::string& ip, int port) {
     if (timer_block_end > total_holding)  total_holding = timer_block_end;
     if (demand_block_end > total_holding) total_holding = demand_block_end;
     fc03_total_holding_ = total_holding;
+    fc04_total_input_ = total_input;
 
     // 初始化 last 缓存
     last_timer_block_.assign(total_timer_regs, 0);
     last_demand_block_.assign(total_demand_regs, 0);
 
-    // 创建 ModbusServer 并分配数据区
-    this->modbus_tcp_server_ = std::make_unique<ModbusServer>(ip, std::to_string(port), 10);
-    this->modbus_tcp_server_->init_data_area(0, 0, total_holding, total_input);
-
-    LOG_INFO_LOC(("ModbusTCP server初始化: total_holding=" + std::to_string(total_holding) +
+    LOG_INFO_LOC(("Modbus地址映射完成: total_holding=" + std::to_string(total_holding) +
                   ", total_input=" + std::to_string(total_input) +
                   ", timer(charge=" + std::to_string(timer_charge_entries_) +
                   "+discharge=" + std::to_string(timer_discharge_entries_) +
@@ -1454,6 +1451,28 @@ void DeviceManager::initModbusTcpServer(const std::string& ip, int port) {
                   ", demand(" + std::to_string(demand_entries_) +
                   ")@" + std::to_string(demand_block_start_addr_) +
                   ", fc03_mappings=" + std::to_string(this->fc03_map_.size())).c_str());
+}
+
+void DeviceManager::initModbusTcpServer(const std::string& ip, int port) {
+    initModbusAddressMapping();
+
+    // 创建 TCP ModbusServer 并分配数据区
+    this->modbus_tcp_server_ = std::make_unique<ModbusServer>(ip, std::to_string(port), 10);
+    this->modbus_tcp_server_->init_data_area(0, 0, fc03_total_holding_, fc04_total_input_);
+
+    LOG_INFO_LOC(("ModbusTCP server初始化: " + ip + ":" + std::to_string(port)).c_str());
+}
+
+void DeviceManager::initModbusRtuServer(const std::string& port, int baudrate, int slave_id) {
+    initModbusAddressMapping();
+
+    // 创建 RTU ModbusServer 并分配数据区
+    this->modbus_rtu_server_ = std::make_unique<ModbusServer>(port, baudrate, slave_id);
+    this->modbus_rtu_server_->init_data_area(0, 0, fc03_total_holding_, fc04_total_input_);
+
+    LOG_INFO_LOC(("ModbusRTU server初始化: port=" + port +
+                  ", baudrate=" + std::to_string(baudrate) +
+                  ", slave_id=" + std::to_string(slave_id)).c_str());
 }
 
 // ── 启动 ──
@@ -1468,7 +1487,7 @@ void DeviceManager::startModbusTcpServer() {
     setDeviceFc04StartAddr("chargers", 1500);
     setDeviceFc04StartAddr("dtsd3366", 1600);
     setDeviceFc04StartAddr("air_condition", 1800);
-    setDeviceFc04StartAddr("board_8di8do", 1900);
+    // board_8di8do removed: no IO module hardware on this EMS
     setDeviceFc04StartAddr("gtbms485", 2000);
     setDeviceFc04StartAddr("dg_hgm6100n", 3000);
 
@@ -1480,7 +1499,7 @@ void DeviceManager::startModbusTcpServer() {
     setDeviceFc03StartAddr("chargers", 1500);
     setDeviceFc03StartAddr("dtsd3366", 1600);
     setDeviceFc03StartAddr("air_condition", 1800);
-    setDeviceFc03StartAddr("board_8di8do", 1900);
+    // board_8di8do removed: no IO module hardware on this EMS
     setDeviceFc03StartAddr("gtbms485", 2000);
     setDeviceFc03StartAddr("dg_hgm6100n", 3000);
 
@@ -1511,6 +1530,75 @@ void DeviceManager::stopModbusTcpServer() {
     LOG_INFO_LOC("Modbus TCP server stopped");
 }
 
+void DeviceManager::stopModbusRtuServer() {
+    // 仅当TCP server也未运行时才停同步线程
+    if (!this->modbus_tcp_server_) {
+        modbus_sync_running_ = false;
+        if (this->modbus_sync_thread_.joinable()) this->modbus_sync_thread_.join();
+    }
+
+    if (this->modbus_rtu_server_) this->modbus_rtu_server_->stop();
+    LOG_INFO_LOC("Modbus RTU server stopped");
+}
+
+// ── 启动 RTU 服务器 ──
+void DeviceManager::startModbusRtuServer() {
+    std::string port = "/dev/ttyS0";    // 默认485串口
+    int baudrate = 9600;
+    int slave_id = 1;
+
+    // 如果映射尚未初始化（如TCP已先启动则复用），则初始化
+    if (fc03_map_.empty() && fc04_offsets_.empty()) {
+        setDeviceFc04StartAddr("ems", 0);
+        setDeviceFc04StartAddr("pcs1", 1000);
+        setDeviceFc04StartAddr("dcdc1", 1300);
+        setDeviceFc04StartAddr("dcdc2", 1400);
+        setDeviceFc04StartAddr("chargers", 1500);
+        setDeviceFc04StartAddr("dtsd3366", 1600);
+        setDeviceFc04StartAddr("air_condition", 1800);
+        setDeviceFc04StartAddr("gtbms485", 2000);
+        setDeviceFc04StartAddr("dg_hgm6100n", 3000);
+
+        setDeviceFc03StartAddr("pcs1", 1000);
+        setDeviceFc03StartAddr("dcdc1", 1300);
+        setDeviceFc03StartAddr("dcdc2", 1400);
+        setDeviceFc03StartAddr("chargers", 1500);
+        setDeviceFc03StartAddr("dtsd3366", 1600);
+        setDeviceFc03StartAddr("air_condition", 1800);
+        setDeviceFc03StartAddr("gtbms485", 2000);
+        setDeviceFc03StartAddr("dg_hgm6100n", 3000);
+
+        initModbusRtuServer(port, baudrate, slave_id);
+    } else {
+        // 复用已有映射，仅创建RTU server
+        this->modbus_rtu_server_ = std::make_unique<ModbusServer>(port, baudrate, slave_id);
+        this->modbus_rtu_server_->init_data_area(0, 0, fc03_total_holding_, fc04_total_input_);
+        LOG_INFO_LOC(("ModbusRTU server复用已有映射: port=" + port +
+                      ", baudrate=" + std::to_string(baudrate) +
+                      ", slave_id=" + std::to_string(slave_id)).c_str());
+    }
+
+    // 先写一次初始值
+    syncAllFc04To(modbus_rtu_server_.get());
+    syncAllFc03To(modbus_rtu_server_.get());
+    syncTimerBlockTo(modbus_rtu_server_.get());
+    syncDemandBlockTo(modbus_rtu_server_.get());
+
+    if (!this->modbus_rtu_server_->start()) {
+        LOG_ERROR_LOC("Modbus RTU server启动失败！");
+        return;
+    }
+
+    // 如果同步线程尚未运行（如TCP已先启动则复用），则启动
+    if (!this->modbus_sync_running_) {
+        this->modbus_sync_running_ = true;
+        this->modbus_sync_thread_ = std::thread(&DeviceManager::modbusSyncLoop, this);
+    }
+    LOG_INFO_LOC("Modbus RTU server启动成功:" + port +
+                 " baudrate=" + std::to_string(baudrate) +
+                 " slave_id=" + std::to_string(slave_id));
+}
+
 // ── 后台同步线程 (≈1秒) ──
 void DeviceManager::modbusSyncLoop() {
     while (this->modbus_sync_running_) {
@@ -1519,10 +1607,18 @@ void DeviceManager::modbusSyncLoop() {
         if (!this->modbus_sync_running_) break;
 
         try {
-            syncAllFc04();               // 刷新所有设备 → 输入寄存器
-            syncAllFc03();               // 双向同步: 检测外部写入→EMS, EMS→保持寄存器
-            syncTimerBlock();            // 双向同步: 检测外部写入→EMS, EMS→定时模式块
-            syncDemandBlock();           // 双向同步: 检测外部写入→EMS, EMS→需求响应块
+            if (modbus_tcp_server_) {
+                syncAllFc04To(modbus_tcp_server_.get());
+                syncAllFc03To(modbus_tcp_server_.get());
+                syncTimerBlockTo(modbus_tcp_server_.get());
+                syncDemandBlockTo(modbus_tcp_server_.get());
+            }
+            if (modbus_rtu_server_) {
+                syncAllFc04To(modbus_rtu_server_.get());
+                syncAllFc03To(modbus_rtu_server_.get());
+                syncTimerBlockTo(modbus_rtu_server_.get());
+                syncDemandBlockTo(modbus_rtu_server_.get());
+            }
         } catch (const std::exception& e) {
             LOG_ERROR_LOC(("Modbus服务器同步错误: " + std::string(e.what())).c_str());
         }
@@ -1530,8 +1626,8 @@ void DeviceManager::modbusSyncLoop() {
 }
 
 // ── FC04: 将设备 data_dict 同步到输入寄存器 ──
-void DeviceManager::syncAllFc04() {
-    if (!this->modbus_tcp_server_) return;
+void DeviceManager::syncAllFc04To(ModbusServer* server) {
+    if (!server) return;
 
     // 优化：先复制所有设备数据，减少持锁时间
     struct DeviceData {
@@ -1575,8 +1671,8 @@ void DeviceManager::syncAllFc04() {
     // 在锁外更新 Modbus 寄存器
     for (auto& dev_data : all_devices_data) {
         // 首个寄存器：online_status
-        this->modbus_tcp_server_->set_input_register(dev_data.start_addr,
-                                                       dev_data.online ? 1 : 0);
+        server->set_input_register(dev_data.start_addr,
+                                   dev_data.online ? 1 : 0);
         uint16_t addr = dev_data.start_addr + 1;
 
         for (const auto& reg_pair : dev_data.registers) {
@@ -1585,9 +1681,9 @@ void DeviceManager::syncAllFc04() {
             value_to_regs(rd.value, rd.mag, rd.offset, rd.datatype, out, cnt);
 
             if (cnt >= 2)
-                this->modbus_tcp_server_->set_input_registers(addr, 2, out);
+                server->set_input_registers(addr, 2, out);
             else
-                this->modbus_tcp_server_->set_input_register(addr, out[0]);
+                server->set_input_register(addr, out[0]);
             addr += cnt;
         }
     }
@@ -1598,12 +1694,12 @@ void DeviceManager::syncAllFc04() {
 // ── FC03: 双边同步（skip_count 防回弹）──
 // 写入方向: 检测HR变化 → 写RTU → skip_count=3 跳过后续推送等data_dict追上
 // 推送方向: skip_count>0 则递减并跳过；否则 data_dict → HR
-void DeviceManager::syncAllFc03() {
-    if (!this->modbus_tcp_server_) return;
+void DeviceManager::syncAllFc03To(ModbusServer* server) {
+    if (!server) return;
     if (this->fc03_map_.empty()) return;
 
-    bool server_running = this->modbus_tcp_server_->is_running();
-    auto hr = this->modbus_tcp_server_->get_holding_registers(0, fc03_total_holding_);
+    bool server_running = server->is_running();
+    auto hr = server->get_holding_registers(0, fc03_total_holding_);
     if (hr.size() < fc03_total_holding_) return;
 
     struct CW { std::string key; double real; };
@@ -1691,13 +1787,13 @@ void DeviceManager::syncAllFc03() {
             if (out[0] == cur[0] && (cnt < 2 || m.reg_count < 2 || out[1] == cur[1])) continue;
 
             if (cnt >= 2)
-                this->modbus_tcp_server_->set_holding_registers(addr, 2, out);
+                server->set_holding_registers(addr, 2, out);
             else
-                this->modbus_tcp_server_->set_holding_register(addr, out[0]);
+                server->set_holding_register(addr, out[0]);
 
             uint16_t c[2];
-            this->modbus_tcp_server_->get_holding_register(addr, &c[0]);
-            if (cnt >= 2 && m.reg_count > 1) this->modbus_tcp_server_->get_holding_register(addr + 1, &c[1]);
+            server->get_holding_register(addr, &c[0]);
+            if (cnt >= 2 && m.reg_count > 1) server->get_holding_register(addr + 1, &c[1]);
             m.last_val[0] = c[0];
             if (m.reg_count > 1) m.last_val[1] = c[1];
         }
@@ -1764,8 +1860,8 @@ static std::string format_datetime(int y, int m, int d, int hh, int mm) {
 }
 
 // ── 定时模式块：双向同步（检测客户端写入→EMS, EMS→保持寄存器），单趟消除竞态 ──
-void DeviceManager::syncTimerBlock() {
-    if (!this->modbus_tcp_server_ || !ems_) return;
+void DeviceManager::syncTimerBlockTo(ModbusServer* server) {
+    if (!server || !ems_) return;
 
     int charge_cnt    = timer_charge_entries_;
     int discharge_cnt = timer_discharge_entries_;
@@ -1775,7 +1871,7 @@ void DeviceManager::syncTimerBlock() {
     std::vector<uint16_t> cur(total);
     for (size_t i = 0; i < total; ++i) {
         uint16_t v;
-        if (!this->modbus_tcp_server_->get_holding_register(
+        if (!server->get_holding_register(
                 timer_block_start_addr_ + i, &v)) return;
         cur[i] = v;
     }
@@ -1840,7 +1936,7 @@ void DeviceManager::syncTimerBlock() {
         // 写入前 recheck HR
         for (size_t i = 0; i < total; ++i) {
             uint16_t v;
-            if (!this->modbus_tcp_server_->get_holding_register(
+            if (!server->get_holding_register(
                     timer_block_start_addr_ + i, &v)) return;
             cur[i] = v;
         }
@@ -1849,10 +1945,10 @@ void DeviceManager::syncTimerBlock() {
             client_wrote = true;
         } else if (regs != last_timer_block_) {
             for (size_t i = 0; i < total; ++i)
-                this->modbus_tcp_server_->set_holding_register(timer_block_start_addr_ + i, regs[i]);
+                server->set_holding_register(timer_block_start_addr_ + i, regs[i]);
             for (size_t i = 0; i < total; ++i) {
                 uint16_t v;
-                this->modbus_tcp_server_->get_holding_register(timer_block_start_addr_ + i, &v);
+                server->get_holding_register(timer_block_start_addr_ + i, &v);
                 cur[i] = v;
             }
             last_timer_block_ = cur;
@@ -1888,11 +1984,12 @@ void DeviceManager::syncTimerBlock() {
             if (all_zero) continue;
             discharge_list.push_back(decode_entry(&cur[off]));
         }
-
-        std::unique_lock<std::shared_mutex> lk(ems_->json_rwlock_);
-        ems_->timingModeSet["chargeTimeList"]    = charge_list;
-        ems_->timingModeSet["dischargeTimeList"] = discharge_list;
-        ems_->tcp_timingModeSet = ems_->timingModeSet;
+        {
+            std::unique_lock<std::shared_mutex> lk(ems_->json_rwlock_);
+            ems_->timingModeSet["chargeTimeList"]    = charge_list;
+            ems_->timingModeSet["dischargeTimeList"] = discharge_list;
+            ems_->tcp_timingModeSet = ems_->timingModeSet;
+        }
         ems_->write_timerJsonFile(
             json{{"timingModeSet", ems_->timingModeSet}},
             Config::EMS_CONFIG_FILEPATH_JSON);
@@ -1904,8 +2001,8 @@ void DeviceManager::syncTimerBlock() {
 }
 
 // ── 需求响应模式块：双向同步（检测客户端写入→EMS, EMS→保持寄存器），单趟消除竞态 ──
-void DeviceManager::syncDemandBlock() {
-    if (!this->modbus_tcp_server_ || !ems_) return;
+void DeviceManager::syncDemandBlockTo(ModbusServer* server) {
+    if (!server || !ems_) return;
 
     size_t total = demand_entries_ * DEMAND_ENTRY_REGS;
 
@@ -1913,7 +2010,7 @@ void DeviceManager::syncDemandBlock() {
     std::vector<uint16_t> cur(total);
     for (size_t i = 0; i < total; ++i) {
         uint16_t v;
-        if (!this->modbus_tcp_server_->get_holding_register(
+        if (!server->get_holding_register(
                 demand_block_start_addr_ + i, &v)) return;
         cur[i] = v;
     }
@@ -1957,7 +2054,7 @@ void DeviceManager::syncDemandBlock() {
         // 写入前 recheck HR（消除 TOCTOU 窗口）
         for (size_t i = 0; i < total; ++i) {
             uint16_t v;
-            if (!this->modbus_tcp_server_->get_holding_register(
+            if (!server->get_holding_register(
                     demand_block_start_addr_ + i, &v)) return;
             cur[i] = v;
         }
@@ -1966,12 +2063,12 @@ void DeviceManager::syncDemandBlock() {
             client_wrote = true;
         } else if (regs != last_demand_block_) {
             for (size_t i = 0; i < total; ++i)
-                this->modbus_tcp_server_->set_holding_register(
+                server->set_holding_register(
                     demand_block_start_addr_ + i, regs[i]);
 
             for (size_t i = 0; i < total; ++i) {
                 uint16_t v;
-                this->modbus_tcp_server_->get_holding_register(
+                server->get_holding_register(
                     demand_block_start_addr_ + i, &v);
                 cur[i] = v;
             }
@@ -2004,10 +2101,11 @@ void DeviceManager::syncDemandBlock() {
             entry["reactivePower"] = reactive;
             demand_list.push_back(entry);
         }
-
-        std::unique_lock<std::shared_mutex> lk(ems_->json_rwlock_);
-        ems_->demandResponseModeSet = demand_list;
-        ems_->tcp_demandResponseModeSet = demand_list;
+        {
+            std::unique_lock<std::shared_mutex> lk(ems_->json_rwlock_);
+            ems_->demandResponseModeSet = demand_list;
+            ems_->tcp_demandResponseModeSet = demand_list;
+        }
         ems_->write_timerJsonFile(
             json{{"demandResponseModeSet", ems_->demandResponseModeSet}},
             Config::EMS_CONFIG_FILEPATH_JSON);

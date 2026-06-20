@@ -16,18 +16,7 @@ EmsCmd::EmsCmd(std::unordered_map<std::string, std::shared_ptr<Device>> device_m
 
 
 void EmsCmd::manual_controll_do() {
-    for (int i = 0; i < 4; i++){
-        if (cmd()->cmd_from_qt["ems"]["do"+std::to_string(i+1)].get<int>() == 1) {
-            LOG_INFO_LOC("准备执行EMS do" + std::to_string(i+1) + " on命令");
-            this->ems->do_on_off(i+1, "on");
-            cmd()->cmd_from_qt["ems"]["do"+std::to_string(i+1)] = 2;
-        }
-        else if (cmd()->cmd_from_qt["ems"]["do"+std::to_string(i+1)].get<int>() == 0) {
-            LOG_INFO_LOC("准备执行EMS do" + std::to_string(i+1) + " off命令");
-            this->ems->do_on_off(i+1, "off");
-            cmd()->cmd_from_qt["ems"]["do"+std::to_string(i+1)] = 2;
-        }
-    }
+    // (DO control removed: no GPIO hardware on this EMS)
 }
 
 void EmsCmd::set_single_config(const std::string& cfg_name,bool& cfg_value) {

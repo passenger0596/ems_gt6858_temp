@@ -785,11 +785,23 @@ public:
 
         mb_client.set_slave(this->id_);
 
+        LOG_DEBUG_F("FC03(%s id=%d): reading %zu segments", this->name_.c_str(), this->id_, segments.size());
+
         buffer_vec.resize(segments.size());
         for (size_t i = 0; i < segments.size(); ++i) {
             buffer_vec[i].resize(segments[i].num_regs);
+            LOG_DEBUG_F("FC03(%s id=%d): seg[%zu] start=%u count=%u (addr %u-%u)",
+                         this->name_.c_str(), this->id_, i,
+                         segments[i].start_addr, segments[i].num_regs,
+                         segments[i].start_addr,
+                         segments[i].start_addr + segments[i].num_regs - 1);
             if (!mb_client.read_holding_registers(
                     segments[i].start_addr, segments[i].num_regs, buffer_vec[i].data())) {
+                LOG_ERROR_F("FC03(%s id=%d): seg[%zu] FAILED start=%u count=%u (addr %u-%u)",
+                            this->name_.c_str(), this->id_, i,
+                            segments[i].start_addr, segments[i].num_regs,
+                            segments[i].start_addr,
+                            segments[i].start_addr + segments[i].num_regs - 1);
                 return false;
             }
         }
@@ -828,13 +840,21 @@ public:
     bool read_all_registers(ModbusClient& mb_client){
         this->data_buffer.clear();
         bool success = true;
-        if (!this->fc01_nameToAddr_map.empty()) 
+
+        LOG_DEBUG_F("read_all_registers(%s id=%d): FC01=%zu FC02=%zu FC03=%zu FC04=%zu segments",
+                    this->name_.c_str(), this->id_,
+                    this->segments01_.size(),
+                    this->segments02_.size(),
+                    this->segments03_.size(),
+                    this->segments04_.size());
+
+        if (!this->fc01_nameToAddr_map.empty())
             success = read_fc01_segments(mb_client, this->segments01_, this->data_buffer_vec01_, this->data_buffer);
-        if (!this->fc02_nameToAddr_map.empty()) 
+        if (!this->fc02_nameToAddr_map.empty())
             success =read_fc02_segments(mb_client, this->segments02_, this->data_buffer_vec02_, this->data_buffer);
-        if (!this->fc03_nameToAddr_map.empty()) 
+        if (!this->fc03_nameToAddr_map.empty())
             success =read_fc03_segments(mb_client, this->segments03_, this->data_buffer_vec03_, this->data_buffer);
-        if (!this->fc04_nameToAddr_map.empty()) 
+        if (!this->fc04_nameToAddr_map.empty())
             success =read_fc04_segments(mb_client, this->segments04_, this->data_buffer_vec04_, this->data_buffer);
         return success;
     }

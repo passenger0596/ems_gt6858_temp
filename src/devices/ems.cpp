@@ -17,7 +17,6 @@ EMS::EMS() : Device("ems", 100, 0) {
     // 初始化基本属性
     this->sys_running_pos = 0;      // 程序运行位置
     this->heartbeat = 0;        // 心跳
-    this->first_parse_dido = true;      // 初次解析dido
     this->is_save_data = false;         // 是否实时保存数据
     this->save_dev_cycle = 15;          // 保存周期
     this->hot_update_flag = false;      // 热更新标志
@@ -31,27 +30,7 @@ EMS::EMS() : Device("ems", 100, 0) {
     
     // 初始化在线状态
     this->online_status = 1;
-    
-    // 初始化GPIO字典
-    this->di_num_dict = {{"DI1", 45}, {"DI2", 44}, {"DI3", 46}, {"DI4", 47}};
-    this->do_num_dict = {{"DO1", 59}, {"DO2", 56}, {"DO3", 58}, {"DO4", 50}};
-    
-    // 初始化DI/DO状态
-    for (const auto& di : this->di_num_dict) {
-        this->di_status[di.first] = false;
-    }
-    for (const auto& d_o : this->do_num_dict) {
-        this->do_status[d_o.first] = false;
-    }
-    
-    // 初始化告警缓存
-    init_config(Config::EMS_COMMUNICATION_FILEPATH);  // 从配置文件加载告警信息
-    // this->alarm_cached = {
-    //     {"消防主机故障", false},
-    //     {"消防二级故障", false},
-    //     {"水浸", false}
-    // };
-    
+
     // 初始化命令映射
     
     // 加载数据字典
@@ -73,10 +52,7 @@ EMS::EMS() : Device("ems", 100, 0) {
     this->tcp_data_dict = this->data_dict_;
     this->tcp_timingModeSet = this->timingModeSet;
     this->tcp_demandResponseModeSet = this->demandResponseModeSet;
-    
-    // 初始化GPIO
-    init_gpio();
-    
+
     // 初始化data_to_qt
     this->data_to_qt = {
         {"name", "ems"},
@@ -194,165 +170,35 @@ bool EMS::load_tcp_cmd_from_json(const std::string& filepath) {
     }
 }
 
-// 初始化GPIO
-void EMS::init_gpio() {
-    // 初始化所有DI为输入方向
-    for (const auto& di : this->di_num_dict) {
-        setup_gpio_direction(di.second, "in");
-    }
-    
-    // 初始化所有DO为输出方向
-    for (const auto& d_o : this->do_num_dict) {
-        setup_gpio_direction(d_o.second, "out");
-    }
-    
-    LOG_INFO_LOC("GPIO initialized");
-}
-
 // 更新EMS状态（写操作，使用独占锁）
 void EMS::update_ems() {
     // 使用独占锁（写锁），因为会修改 data_dict_ 和 data_to_qt
     std::unique_lock<std::shared_mutex> lock(this->json_rwlock_);
-    
-    // 读取DI状态
-    read_di_status();
-    
+
     // 更新在线状态
     this->online_status = 1;
-    
+
     // 更新data_to_qt
     this->data_to_qt["timestamp"] = get_current_time_string();
-    
+
     // 构建临时数据列表
     std::vector<double> temp_list;
-    
+
     // 添加基本状态
     temp_list.push_back(this->getValue<double>("开机", 0));
     temp_list.push_back(this->getValue<double>("系统运行模式", 1));
     temp_list.push_back(this->getValue<double>("系统状态", 2));
     temp_list.push_back(this->getValue<double>("系统告警等级", 0));
-    
-    // 添加DO状态
-    for (const auto& do_item : this->do_status) {
-        temp_list.push_back(do_item.second ? 1 : 0);
-        // 使用线程安全的 setValue 方法
-        this->setValue<double>(do_item.first, do_item.second ? 1.0 : 0.0);
-    }
-    
-    // 添加DI状态
-    for (const auto& di_item : this->di_status) {
-        temp_list.push_back(di_item.second ? 1 : 0);
-        // 使用线程安全的 setValue 方法
-        this->setValue<double>(di_item.first, di_item.second ? 1.0 : 0.0);
-    }
-    
+
     // 添加系统并离网状态
     temp_list.push_back(this->getValue<double>("系统并离网", 0));
-    
+
     // 更新data_to_qt的数据字段
     this->data_to_qt["data"] = temp_list;
-    
+
     // 更新定时模式和需求响应模式
     this->data_to_qt["timingModeSet"] = this->timingModeSet;
     this->data_to_qt["demandResponseModeSet"] = this->demandResponseModeSet;
-    
-    // 更新告警
-    parse_dido();
-}
-
-// 读取DI状态
-void EMS::read_di_status() {
-    try {
-        for (const auto& di_item : this->di_num_dict) {
-            const std::string& di_name = di_item.first;
-            int gpio_num = di_item.second;
-            
-            std::string gpio_path = "/sys/class/gpio/gpio" + std::to_string(gpio_num) + "/value";
-            std::ifstream file(gpio_path);
-            
-            if (!file.is_open()) {
-                LOG_ERROR_LOC("Cannot open GPIO file: " + gpio_path);
-                continue;
-            }
-
-            std::string value;
-            file >> value;
-            file.close();
-            
-            // 去除空白字符
-            value.erase(std::remove(value.begin(), value.end(), '\n'), value.end());
-            value.erase(std::remove(value.begin(), value.end(), '\r'), value.end());
-            value.erase(std::remove(value.begin(), value.end(), ' '), value.end());
-            
-            // 转换为布尔值
-            bool di_value = (value == "1");
-            this->di_status[di_name] = di_value;
-        }
-    } catch (const std::exception& e) {
-        LOG_ERROR_LOC("Error reading DI status: " + std::string(e.what()));
-    }
-}
-
-// 控制DO输出
-void EMS::do_on_off(int num, const std::string& switch_state) {
-    try {
-        std::string do_name = "DO" + std::to_string(num);
-        
-        if (this->do_num_dict.find(do_name) == this->do_num_dict.end()) {
-            LOG_ERROR_LOC("DO" + std::to_string(num) + " not found in DO dictionary");
-            return;
-        }
-        
-        int gpio_num = this->do_num_dict[do_name];
-        std::string value = (switch_state == "on") ? "1" : "0";
-        
-        std::string gpio_path = "/sys/class/gpio/gpio" + std::to_string(gpio_num) + "/value";
-        std::ofstream file(gpio_path);
-        
-        if (!file.is_open()) {
-            LOG_ERROR_LOC("Cannot open GPIO file: " + gpio_path);
-            return;
-        }
-        
-        file << value;
-        file.close();
-        
-        // 更新状态字典
-        {
-            std::lock_guard<std::shared_mutex> lock(this->do_rwlock_);
-            this->do_status[do_name] = (switch_state == "on");
-        }
-        
-        LOG_INFO_LOC("DO" + std::to_string(num) + " 设置为 " + switch_state);
-        
-    } catch (const std::exception& e) {
-        LOG_ERROR_LOC("Error controlling DO: " + std::string(e.what()));
-    }
-}
-
-// GPIO方向设置
-void EMS::setup_gpio_direction(int gpio_num, const std::string& direction) {
-    try {
-        std::string gpio_path = "/sys/class/gpio/gpio" + std::to_string(gpio_num) + "/direction";
-        std::ofstream file(gpio_path);
-        
-        if (!file.is_open()) {
-            LOG_ERROR_LOC("Cannot open GPIO direction file: " + gpio_path);
-            return;
-        }
-        
-        if (direction == "out") {
-            file << "out";
-        } else {
-            file << "in";
-        }
-        
-        file.close();
-        LOG_INFO_LOC("GPIO " + std::to_string(gpio_num) + " direction set to " + direction);
-        
-    } catch (const std::exception& e) {
-        LOG_ERROR_LOC("Error setting GPIO direction: " + std::string(e.what()));
-    }
 }
 
 // 读取并解析JSON配置文件（写操作，使用独占锁）
@@ -595,37 +441,6 @@ void EMS::compare_and_synchronized(int address) {
         write_timerJsonFile(Config::EMS_CONFIG_FILEPATH_JSON, to_set_dict);
         LOG_INFO_LOC("Demand response mode synchronized with TCP");
     }
-}
-
-// 解析DI/DO告警
-void EMS::parse_dido() {
-    // 注意：此函数应该在 update_ems 的锁保护下调用，所以不需要再次加锁
-    
-    // 获取当前时间字符串
-    std::string now = Utils::getCurrentTimeString();
-    
-    // 首次执行时，只更新缓存，不触发告警
-    if (this->first_parse_dido) {
-        this->alarm_cached["消防主机故障"] = false;
-        this->alarm_cached["消防二级故障"] = false;
-        this->alarm_cached["水浸"] = false;
-        this->first_parse_dido = false;
-        return;
-    }
-
-    // ✅ 使用基类的通用告警处理方法处理DI告警
-    
-    // 消防主机故障（一级告警，常闭接点，需要取反）
-    bool fire_host_fault = !this->di_status["DI1"];
-    this->handle_alarm("消防主机故障", 1, fire_host_fault, now);
-    
-    // 消防二级故障（二级告警）
-    bool fire_level2_fault = this->di_status["DI2"];
-    this->handle_alarm("消防二级故障", 2, fire_level2_fault, now);
-    
-    // 水浸（三级告警）
-    bool water_immersion = this->di_status["DI3"];
-    this->handle_alarm("水浸", 3, water_immersion, now);
 }
 
 // 获取当前时间字符串
@@ -1210,32 +1025,4 @@ std::tuple<bool, int, int> EMS::check_demand_response_status() {
     }
     
     return {false, 0, 0};
-}
-
-
-void EMS::init_config(const std::string& config_file){
-    try{
-        LOG_INFO_LOC("EMS开始初始化告警配置文件: " + config_file);
-        pugi::xml_document doc;
-        pugi::xml_parse_result result = doc.load_file(config_file.c_str());
-
-        if (!result) {
-            LOG_ERROR_LOC(("Failed to load config file: " + config_file + ", Error: " + result.description()).c_str());
-            return;
-        }
-
-        pugi::xml_node root = doc.document_element();
-        if (!root) {
-            LOG_ERROR_LOC("Invalid XML format");
-            return;
-        }
-
-        this->parse_alarm_config(root);
-    }
-    catch (...) {
-        LOG_CRITICAL_LOC("Failed to load alarm from XML file: " + config_file);
-        return;
-    }
-
-
 }

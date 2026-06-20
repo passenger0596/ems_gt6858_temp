@@ -14,7 +14,6 @@ Strategy::Strategy(std::shared_ptr<DeviceManager> device_manager)
     , gtbms_cmd_(device_manager_->getModbusClients(), device_manager_->device_map_)
     , hengdu_ac_cmd_(device_manager_->getModbusClients(), device_manager_->device_map_)
     , dg_hgm6100_cmd_(device_manager_->getModbusClients(), device_manager_->device_map_)
-    , zhongsheng8dido_cmd_(device_manager_->getModbusClients(), device_manager_->device_map_)
 {
 }
 
@@ -108,8 +107,6 @@ void Strategy::manualModeRun() {
 
     dg_hgm6100_cmd_.process_dg_hgm6100n_commands("dg_hgm6100n");
 
-    zhongsheng8dido_cmd_.process_board_8di8do_commands("board_8di8do");
-    
 }
 
 
@@ -359,12 +356,7 @@ void Strategy::demandResponseModeRun() {
             if (alarm_level == 0 || alarm_level == 1) {
                 ems->sys_running_pos = 20;
                 fault_occurred = false;
-                
-                // 检测DO1开关状态
-                if (!ems->do_status["DO1"]) {
-                    ems->do_on_off(1, "on");
-                }
-                
+
                 // 检查需求响应状态
                 auto [should_run_demand_response, demand_power_need, reactive_power] = 
                     ems->check_demand_response_status();
@@ -605,17 +597,13 @@ void Strategy::waterPumpManager() {
     double max_temp = bms_device->getValue<double>("电池最高温度", 0);
     double pump_start_temp = ems->getValue<double>("pumpStartBatTemp", 35.0);
     double pump_stop_temp = ems->getValue<double>("pumpStopBatTemp", 30.0);
-    
-    // 启动水泵（DO2）
-    if (max_temp >= pump_start_temp && !ems->do_status["DO2"]) {
-        ems->do_on_off(2, "on");
-        LOG_INFO_LOC("启动循环水泵，电池温度: " + std::to_string(max_temp));
+
+    // 水泵温度监控（无DO硬件，仅记录日志）
+    if (max_temp >= pump_start_temp) {
+        LOG_INFO_LOC("电池温度达到水泵启动阈值: " + std::to_string(max_temp) + "°C (启动阈值: " + std::to_string(pump_start_temp) + "°C)");
     }
-    
-    // 停止水泵（DO2）
-    if (max_temp <= pump_stop_temp && ems->do_status["DO2"]) {
-        ems->do_on_off(2, "off");
-        LOG_INFO_LOC("停止循环水泵，电池温度: " + std::to_string(max_temp));
+    if (max_temp <= pump_stop_temp) {
+        LOG_INFO_LOC("电池温度降至水泵停止阈值: " + std::to_string(max_temp) + "°C (停止阈值: " + std::to_string(pump_stop_temp) + "°C)");
     }
 }
 
@@ -709,8 +697,6 @@ void Strategy::alarmLv2Protect() {
         LOG_WARNING_LOC("系统二级告警保护策略执行失败: " + std::string(e.what()));
     }
     
-    // 无论是否异常，都执行DO1关闭
-    ems->do_on_off(1, "off");
 }
 
 // 三级告警保护
@@ -736,9 +722,6 @@ void Strategy::alarmLv3Protect() {
     } catch (const std::exception& e) {
         LOG_WARNING_LOC("系统三级告警保护策略执行失败: " + std::string(e.what()));
     }
-    
-    // 无论是否异常，都执行DO1关闭
-    ems->do_on_off(1, "off");
 }
 
 // 定时模式启动过程
@@ -755,7 +738,7 @@ bool Strategy::timerStartupProcess() {
     // TODO: BMS上高压
     // gtbms_cmd.gtbms_vol_on_off(switch='on', dev_name='gtbms485', mode='定时启动')
     
-    ems->do_on_off(1, "on");
+    // (DO1 control removed: no GPIO hardware on this EMS)
     std::this_thread::sleep_for(std::chrono::seconds(1));
     
     // 检查PCS状态
@@ -808,7 +791,7 @@ bool Strategy::demandResponseStartupProcess() {
     // TODO: BMS上高压
     // gtbms_cmd.gtbms_vol_on_off(switch='on', dev_name='gtbms485', mode='定时启动')
     
-    ems->do_on_off(1, "on");
+    // (DO1 control removed: no GPIO hardware on this EMS)
     std::this_thread::sleep_for(std::chrono::seconds(1));
     
     // 检查PCS状态
@@ -854,10 +837,7 @@ void Strategy::pilotLampShowThread(){
     std::this_thread::sleep_for(std::chrono::seconds(3));
     while (keep_running_) {
         bool isFault = (static_cast<int>(ems->getValue<double>("系统告警等级", 0.0)) > 1);
-        if (isFault&&!ems->getValue<bool>("DO3", false))
-            ems->do_on_off(3, "on");
-        if (!isFault&&ems->getValue<bool>("DO3", false))
-            ems->do_on_off(3, "off");
+        // (DO3 fault lamp control removed: no GPIO hardware on this EMS)
         if (isFault)
             ems->setValue("系统状态", 6);
         std::this_thread::sleep_for(std::chrono::seconds(1));

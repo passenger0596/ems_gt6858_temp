@@ -37,12 +37,6 @@ public:
     // 更新EMS状态
     void update_ems();
     
-    // 读取DI状态
-    void read_di_status();
-    
-    // 控制DO输出
-    void do_on_off(int num, const std::string& switch_state);
-    
     // 比较和同步Modbus TCP保持寄存器与data_dict
     void compare_and_synchronized(int address);
     
@@ -57,19 +51,13 @@ public:
     
     // 写入定时模式或需求响应模式JSON文件
     bool write_timerJsonFile(const json& data,const std::string& filename =Config::EMS_CONFIG_FILEPATH_JSON);
-    
-    // 解析DI/DO告警
-    void parse_dido();
-    
+
     // 获取当前时间字符串
     std::string get_current_time_string();
     
     // 获取当前ISO时间字符串
     std::string get_current_iso_time_string();
-    
-    // GPIO方向设置
-    void setup_gpio_direction(int gpio_num, const std::string& direction);
-    
+
     // 定时保存设备数据
     void cycle_record_all();
     
@@ -121,28 +109,13 @@ public:
     std::unordered_map<std::string, RegisterData> tcp_data_dict;           // TCP数据字典
     json tcp_timingModeSet;       // TCP定时模式缓存
     json tcp_demandResponseModeSet; // TCP需求响应模式缓存
-    
-    // DI GPIO编号字典
-    std::unordered_map<std::string, int> di_num_dict;
-    
-    // DI状态字典
-    std::unordered_map<std::string, bool> di_status;
-    
-    // DO GPIO编号字典
-    std::unordered_map<std::string, int> do_num_dict;
-    
-    // DO状态字典
-    std::unordered_map<std::string, bool> do_status;
-    
+
     // TCP命令字典
     json tcp_cmd;
     
     // 数据到QT的映射
     json data_to_qt;
-    
-    // 是否首次解析DI/DO
-    bool first_parse_dido;
-    
+
     // 是否保存数据
     std::atomic<bool> is_save_data;
     
@@ -170,7 +143,6 @@ public:
     // 读写锁，保护共享JSON数据的并发访问（C++17）
     // 允许多个线程同时读取，写入时互斥
     mutable std::shared_mutex json_rwlock_;
-    mutable std::shared_mutex do_rwlock_;
     
 private:
     // 构造函数
@@ -181,12 +153,6 @@ private:
     // 从JSON文件加载TCP命令
     bool load_tcp_cmd_from_json(const std::string& filepath);
 
-    // 从XML文件加载告警
-    void init_config(const std::string& config_file) override;
-    
-    // 初始化GPIO
-    void init_gpio();
-    
     // 初始化命令映射
     void init_cmd_mapping();
     

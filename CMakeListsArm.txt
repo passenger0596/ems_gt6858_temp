@@ -45,7 +45,6 @@ set(DEVICE_SOURCES
     ${CMAKE_SOURCE_DIR}/src/devices/dcdc.cpp
     ${CMAKE_SOURCE_DIR}/src/devices/devicemanager.cpp
     ${CMAKE_SOURCE_DIR}/src/devices/ems.cpp
-    ${CMAKE_SOURCE_DIR}/src/devices/iomodule.cpp
     ${CMAKE_SOURCE_DIR}/src/devices/pcs.cpp
     # ${CMAKE_SOURCE_DIR}/src/devices/pcs_15am.cpp
 )
@@ -54,7 +53,6 @@ set(DEVICE_SOURCES
 set(CONTROL_SOURCES
     ${CMAKE_SOURCE_DIR}/src/control/ejdcdc.cpp
     ${CMAKE_SOURCE_DIR}/src/control/ejpcscmd.cpp
-    ${CMAKE_SOURCE_DIR}/src/control/iomodulecmd.cpp
     ${CMAKE_SOURCE_DIR}/src/control/qtcontroller.cpp
     ${CMAKE_SOURCE_DIR}/src/control/strategy.cpp
     ${CMAKE_SOURCE_DIR}/src/control/xmcooler.cpp

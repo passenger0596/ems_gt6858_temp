@@ -6,15 +6,6 @@
   "系统状态":{"value":1,"datatype":"INT16","mag":1,"offset":0},
   "系统告警等级":{"value":0,"datatype":"INT16","mag":1,"offset":0},
 
-  "DI1":{"value":0,"datatype":"BOOL","mag":1,"offset":0},
-  "DI2":{"value":0,"datatype":"BOOL","mag":1,"offset":0},
-  "DI3":{"value":0,"datatype":"BOOL","mag":1,"offset":0},
-  "DI4":{"value":0,"datatype":"BOOL","mag":1,"offset":0},
-  "DO1":{"value":0,"datatype":"BOOL","mag":1,"offset":0},
-  "DO2":{"value":0,"datatype":"BOOL","mag":1,"offset":0},
-  "DO3":{"value":0,"datatype":"BOOL","mag":1,"offset":0},
-  "DO4":{"value":0,"datatype":"BOOL","mag":1,"offset":0},
-
   "系统故障复归": {"value": 0,"datatype": "BOOL","mag":1,"offset":0},
   
   "使能SOC保护": {"value": true,"datatype": "BOOL","mag":1,"offset":0},

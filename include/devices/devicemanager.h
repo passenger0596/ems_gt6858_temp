@@ -3,7 +3,6 @@
 #include "pcs.h"
 #include "dcdc.h"
 #include "ems.h"
-#include "iomodule.h"
 #include "ac_hengdu.h"
 #include "gt_bms.h"  // 添加高特BMS头文件
 #include "dg_hgm6100.h"
@@ -72,7 +71,6 @@ class DeviceManager{
         
         std::shared_ptr<AcHengdu> ac_hengdu_ = nullptr;  // ACMeter_3366设备 
         std::shared_ptr<DgHgm6100n> dg_hgm6100_ = nullptr;  // DG_HGM6100设备
-        std::shared_ptr<IOModule> iomodule_ = nullptr;  // IOModule设备
 
         std::shared_ptr<InfyCharger> chargers_ = nullptr;  // 充电器设备
 
@@ -149,6 +147,7 @@ class DeviceManager{
         };
 
         std::unique_ptr<ModbusServer> modbus_tcp_server_;
+        std::unique_ptr<ModbusServer> modbus_rtu_server_;
         std::thread modbus_sync_thread_;
         std::atomic<bool> modbus_sync_running_{false};
 
@@ -161,6 +160,7 @@ class DeviceManager{
         // FC03: tcp_addr → mapping entry (所有设备)
         std::map<uint16_t, Fc03Mapping> fc03_map_;
         uint16_t fc03_total_holding_ = 0;
+        uint16_t fc04_total_input_ = 0;
 
         // ── 定时模式 / 需求响应模式块映射 ──
         // 可配置的起始地址（可通过 setter 修改）
@@ -180,12 +180,18 @@ class DeviceManager{
         std::vector<uint16_t> last_demand_block_;
 
         // ── 定时/需求响应块同步方法 ──
-        void syncTimerBlock();             // 双向同步: 检测外部写入→EMS, EMS→定时模式块
-        void syncDemandBlock();            // 双向同步: 检测外部写入→EMS, EMS→需求响应块
+        void syncTimerBlockTo(ModbusServer* server);     // 双向同步到指定server
+        void syncDemandBlockTo(ModbusServer* server);
+        void syncTimerBlock() { syncTimerBlockTo(modbus_tcp_server_.get()); }
+        void syncDemandBlock() { syncDemandBlockTo(modbus_tcp_server_.get()); }
 
+        void initModbusAddressMapping();                 // 公共映射逻辑（TCP/RTU共用）
         void initModbusTcpServer(const std::string& ip, int port);
-        void syncAllFc04();
-        void syncAllFc03();
+        void initModbusRtuServer(const std::string& port, int baudrate, int slave_id);
+        void syncAllFc04To(ModbusServer* server);
+        void syncAllFc03To(ModbusServer* server);
+        void syncAllFc04() { syncAllFc04To(modbus_tcp_server_.get()); }
+        void syncAllFc03() { syncAllFc03To(modbus_tcp_server_.get()); }
         void modbusSyncLoop();
         static constexpr int FC03_SKIP_CYCLES = 4;  // RTU写入后跳过推送的轮数
 
@@ -201,5 +207,9 @@ class DeviceManager{
         // 启动 Modbus TCP 服务器
         void startModbusTcpServer();
         void stopModbusTcpServer();
+
+        // 启动 Modbus RTU 服务器（RS485从站）
+        void startModbusRtuServer();
+        void stopModbusRtuServer();
 
 };

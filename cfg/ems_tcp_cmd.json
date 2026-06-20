@@ -6,11 +6,6 @@
   "有功功率设置": {"value": 0,"datatype": "INT16","mag": 10,"offset": 0,"tcp_addr": 4,"desc": "有功功率设置"},
   "系统故障复归": {"value": 0,"datatype": "BOOL","mag": 1,"offset": 0,"tcp_addr": 5,"desc": "系统故障复归"},
 
-  "DO1":{"value":0,"datatype":"BOOL","mag": 1,"offset": 0,"tcp_addr": 7,"desc": "DO1"},
-  "DO2":{"value":0,"datatype":"BOOL","mag": 1,"offset": 0,"tcp_addr": 8,"desc": "DO2"},
-  "DO3":{"value":0,"datatype":"BOOL","mag": 1,"offset": 0,"tcp_addr": 9,"desc": "DO3"},
-  "DO4":{"value":0,"datatype":"BOOL","mag": 1,"offset": 0,"tcp_addr": 10,"desc": "DO4"},
-
   "使能SOC保护": {"value": 0,"datatype": "BOOL","mag": 1,"offset": 0,"tcp_addr": 11,"desc": "使能SOC保护"},
   "开始充电SOC": {"value": 0,"datatype": "UINT16","mag": 1,"offset": 0,"tcp_addr": 12,"desc": "开始充电SOC"},
   "停止充电SOC": {"value": 0,"datatype": "UINT16","mag": 1,"offset": 0,"tcp_addr": 13,"desc": "停止充电SOC"},

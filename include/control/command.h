@@ -359,21 +359,7 @@ class HengduAcCmd {
         std::unordered_map<std::string, std::shared_ptr<Device>> device_map_;  
 };
 
-class Zhongsheng8didoCmd {
-    public:
-        Zhongsheng8didoCmd(std::unordered_map<int, std::shared_ptr<ModbusClient>> modbus_clients,std::unordered_map<std::string, std::shared_ptr<Device>> device_map);
-        ~Zhongsheng8didoCmd()=default;
-        
-        void board_8di8do_operate(const std::string& switch_state,const int do_num,const std::string& mode,std::shared_ptr<Device>& device);
-        void board_8di8do_multi_operate(const std::vector<uint16_t>& switch_list,const std::string& mode,std::shared_ptr<Device>& device);
-        
-        void process_board_8di8do_commands(const std::string& device_name);
-        void board_8di8do_manual_control(const std::string& device_name);
-    
-    private:
-        std::unordered_map<int, std::shared_ptr<ModbusClient>> modbus_clients_;
-        std::unordered_map<std::string, std::shared_ptr<Device>> device_map_;  
-};
+// Zhongsheng8didoCmd removed: no IO module (8DI8DO) hardware on this EMS
 
 
 

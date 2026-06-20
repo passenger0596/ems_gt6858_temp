@@ -33,9 +33,7 @@ class Strategy {
         
         HengduAcCmd hengdu_ac_cmd_;
         Hgm6100Cmd dg_hgm6100_cmd_;
-        
-        Zhongsheng8didoCmd zhongsheng8dido_cmd_;
-        
+
 
         
         // 运行模式函数

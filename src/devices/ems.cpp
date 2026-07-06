@@ -33,23 +33,17 @@ EMS::EMS() : Device("ems", 100, 0) {
 
     // 初始化命令映射
     
-    // 加载数据字典
+    // 加载数据字典（含 tcp_addr / writable，替代原 ems_tcp_cmd.json）
     if (!load_data_dict_from_json(Config::EMS_DATA_DICT_FILEPATH)) {
         LOG_ERROR_LOC("EMS加载数据字典：" + Config::EMS_DATA_DICT_FILEPATH + "失败！");
     }
-    
-    // 加载TCP命令
-    if (!load_tcp_cmd_from_json(Config::EMS_TCP_CMD_FILEPATH)) {
-        LOG_ERROR_LOC("EMS加载TCP配置文件：" + Config::EMS_TCP_CMD_FILEPATH + "失败！");
-    }
-    
+
     // 加载配置文件
     if (!read_and_parse_jsonfile(Config::EMS_CONFIG_FILEPATH_JSON)) {
         LOG_ERROR_LOC("EMS加载配置文件：" + Config::EMS_CONFIG_FILEPATH_JSON + "失败！");
     }
     
-    // 初始化TCP数据字典和模式设置
-    this->tcp_data_dict = this->data_dict_;
+    // 初始化TCP模式缓存
     this->tcp_timingModeSet = this->timingModeSet;
     this->tcp_demandResponseModeSet = this->demandResponseModeSet;
 
@@ -135,6 +129,8 @@ bool EMS::load_data_dict_from_json(const std::string& filepath) {
             reg_data.mag = value_obj["mag"].is_number() ? value_obj["mag"].get<int>() : 1;
             reg_data.offset = value_obj["offset"].is_number() ? value_obj["offset"].get<int>() : 0;
             reg_data.unit = value_obj["unit"].is_string() ? value_obj["unit"].get<std::string>() : "";
+            reg_data.tcp_addr = value_obj["tcp_addr"].is_number() ? value_obj["tcp_addr"].get<uint16_t>() : 0xFFFF;
+            reg_data.writable = value_obj.value("writable", false);
             
             // 直接赋值到内部结构(初始化阶段,无需加锁)
             this->data_dict_[key] = reg_data;
@@ -145,27 +141,6 @@ bool EMS::load_data_dict_from_json(const std::string& filepath) {
         
     } catch (const std::exception& e) {
         LOG_ERROR_LOC("EMS加载数据字典失败，错误信息: " + std::string(e.what()));
-        return false;
-    }
-}
-
-// 从JSON文件加载TCP命令
-bool EMS::load_tcp_cmd_from_json(const std::string& filepath) {
-    try {
-        std::ifstream file(filepath);
-        if (!file.is_open()) {
-            LOG_ERROR_LOC("EMS加载TCP命令失败，文件不存在: " + filepath);
-            return false;
-        }
-        
-        file >> this->tcp_cmd;
-        file.close();
-        
-        LOG_INFO_LOC("EMS加载TCP命令成功!!");
-        return true;
-        
-    } catch (const std::exception& e) {
-        LOG_ERROR_LOC("EMS加载TCP命令失败，错误信息: " + std::string(e.what()));
         return false;
     }
 }
@@ -366,80 +341,6 @@ bool EMS::write_timerJsonFile(const json& data,const std::string& filename) {
     } catch (const std::exception& e) {
         LOG_ERROR_LOC("Error writing timer config to JSON: " + std::string(e.what()));
         return false;
-    }
-}
-
-// 比较和同步Modbus TCP保持寄存器与data_dict（写操作，使用独占锁）
-void EMS::compare_and_synchronized(int address) {
-    // 使用独占锁（写锁），因为会修改 data_dict_
-    std::unique_lock<std::shared_mutex> lock(this->json_rwlock_);
-    
-    // 比较data_dict和tcp_data_dict
-    bool data_dict_changed = false;
-    
-    for (auto& item : this->tcp_cmd.items()) {
-        const std::string& key = item.key();
-        int tcp_addr = item.value()["tcp_addr"].get<int>();
-        
-        if (tcp_addr == address - 1) {
-            if (this->data_dict_.find(key) != this->data_dict_.end() && 
-                this->tcp_data_dict.find(key) != this->tcp_data_dict.end()) {
-                
-                double data_dict_value = this->getValue<double>(key, 0);
-                double tcp_data_value = this->tcp_data_dict[key].value;
-                
-                if (std::abs(data_dict_value - tcp_data_value) > 0.001) {
-                    // 使用线程安全的 setValue（虽然已有锁，但保持一致性）
-                    this->setValue<double>(key, tcp_data_value);
-                    data_dict_changed = true;
-                }
-            }
-        }
-    }
-    
-    // 如果数据字典发生变化，更新配置文件
-    if (data_dict_changed) {
-        // 读取现有配置文件
-        std::ifstream in_file(Config::EMS_CONFIG_FILEPATH_JSON);
-        if (in_file.is_open()) {
-            json config_data;
-            in_file >> config_data;
-            in_file.close();
-            
-            // 更新配置值 - 在锁保护下遍历
-            {
-                std::shared_lock<std::shared_mutex> lock(this->json_rwlock_);
-                for (const auto& item : this->data_dict_) {
-                    const std::string& key = item.first;
-                    if (config_data.contains(key)) {
-                        config_data[key]["value"] = item.second.value;
-                    }
-                }
-            }
-            
-            // 写入文件
-            std::ofstream out_file(Config::EMS_CONFIG_FILEPATH_JSON);
-            out_file << config_data.dump(4);
-            out_file.close();
-            
-            LOG_INFO_LOC("Data dictionary synchronized with TCP registers");
-        }
-    }
-    
-    // 比较定时模式
-    if (this->timingModeSet != this->tcp_timingModeSet) {
-        this->timingModeSet = this->tcp_timingModeSet;
-        json to_set_dict = {{"timingModeSet", this->timingModeSet}};
-        write_timerJsonFile(Config::EMS_CONFIG_FILEPATH_JSON, to_set_dict);
-        LOG_INFO_LOC("Timing mode synchronized with TCP");
-    }
-    
-    // 比较需求响应模式
-    if (this->demandResponseModeSet != this->tcp_demandResponseModeSet) {
-        this->demandResponseModeSet = this->tcp_demandResponseModeSet;
-        json to_set_dict = {{"demandResponseModeSet", this->demandResponseModeSet}};
-        write_timerJsonFile(Config::EMS_CONFIG_FILEPATH_JSON, to_set_dict);
-        LOG_INFO_LOC("Demand response mode synchronized with TCP");
     }
 }
 

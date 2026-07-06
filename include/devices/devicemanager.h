@@ -24,12 +24,12 @@ class DeviceManager{
         std::vector<std::shared_ptr<Device>> devices_;
         std::unordered_map<std::string, std::shared_ptr<Device>> device_map_;   //  存储设备名称到设备指针的映射
         
-        void createReadThreads();
-        void stopAllThreads();
+        void createReadThreads();       // 创建modbus和can设备读取线程
+        void stopAllThreads();          // 停止所有线程
 
-        std::shared_ptr<Device> getDeviceByName(const std::string& name);
-        std::unordered_map<int, std::shared_ptr<ModbusClient>> getModbusClients();
-        std::unordered_map<int, std::shared_ptr<CanOperator>> getCanOperators();
+        std::shared_ptr<Device> getDeviceByName(const std::string& name);       // 获取设备智能指针
+        std::unordered_map<int, std::shared_ptr<ModbusClient>> getModbusClients();  // 获取modbus客户端智能指针
+        std::unordered_map<int, std::shared_ptr<CanOperator>> getCanOperators();  // 获取can操作符智能指针
         
         void publishDataToRedis();  // 发布所有设备数据到Redis
         
@@ -50,14 +50,14 @@ class DeviceManager{
         // 独立方法：从Redis获取所有设备数据并保存到数据库，可单独调用
         void saveDeviceDataFromRedis();
         
-        // 新增：设置控制消息回调函数
+        // 新增：设置mqtt的控制消息回调函数
         using ControlMessageCallback = std::function<void(const std::string&, const std::string&)>;
         void setControlMessageCallback(ControlMessageCallback callback);
 
 
 
     private:
-        std::unordered_map<uint8_t, std::vector<std::shared_ptr<Device>>> dev_com_map;  // 存储每个COM端口的设备列表
+        std::unordered_map<uint8_t, std::vector<std::shared_ptr<Device>>> com_dev_map;  // 存储每个COM端口的设备列表
         std::unordered_map<uint8_t, std::vector<std::shared_ptr<Device>>> can_dev_map;  // 存储每个CAN口的设备列表
         std::vector<std::thread> device_threads_;
 
@@ -115,9 +115,15 @@ class DeviceManager{
         std::unique_ptr<sw::redis::Subscriber> redis_subscriber_;  // Redis订阅者
         std::thread cloud_control_thread_;  // 云端控制订阅线程
         std::atomic<bool> stop_cloud_control_{false};  // 停止标志
-        
+
         // 新增：控制消息回调,mqtt->redis->本地控制消息
         ControlMessageCallback control_message_callback_;
+
+        // MQTT 配置（从 mqtt_config.json 加载）
+        std::string mqtt_sn_;
+        std::string mqtt_project_code_;
+        std::string mqtt_control_channel_;
+        void loadMqttConfig();
 
         // 新增：订阅线程函数
         void cloudControlSubscribeThread();
@@ -144,6 +150,8 @@ class DeviceManager{
             int skip_count;           // RTU写入后跳过N轮推送等data_dict追上
             bool is_fc03_original = false;  // rtu_addr是否来自FC03地址空间（false则跳过RTU写回）
             uint8_t original_fc = 0;       // 原始功能码: 0=无, 1=FC01线圈, 3=FC03保持寄存器, 其他=只读不写回
+            bool can_device_ctrl = false;  // true = 写入路由到CAN设备控制方法（而非RTU写回）
+            bool writable = false;         // FC03 是否可写（false=只读映射）
         };
 
         std::unique_ptr<ModbusServer> modbus_tcp_server_;
@@ -161,6 +169,7 @@ class DeviceManager{
         std::map<uint16_t, Fc03Mapping> fc03_map_;
         uint16_t fc03_total_holding_ = 0;
         uint16_t fc04_total_input_ = 0;
+        bool fc04_enabled_ = false;   // FC04默认关闭，通过setFc04Enabled启用
 
         // ── 定时模式 / 需求响应模式块映射 ──
         // 可配置的起始地址（可通过 setter 修改）
@@ -203,6 +212,8 @@ class DeviceManager{
         inline void setDeviceFc04StartAddr(const std::string& name, uint16_t addr) { fc04_start_addrs_[name] = addr; }
         // 允许外部设置设备的 FC03 起始地址（必须在 startModbusTcpServer 之前调用）
         inline void setDeviceFc03StartAddr(const std::string& name, uint16_t addr) { fc03_start_addrs_[name] = addr; }
+        // 允许外部启用/禁用 FC04 输入寄存器映射（默认关闭，必须在 startModbusTcpServer 之前调用）
+        inline void setFc04Enabled(bool enabled) { fc04_enabled_ = enabled; }
 
         // 启动 Modbus TCP 服务器
         void startModbusTcpServer();

@@ -836,8 +836,8 @@
 		<subdido name="单体温差过高2级报警" level="2" />
 		<subdido name="单体温差过高3级报警" level="3" />
 		<subdido name="SOC过低1级告警" level="1" />
-		<subdido name="SOC过低2级告警" level="2" />
-		<subdido name="SOC过低3级告警" level="3" />
+		<subdido name="SOC过低2级告警" level="1" />
+		<subdido name="SOC过低3级告警" level="1" />
 		<subdido name="动力插箱温度过高1级报警" level="1" />
 		<subdido name="动力插箱温度过高2级报警" level="2" />
 		<subdido name="动力插箱温度过高3级报警" level="3" />

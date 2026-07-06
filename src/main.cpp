@@ -63,10 +63,10 @@ int main() {
         device_manager->startSubscribeCloudControl();
         
         // 设置控制消息回调（可选）
-        device_manager->setControlMessageCallback([](const std::string& channel, const std::string& message) {
-            LOG_INFO_LOC(("自定义控制消息处理: channel=" + channel).c_str());
-            // 这里可以添加自定义的控制逻辑
-        });
+        // device_manager->setControlMessageCallback([](const std::string& channel, const std::string& message) {
+        //     LOG_INFO_LOC(("自定义控制消息处理: channel=" + channel).c_str());
+        //     // 这里可以添加自定义的控制逻辑
+        // });
         
         // 启动Socket服务器（与qt通讯）
         std::unique_ptr<UnixSocketServer> socket_server = std::make_unique<UnixSocketServer>(Config::SOCKET_PATH, device_manager->devices_);

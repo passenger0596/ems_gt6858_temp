@@ -28,6 +28,7 @@ QtController::~QtController() {
 
 
 void QtController::parse_qt_data(const json& qtData) {
+    std::lock_guard<std::mutex> lock(cmd_mutex_);
     try{
         if(qtData.contains("device")&&qtData.contains("type")){
             if (qtData["type"] == "single"){

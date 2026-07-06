@@ -63,15 +63,15 @@
 		<coil address="59" name="可编程输出口2" datatype="BOOL" unit="" />
 		<coil address="60" name="可编程输出口3" datatype="BOOL" unit="" />
 		<coil address="61" name="可编程输出口4" datatype="BOOL" unit="" />
-		<coil address="62" name="燃油1输出控制" datatype="BOOL" unit="" />
-		<coil address="63" name="过流故障停机输入报警" datatype="BOOL" unit="" />
-		<coil address="64" name="超速停机输入报警" datatype="BOOL" unit="" />
-		<coil address="65" name="市电故障" datatype="BOOL" unit="" />
-		<coil address="66" name="市电正常" datatype="BOOL" unit="" />
-		<coil address="67" name="市电过压" datatype="BOOL" unit="" />
-		<coil address="68" name="市电欠压" datatype="BOOL" unit="" />
-		<coil address="69" name="市电缺相" datatype="BOOL" unit="" />
-		<coil address="70" name="市电无" datatype="BOOL" unit="" />
+		<coil address="62" name="过流故障停机输入报警" datatype="BOOL" unit="" />
+		<coil address="63" name="超速停机输入报警" datatype="BOOL" unit="" />
+		<coil address="64" name="市电故障" datatype="BOOL" unit="" />
+		<coil address="65" name="市电正常" datatype="BOOL" unit="" />
+		<coil address="66" name="市电过压" datatype="BOOL" unit="" />
+		<coil address="67" name="市电欠压" datatype="BOOL" unit="" />
+		<coil address="68" name="市电缺相" datatype="BOOL" unit="" />
+		<coil address="69" name="市电无" datatype="BOOL" unit="" />
+		<coil address="70" name="高温报警停机" datatype="BOOL" unit="" />
 		<coil address="71" name="低油压报警停机" datatype="BOOL" unit="" />
 		<coil address="72" name="发电正常" datatype="BOOL" unit="" />
 		<coil address="73" name="发电过压" datatype="BOOL" unit="" />
@@ -192,25 +192,20 @@
 		<subdido name="过功率停机报警" level="1" />
 		<subdido name="紧急停机输入" level="1" />
 		<subdido name="漏液停机" level="1" />
-		<subdido name="起动继电器输出" level="1" />
-		<subdido name="燃油继电器输出" level="1" />
-		<subdido name="燃油1输出控制" level="1" />
 		<subdido name="过流故障停机输入报警" level="1" />
 		<subdido name="超速停机输入报警" level="1" />
 		<subdido name="市电故障" level="1" />
-		<subdido name="市电正常" level="1" />
 		<subdido name="市电过压" level="1" />
 		<subdido name="市电欠压" level="1" />
 		<subdido name="市电缺相" level="1" />
 		<subdido name="市电无" level="1" />
+		<subdido name="高温报警停机" level="1" />
 		<subdido name="低油压报警停机" level="1" />
-		<subdido name="发电正常" level="1" />
 		<subdido name="发电过压" level="1" />
 		<subdido name="发电欠压" level="1" />
 		<subdido name="发电过频" level="1" />
 		<subdido name="发电欠频" level="1" />
 		<subdido name="发电过流" level="1" />
-		<subdido name="定时不开机时间指示" level="1" />
 		<subdido name="漏液警告" level="1" />
 	</dido>
 </HGM6100N_protocol>

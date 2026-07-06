@@ -25,6 +25,8 @@ struct RegisterData {
     std::string unit;
     uint8_t register_count = 1;
     bool big_endian = true;
+    uint16_t tcp_addr = 0xFFFF;  // Modbus TCP 地址 (0xFFFF=不映射)
+    bool writable = false;       // FC03 是否可写
 };
 
 class Device {
@@ -65,6 +67,19 @@ public:
      * @param can_operator 注入的 CAN 操作对象
      */
     virtual void multiWriteCmdToDevice(std::shared_ptr<CanOperator> can_operator) {}
+
+    /**
+     * @brief 供 CAN 设备实现：FC03 写入时路由到设备控制参数 setter
+     * @param key   data_dict 键名（如 "开关机控制"、"电压设定(V)"）
+     * @param value 真实值（已通过 mag/offset 反算）
+     */
+    virtual void setCanControlParam(const std::string& key, double value) {}
+
+    /**
+     * @brief 供 CAN 设备实现：发送 CAN 控制帧
+     * @param can_operator CAN 操作对象
+     */
+    virtual void sendCanControlFrames(std::shared_ptr<CanOperator> can_operator) {}
 
     // JSON结构初始化 - 提供默认实现
     virtual void init_json_structure(const std::string& name) {

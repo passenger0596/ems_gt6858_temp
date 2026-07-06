@@ -32,6 +32,9 @@
 		<hRegister address="27" name="模块3AB线电压(V)" datatype="UINT16" unit="V" mag="10" offset="0" />
 		<hRegister address="28" name="模块3BC线电压(V)" datatype="UINT16" unit="V" mag="10" offset="0" />
 		<hRegister address="29" name="模块3CA线电压(V)" datatype="UINT16" unit="V" mag="10" offset="0" />
+		<hRegister address="240" name="充电机开关机" datatype="UINT16" unit="" mag="1" offset="0" />
+		<hRegister address="241" name="充电机设置电压(V)" datatype="FLOAT" unit="V" mag="10" offset="0" />
+		<hRegister address="242" name="充电机设置电流(A)" datatype="FLOAT" unit="A" mag="10" offset="0" />
 	</function_code03>
 	<function_code04 code="0x04" description="Read Input Registers" />
 	<function_code05 code="0x05" description="Write Single Coil" />

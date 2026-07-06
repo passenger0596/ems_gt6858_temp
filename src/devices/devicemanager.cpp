@@ -8,12 +8,15 @@
 #include "sqlcpp.h"
 #include <hiredis/hiredis.h>
 #include "log.h"
+#include "control/qtcontroller.h"
 #include <thread>
 #include <map>
 #include <chrono>
 #include <iomanip>
 #include <functional>  // 用于 std::function
 #include <algorithm>
+#include <unordered_set>
+#include <fstream>
 
 DeviceManager::DeviceManager() {
     // 初始化所有设备实例
@@ -22,19 +25,20 @@ DeviceManager::DeviceManager() {
     this->dcdc1_ = std::make_shared<Dcdc>("dcdc1", 1, 1);
     this->dcdc2_ = std::make_shared<Dcdc>("dcdc2", 1, 2);
     // 创建高特BMS设备（假设使用串口5，Modbus从站地址为1）
-    this->gt_bms_ = std::make_shared<GtBms>("gtbms485", 2, 1);
-    this->ac_hengdu_ = std::make_shared<AcHengdu>("air_condition", 3, 1);
+    // this->gt_bms_ = std::make_shared<GtBms>("gtbms485", 2, 1);
+    // this->ac_hengdu_ = std::make_shared<AcHengdu>("air_condition", 3, 1);
     
     // this->dtsd3366_ = std::make_shared<ACMeter_3366>("dtsd3366", 4, 1);
     // this->dg_hgm6100_ = std::make_shared<DgHgm6100n>("dg_hgm6100n", 5, 1);
     // this->iomodule_ = std::make_shared<IOModule>("board_8di8do", 7, 20);
 
-    // this->chargers_ = std::make_shared<InfyCharger>("chargers", 17, 1);
-    // this->chargers_->init_config(Config::INFY_CHARGER_COMMUNICATION_FILEPATH);
+    this->chargers_ = std::make_shared<InfyCharger>("chargers", 17, 1);
+    this->chargers_->init_config(Config::INFY_CHARGER_COMMUNICATION_FILEPATH);
     
     
-    this->devices_ = {this->ems_, this->pcs_, this->dcdc1_, this->dcdc2_,
-                      this->gt_bms_, this->ac_hengdu_
+    
+    this->devices_ = {this->ems_, this->pcs_, this->dcdc1_, this->dcdc2_, this->chargers_
+                    //   this->gt_bms_, this->ac_hengdu_
                       }; 
     
     for (auto& device : this->devices_) {
@@ -82,13 +86,15 @@ void DeviceManager::createReadThreads()
     for(auto& device : this->devices_){
         uint8_t com_num = device->get_com();
         if (Config::SERIAL_PORTS.find(com_num) != Config::SERIAL_PORTS.end()) {
-            this->dev_com_map[com_num].push_back(device); 
+            this->com_dev_map[com_num].push_back(device); 
         } else if (Config::CAN_INTERFACES.find(com_num) != Config::CAN_INTERFACES.end()) {
             this->can_dev_map[com_num].push_back(device);
+        } else {
+            LOG_ERROR_LOC("设备串口或CAN接口不存在: " + device->get_name());
         }
     }
     // 2. 遍历串口 (Modbus) 端口，为每个端口启动一个读取线程
-    for (auto& pair : this->dev_com_map){
+    for (auto& pair : this->com_dev_map){
         // 检查串口配置是否存在
         auto it = Config::SERIAL_PORTS.find(pair.first);
         if (it != Config::SERIAL_PORTS.end()) {
@@ -99,7 +105,7 @@ void DeviceManager::createReadThreads()
                 modbus_client = std::make_shared<ModbusClient>(std::string(it->second), 9600);
             }else{
                 // 使用TCP通信构造函数
-                LOG_INFO_LOC(("Creating ModbusClient for TCP: " + it->second).c_str());
+                LOG_INFO_LOC(("创建ModbusClient for TCP: " + it->second).c_str());
                 auto [ip,port] = Utils::splitIpPort(it->second);
                 modbus_client = std::make_shared<ModbusClient>(ip, port);
             }
@@ -107,8 +113,8 @@ void DeviceManager::createReadThreads()
             // 尝试连接，如果失败则记录警告但继续运行
             bool connected = modbus_client->connect();
             if (!connected){
-                LOG_WARNING_LOC(("ModbusClient connection 失败 for " + it->second + ", this device will be skipped").c_str());
-                LOG_WARNING_LOC("Continuing with other devices...");
+                LOG_WARNING_LOC(("ModbusClient connection 失败 for " + it->second + ", 该设备将被跳过").c_str());
+                LOG_WARNING_LOC("继续处理其他设备...");
                 continue;
             }
             
@@ -130,7 +136,7 @@ void DeviceManager::createReadThreads()
             );
             LOG_INFO_LOC(("创建读取线程成功: " + it->second).c_str());
         } else {
-            LOG_ERROR_LOC("Error: Serial port configuration not found for COM " + 
+            LOG_ERROR_LOC("创建读取线程错误: COM " + 
                          std::to_string(static_cast<int>(pair.first)));
         }
        
@@ -140,16 +146,17 @@ void DeviceManager::createReadThreads()
     for (auto& pair : this->can_dev_map) {
         auto it = Config::CAN_INTERFACES.find(pair.first);
         if (it == Config::CAN_INTERFACES.end()) {
-            LOG_ERROR_LOC("Error: CAN interface configuration not found for COM " +
+            LOG_ERROR_LOC("找不到CAN接口: COM " + 
                          std::to_string(static_cast<int>(pair.first)));
+
             continue;
         }
 
         auto can_operator = std::make_shared<CanOperator>(it->second, 0);
         const bool connected = can_operator->connect();
         if (!connected) {
-            LOG_WARNING_LOC(("CanOperator connection failed for " + it->second +
-                             ", this device group will be skipped").c_str());
+            LOG_WARNING_LOC(("CanOperator连接错误: " + it->second +
+                             ", 该设备组将被跳过").c_str());
             continue;
         }
 
@@ -172,7 +179,7 @@ void DeviceManager::readDeviceThreadWithStopFlag(
     int thread_id)
 {
     LOG_INFO_LOC(
-        ("Modbus read thread started for COM" +
+        ("Modbus读取线程启动:COM" +
         std::to_string(static_cast<int>(com))).c_str());
 
     while (!this->stop_threads_.load())
@@ -195,7 +202,7 @@ void DeviceManager::readDeviceThreadWithStopFlag(
         if (!modbus_client) {
 
             LOG_ERROR_LOC(
-                ("Modbus client is null for COM" +
+                ("Modbus读取线程错误:COM" +
                 std::to_string(static_cast<int>(com))).c_str());
 
             std::this_thread::sleep_for(
@@ -205,7 +212,7 @@ void DeviceManager::readDeviceThreadWithStopFlag(
         }
 
         // 遍历当前串口下所有设备
-        for (auto& device : this->dev_com_map[com])
+        for (auto& device : this->com_dev_map[com])
         {
             // 再次检查停止状态
             auto stop_it =
@@ -216,7 +223,7 @@ void DeviceManager::readDeviceThreadWithStopFlag(
                 stop_it->second.load())
             {
                 LOG_INFO_LOC(
-                    ("Modbus thread exit for COM" +
+                    ("Modbus读取线程退出:COM" +
                     std::to_string(static_cast<int>(com))).c_str());
 
                 return;
@@ -225,7 +232,7 @@ void DeviceManager::readDeviceThreadWithStopFlag(
             // 空设备保护
             if (!device) {
 
-                LOG_ERROR_LOC("device is nullptr");
+                LOG_ERROR_LOC("设备为空");
 
                 continue;
             }
@@ -258,36 +265,10 @@ void DeviceManager::readDeviceThreadWithStopFlag(
     }
 
     LOG_INFO_LOC(
-        ("Modbus read thread stopped for COM" +
+        ("Modbus读取线程停止:COM" +
         std::to_string(static_cast<int>(com))).c_str());
 }
 
-// void DeviceManager::readDeviceThreadWithStopFlag(uint8_t com, 
-//     std::shared_ptr<ModbusClient> modbus_client, int thread_id)
-// {
-//     // 获取当前线程的停止标志引用
-    
-
-//     auto& stop_flag = this->thread_stop_flags_[thread_id];
-
-//     while(!stop_flag && !this->stop_threads_)
-//     {   
-//         // 快速检查停止标志
-//         if (stop_flag || this->stop_threads_) break;
-        
-//         // 读取同一个串口的每个设备的数据
-//         for(auto& device : this->dev_com_map[com])
-//         {
-//             // 每次操作前都检查停止标志
-//             if (stop_flag || this->stop_threads_) return;
-            
-//             device->read_data(*modbus_client);
-//             // 使用更短的睡眠，以便更快响应停止信号
-//             // std::this_thread::sleep_for(std::chrono::milliseconds(20));
-
-//         }
-//     }
-// }
 
 /**
  * @brief CAN 设备的线程主循环
@@ -299,9 +280,9 @@ void DeviceManager::readCanDeviceThreadWithStopFlag(uint8_t com,
     // 获取当前线程的停止标志引用
     auto& stop_flag = this->thread_stop_flags_[thread_id];
 
-    LOG_INFO_LOC(("CAN read thread started for COM" + std::to_string(static_cast<int>(com))).c_str());
+    LOG_INFO_LOC(("CAN读取线程启动:COM" + std::to_string(static_cast<int>(com))).c_str());
 
-    int consecutive_errors = 0;
+    int consecutive_errors = 0;         // 连续错误计数
     static constexpr int MAX_CONSECUTIVE_ERRORS = 10;
 
     while (!stop_flag && !this->stop_threads_) {
@@ -315,7 +296,7 @@ void DeviceManager::readCanDeviceThreadWithStopFlag(uint8_t com,
                 consecutive_errors = 0;
             } else {
                 // 重连失败，等待后重试
-                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                std::this_thread::sleep_for(std::chrono::milliseconds(10000));
                 continue;
             }
         }
@@ -403,7 +384,7 @@ void DeviceManager::stopAllThreads()
 
 
 // 辅助函数：生成 ISO 8601 格式的时间戳字符串
-std::string getCurrentISOTimeString() {
+static std::string getCurrentISOTimeString() {
     auto now = std::chrono::system_clock::now();
     auto time_t_now = std::chrono::system_clock::to_time_t(now);
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -424,60 +405,68 @@ void DeviceManager::runningLogShowThread() {
             auto ems = EMS::instance();
             
             // 获取当前时间
-            auto now = std::chrono::system_clock::now();
-            auto time_t_now = std::chrono::system_clock::to_time_t(now);
-            std::tm tm_now = *std::localtime(&time_t_now);
-            std::stringstream time_ss;
-            time_ss << std::put_time(&tm_now, "%Y-%m-%d %H:%M:%S");
-            std::string current_time = time_ss.str();
+            std::string current_time = getCurrentISOTimeString();   
             
             LOG_INFO_LOC(("[" + current_time + "] " + std::string(50, '-')).c_str());
             
-            // 使用共享锁保护读取操作 - EMS 使用专用的 json_rwlock_
+            static const std::map<int, std::string> status_map = {
+                {1, "初始化"},
+                {2, "待机"},
+                {3, "开机中"},
+                {4, "充电"},
+                {5, "放电"},
+                {6, "故障"}
+            };
+            static const std::map<int, std::string> mode_map = {
+                {1, "手动"},
+                {2, "自动"},
+                {3, "定时"},
+                {4, "需求侧响应"},
+                {5, "离网"}
+            };
+
+            int sys_running_pos;
+            int heartbeat;
+            int power_on;
+            int sys_status;
+            int run_mode;
+            int alarm_level;
+            double weekPlanPower_need = 0;
+            double demandPower_need = 0;
+
+            power_on = static_cast<int>(ems->getValue<double>("开机", 0));
+            sys_status = static_cast<int>(ems->getValue<double>("系统状态", 0));
+            run_mode = static_cast<int>(ems->getValue<double>("系统运行模式", 1));
+            alarm_level = static_cast<int>(ems->getValue<double>("系统告警等级", 0));
+
+            sys_running_pos = ems->sys_running_pos.load();
+            heartbeat = ems->heartbeat.load();
             {
                 std::shared_lock<std::shared_mutex> lock(ems->json_rwlock_);
-                
-                LOG_INFO_LOC(("系统运行位置: " + std::to_string(ems->sys_running_pos)).c_str());
-                LOG_INFO_LOC(("系统心跳包: " + std::to_string(ems->heartbeat)).c_str());
-                // 使用线程安全的 getValue 方法
-                LOG_INFO_LOC(("系统开机状态: " + std::to_string(static_cast<int>(ems->getValue<double>("开机", 0)))).c_str());
-                
-                // 系统状态映射
-                std::map<int, std::string> status_map = {
-                    {1, "初始化"},
-                    {2, "待机"},
-                    {3, "开机中"},
-                    {4, "充电"},
-                    {5, "放电"},
-                    {6, "故障"}
-                };
-                int sys_status = static_cast<int>(ems->getValue<double>("系统状态", 0));
-                std::string status_str = status_map.count(sys_status) ? status_map[sys_status] : "未知";
-                LOG_INFO_LOC(("系统状态: " + std::to_string(sys_status) + ":" + status_str).c_str());
-                
-                // 系统运行模式
-                std::map<int, std::string> mode_map = {
-                    {1, "手动"},
-                    {2, "自动"},
-                    {3, "定时"},
-                    {4, "需求侧响应"},
-                    {5, "离网"}
-                };
-                int run_mode = static_cast<int>(ems->getValue<double>("系统运行模式", 1));
-                std::string mode_str = mode_map.count(run_mode) ? mode_map[run_mode] : "未知";
-                LOG_INFO_LOC(("系统运行模式: " + std::to_string(run_mode) + ":" + mode_str).c_str());
-                
-                // 系统告警等级
-                int alarm_level = static_cast<int>(ems->getValue<double>("系统告警等级", 0));
-                LOG_INFO_LOC(("系统告警等级: " + std::to_string(alarm_level)).c_str());
-                
-                // 系统功率需求
                 if (run_mode == 3) {
-                    LOG_INFO_LOC(("系统功率需求: " + std::to_string(ems->weekPlanPower_need) + "kW").c_str());
+                    weekPlanPower_need = ems->weekPlanPower_need;
                 } else if (run_mode == 4) {
-                    LOG_INFO_LOC(("系统功率需求: " +  std::to_string(ems->demandPower_need) + "kW").c_str());
+                    demandPower_need = ems->demandPower_need;
                 }
-            }  // EMS锁在此处释放
+            }
+
+            LOG_INFO_LOC(("系统运行位置: " + std::to_string(sys_running_pos)).c_str());
+            LOG_INFO_LOC(("系统心跳包: " + std::to_string(heartbeat)).c_str());
+            LOG_INFO_LOC(("系统开机状态: " + std::to_string(power_on)).c_str());
+
+            std::string status_str = status_map.count(sys_status) ? status_map.at(sys_status) : "未知";
+            LOG_INFO_LOC(("系统状态: " + std::to_string(sys_status) + ":" + status_str).c_str());
+
+            std::string mode_str = mode_map.count(run_mode) ? mode_map.at(run_mode) : "未知";
+            LOG_INFO_LOC(("系统运行模式: " + std::to_string(run_mode) + ":" + mode_str).c_str());
+
+            LOG_INFO_LOC(("系统告警等级: " + std::to_string(alarm_level)).c_str());
+
+            if (run_mode == 3) {
+                LOG_INFO_LOC(("系统功率需求: " + std::to_string(weekPlanPower_need) + "kW").c_str());
+            } else if (run_mode == 4) {
+                LOG_INFO_LOC(("系统功率需求: " + std::to_string(demandPower_need) + "kW").c_str());
+            }
             
             // 在线设备和离线设备
             std::vector<std::string> online_devices;
@@ -535,7 +524,7 @@ void DeviceManager::runningLogShowThread() {
         if (this->stop_running_log_) {
             break;
         }
-        }
+    }
 
     LOG_INFO_LOC("运行日志显示线程已停止");
 }
@@ -956,7 +945,33 @@ void DeviceManager::stopSubscribeCloudControl() {
 // }
 
 
+// ── 从 mqtt_config.json 加载 SN / project_code / control_channel ──
+void DeviceManager::loadMqttConfig() {
+    try {
+        std::ifstream f(Config::MQTT_CONFIG_FILEPATH);
+        if (!f.is_open()) {
+            LOG_WARNING_LOC("mqtt_config.json 未找到，使用默认配置");
+            mqtt_sn_ = "xyc2026002";
+            mqtt_project_code_ = "15kW南网户储项目1";
+            mqtt_control_channel_ = "cloud/action/xyc2026002/control";
+            return;
+        }
+        json cfg;
+        f >> cfg;
+        mqtt_sn_ = cfg.value("sn", "xyc2026002");
+        mqtt_project_code_ = cfg.value("project_code", "15kW南网户储项目1");
+        mqtt_control_channel_ = "cloud/action/" + mqtt_sn_ + "/control";
+        LOG_INFO_LOC(("MQTT配置加载: sn=" + mqtt_sn_ +
+                      ", channel=" + mqtt_control_channel_).c_str());
+    } catch (const std::exception& e) {
+        LOG_ERROR_LOC(("加载 mqtt_config.json 失败: " + std::string(e.what())).c_str());
+    }
+}
+
 void DeviceManager::cloudControlSubscribeThread() {
+    // 加载 MQTT 配置（sn / channel 等）
+    loadMqttConfig();
+
     try {
         // 配置超时时间
         sw::redis::ConnectionOptions opts;
@@ -966,16 +981,15 @@ void DeviceManager::cloudControlSubscribeThread() {
 
         redis_sub_client_ = std::make_unique<sw::redis::Redis>(opts);
         redis_subscriber_ = std::make_unique<sw::redis::Subscriber>(redis_sub_client_->subscriber());
-        
+
         // 设置消息回调
         redis_subscriber_->on_message([this](const std::string& channel, const std::string& msg) {
             this->handleControlMessage(channel, msg);
         });
-        
-        // 订阅控制频道（与Python端保持一致）
-        std::string control_channel = "cloud/action/xyc2026002/control";
-        redis_subscriber_->subscribe(control_channel);
-        LOG_INFO_LOC(("开始订阅Redis频道: " + control_channel).c_str());
+
+        // 订阅控制频道（从 mqtt_config.json 读取 sn，与 Python 端一致）
+        redis_subscriber_->subscribe(mqtt_control_channel_);
+        LOG_INFO_LOC(("开始订阅Redis频道: " + mqtt_control_channel_).c_str());
 
         while (!stop_cloud_control_) {
             try {
@@ -1006,17 +1020,14 @@ void DeviceManager::handleControlMessage(const std::string& channel, const std::
         // 解析JSON消息
         auto json_msg = nlohmann::json::parse(message);
         
-        // 验证 SN 和 PROJECT_CODE（与 Python 端保持一致）
-        std::string expected_sn = "xyc2026002";
-        std::string expected_code = "15kW南网户储项目1";
-        
-        if (json_msg.contains("sn") && json_msg["sn"] != expected_sn) {
-            LOG_WARNING_LOC(("SN不匹配: 期望=" + expected_sn + ", 实际=" + json_msg["sn"].get<std::string>()).c_str());
+        // 验证 SN 和 PROJECT_CODE（与 Python 端保持一致，配置从 mqtt_config.json 读取）
+        if (json_msg.contains("sn") && json_msg["sn"] != mqtt_sn_) {
+            LOG_WARNING_LOC(("SN不匹配: 期望=" + mqtt_sn_ + ", 实际=" + json_msg["sn"].get<std::string>()).c_str());
             return;
         }
-        
-        if (json_msg.contains("code") && json_msg["code"] != expected_code) {
-            LOG_WARNING_LOC(("PROJECT_CODE不匹配: 期望=" + expected_code + ", 实际=" + json_msg["code"].get<std::string>()).c_str());
+
+        if (json_msg.contains("code") && json_msg["code"] != mqtt_project_code_) {
+            LOG_WARNING_LOC(("PROJECT_CODE不匹配: 期望=" + mqtt_project_code_ + ", 实际=" + json_msg["code"].get<std::string>()).c_str());
             return;
         }
         
@@ -1044,82 +1055,36 @@ void DeviceManager::handleControlMessage(const std::string& channel, const std::
         if (control_message_callback_) {
             control_message_callback_(channel, message);
         } else {
-            // 默认处理逻辑：根据消息内容执行设备控制
+            // 默认处理逻辑：仿照 Python mqtt_controller，直接写入 cmd_from_qt
+            // 策略线程的各设备 cmd 模块（ejpcscmd/ejdcdc/emscmd 等）会轮询消费
             if (json_msg.contains("device") && json_msg.contains("command")) {
                 std::string device_name = json_msg["device"];
                 std::string command = json_msg["command"];
-                
-                auto device = getDeviceByName(device_name);
-                if (device) {
-                    LOG_INFO_LOC(("执行设备控制: " + device_name + " -> " + command).c_str());
-                    
-                    // 示例：如果是PCS设备，可以设置功率
-                    if (device_name == "pcs1" && json_msg.contains("power")) {
-                        double power = json_msg["power"];
-                        LOG_INFO_LOC(("设置PCS功率: " + std::to_string(power) + "kW").c_str());
-                        // TODO: 实际应该调用PCS的控制接口
-                        // pcs_->set_power(power);
-                    }
-                    
-                    // ══════ InfyCharger 充电机控制 ══════
-                    if (device_name == "chargers") {
-                        auto charger = std::dynamic_pointer_cast<InfyCharger>(device);
-                        if (charger) {
-                            // 开关机控制: command="on_off", value=0或1
-                            if (command == "on_off" && json_msg.contains("value")) {
-                                int on_off = json_msg["value"].get<int>();
-                                charger->set_on_off(on_off);
-                                LOG_INFO_LOC(("充电机开关机: " + std::to_string(on_off)).c_str());
+                json value = json_msg.value("value", json(nullptr));
 
-                                // 通过 CAN 发送控制帧
-                                auto can_ops = getCanOperators();
-                                auto it = can_ops.find(static_cast<int>(charger->get_com()));
-                                if (it != can_ops.end()) {
-                                    charger->multiWriteCmdToDevice(it->second);
-                                }
-                            }
-                            // 电压电流设置: command="set_voltage_current", voltage=xxx, current=xxx
-                            else if (command == "set_voltage_current" &&
-                                     json_msg.contains("voltage") && json_msg.contains("current")) {
-                                double voltage = json_msg["voltage"].get<double>();
-                                double current = json_msg["current"].get<double>();
-                                charger->set_voltage_current(voltage, current);
-                                LOG_INFO_LOC(("充电机设置电压电流: V=" + std::to_string(voltage) +
-                                              "V, I=" + std::to_string(current) + "A").c_str());
+                auto qt = QtController::getInstance();
+                std::lock_guard<std::mutex> lock(qt->cmd_mutex_);
+                auto& cmd_from_qt = qt->cmd_from_qt;
+                cmd_from_qt[device_name][command] = value;
 
-                                // 通过 CAN 发送控制帧
-                                auto can_ops = getCanOperators();
-                                auto it = can_ops.find(static_cast<int>(charger->get_com()));
-                                if (it != can_ops.end()) {
-                                    charger->multiWriteCmdToDevice(it->second);
-                                }
-                            }
-                        }
-                    }
-
-                    // 示例：如果是EMS设备，可以设置运行模式
-                    if (device_name == "ems") {
-                        if (json_msg.contains("mode")) {
-                            int mode = json_msg["mode"];
-                            LOG_INFO_LOC(("设置EMS运行模式: " + std::to_string(mode)).c_str());
-                            // TODO: 实际应该调用EMS的控制接口
-                            // ems_->set_run_mode(mode);
-                        }
-                    }
-                } else {
-                    LOG_WARNING_LOC(("设备不存在: " + device_name).c_str());
+                // 定时模式 / 需求响应模式附带数据写入兄弟 key
+                if (command == "sys_setTimer" && json_msg.contains("timingModeSet")) {
+                    cmd_from_qt[device_name]["timingModeSet"] = json_msg["timingModeSet"];
                 }
-            }
-            
-            // 处理通用控制命令（cmd_id 和 value 格式，类似 Python 的 mqtt_controller）
-            if (json_msg.contains("cmd_id") && json_msg.contains("value")) {
-                std::string cmd_id = json_msg["cmd_id"];
-                auto value = json_msg["value"];
-                
-                LOG_INFO_LOC(("收到通用控制命令: cmd_id=" + cmd_id + ", value=" + value.dump()).c_str());
-                
-                // TODO: 根据 cmd_id 执行相应的控制操作
-                // 这里可以集成到现有的命令系统中
+                if (command == "sys_setDemandResponse" && json_msg.contains("demandResponseModeSet")) {
+                    cmd_from_qt[device_name]["demandResponseModeSet"] = json_msg["demandResponseModeSet"];
+                }
+                // 透传消息中的其他字段作为兄弟 key（支持未来扩展）
+                for (auto& [k, v] : json_msg.items()) {
+                    if (k != "device" && k != "command" && k != "value" &&
+                        k != "sn" && k != "code" &&
+                        k != "timingModeSet" && k != "demandResponseModeSet") {
+                        cmd_from_qt[device_name][k] = v;
+                    }
+                }
+
+                LOG_INFO_LOC(("云端控制 -> cmd_from_qt: [" + device_name + "][" +
+                              command + "] = " + value.dump()).c_str());
             }
         }
     } catch (const nlohmann::json::parse_error& e) {
@@ -1169,98 +1134,102 @@ void DeviceManager::initModbusAddressMapping() {
     this->fc03_map_.clear();
 
     // --- FC04: 遍历非EMS设备，分配地址（支持自定义起始地址，未设置则按顺序分配） ---
-    uint16_t cursor = 0;
-    for (const auto& dev : devices_) {
-        if (!dev) continue;
+    uint16_t total_input = 0;
+    if (this->fc04_enabled_) {
+        uint16_t cursor = 0;
+        for (const auto& dev : devices_) {
+            if (!dev) continue;
 
-        const auto& keys = dev->dev_data_keys_;
-        if (keys.empty()) continue;
+            const auto& keys = dev->dev_data_keys_;
+            if (keys.empty()) continue;
 
-        // 自定义起始地址优先，否则使用自动递增的 cursor
-        auto custom_it = this->fc04_start_addrs_.find(dev->get_name());
-        uint16_t start = (custom_it != this->fc04_start_addrs_.end())
-                             ? custom_it->second
-                             : cursor;
+            // 自定义起始地址优先，否则使用自动递增的 cursor
+            auto custom_it = this->fc04_start_addrs_.find(dev->get_name());
+            uint16_t start = (custom_it != this->fc04_start_addrs_.end())
+                                 ? custom_it->second
+                                 : cursor;
 
-        uint16_t cnt = 0;
-        {
-            std::shared_lock<std::shared_mutex> lk(dev->data_dict_rwlock_);
-            const auto& dict = dev->data_dict_;
-            for (const auto& k : keys) {
-                auto it = dict.find(k);
-                if (it != dict.end())
-                    cnt += reg_count_of(it->second.datatype);
+            uint16_t cnt = 0;
+            {
+                std::shared_lock<std::shared_mutex> lk(dev->data_dict_rwlock_);
+                const auto& dict = dev->data_dict_;
+                for (const auto& k : keys) {
+                    auto it = dict.find(k);
+                    if (it != dict.end())
+                        cnt += reg_count_of(it->second.datatype);
+                }
             }
+            if (cnt == 0) continue;
+
+            // +1 寄存器用于 online_status
+            cnt += 1;
+
+            // 冲突检测：新范围 [start, start+cnt-1] 与已分配范围是否重叠
+            uint16_t end = start + cnt - 1;
+            bool conflict = false;
+            for (const auto& kv : this->fc04_offsets_) {
+                uint16_t a = kv.second.first;
+                uint16_t b = kv.second.first + kv.second.second - 1;
+                if (!(end < a || start > b)) {
+                    LOG_ERROR_LOC(("FC04 [" + dev->get_name() + "] addr " +
+                                   std::to_string(start) + "~" + std::to_string(end) +
+                                   " 与 [" + kv.first + "] addr " +
+                                   std::to_string(a) + "~" + std::to_string(b) + " 重叠，跳过").c_str());
+                    conflict = true;
+                    break;
+                }
+            }
+            if (conflict) continue;
+
+            this->fc04_offsets_[dev->get_name()] = {start, cnt};
+
+            // 未自定义的设备才推进顺序 cursor，自定义设备不影响自动分配
+            if (custom_it == this->fc04_start_addrs_.end()) {
+                cursor = start + cnt;
+            }
+
+            LOG_INFO_LOC(("FC04 [" + dev->get_name() + "] addr " +
+                          std::to_string(start) + "~" + std::to_string(end) +
+                          " (" + std::to_string(cnt) + " regs)").c_str());
         }
-        if (cnt == 0) continue;
 
-        // +1 寄存器用于 online_status
-        cnt += 1;
-
-        // 冲突检测：新范围 [start, start+cnt-1] 与已分配范围是否重叠
-        uint16_t end = start + cnt - 1;
-        bool conflict = false;
+        // total_input = max(end of all allocated ranges)，预留间隙全部纳入
+        total_input = 1;
         for (const auto& kv : this->fc04_offsets_) {
-            uint16_t a = kv.second.first;
-            uint16_t b = kv.second.first + kv.second.second - 1;
-            if (!(end < a || start > b)) {
-                LOG_ERROR_LOC(("FC04 [" + dev->get_name() + "] addr " +
-                               std::to_string(start) + "~" + std::to_string(end) +
-                               " 与 [" + kv.first + "] addr " +
-                               std::to_string(a) + "~" + std::to_string(b) + " 重叠，跳过").c_str());
-                conflict = true;
-                break;
-            }
+            uint16_t end = kv.second.first + kv.second.second;
+            if (end > total_input) total_input = end;
         }
-        if (conflict) continue;
-
-        this->fc04_offsets_[dev->get_name()] = {start, cnt};
-
-        // 未自定义的设备才推进顺序 cursor，自定义设备不影响自动分配
-        if (custom_it == this->fc04_start_addrs_.end()) {
-            cursor = start + cnt;
-        }
-
-        LOG_INFO_LOC(("FC04 [" + dev->get_name() + "] addr " +
-                      std::to_string(start) + "~" + std::to_string(end) +
-                      " (" + std::to_string(cnt) + " regs)").c_str());
+        fc04_total_input_ = total_input;
+    } else {
+        fc04_total_input_ = 0;
+        LOG_INFO_LOC("FC04 已禁用 (fc04_enabled_=false)");
     }
 
-    // total_input = max(end of all allocated ranges)，预留间隙全部纳入
-    uint16_t total_input = 1;
-    for (const auto& kv : this->fc04_offsets_) {
-        uint16_t end = kv.second.first + kv.second.second;
-        if (end > total_input) total_input = end;
-    }
-
-    // --- FC03: 从 ems_->tcp_cmd 读取可读写变量 ---
+    // --- FC03: EMS data_dict_ 中所有带 tcp_addr 的条目映射到 FC03 ---
     if (ems_) {
-        std::shared_lock<std::shared_mutex> lk(ems_->json_rwlock_);
-        for (auto& item : ems_->tcp_cmd.items()) {
-            const std::string& k = item.key();
-            const json& v = item.value();
-            if (!v.contains("tcp_addr")) continue;
+        std::shared_lock<std::shared_mutex> lk(ems_->data_dict_rwlock_);
+        for (const auto& pair : ems_->data_dict_) {
+            const std::string& k = pair.first;
+            const RegisterData& rd = pair.second;
+            if (rd.tcp_addr == 0xFFFF) continue;
 
-            uint16_t addr = v["tcp_addr"].get<uint16_t>();
             Fc03Mapping m;
             m.device_name = "ems";
             m.key      = k;
-            m.mag      = v.value("mag", 1.0);
-            m.offset   = v.value("offset", 0);
-            m.datatype = v.value("datatype", "INT16");
+            m.mag      = rd.mag;
+            m.offset   = rd.offset;
+            m.datatype = rd.datatype;
             m.reg_count = reg_count_of(m.datatype);
             m.rtu_addr = 0;  // EMS是虚拟设备，无RTU地址
             m.skip_count = 0; m.last_val[0] = m.last_val[1] = 0;
+            m.writable = rd.writable;
 
-            auto dit = ems_->data_dict_.find(k);
-            if (dit != ems_->data_dict_.end()) {
-                int dummy;
-                uint16_t out[2];
-                value_to_regs(dit->second.value, m.mag, m.offset, m.datatype, out, dummy);
-                m.last_val[0] = out[0];
-                if (m.reg_count > 1) m.last_val[1] = out[1];
-            }
-            this->fc03_map_[addr] = m;
+            uint16_t out[2]; int dummy;
+            value_to_regs(rd.value, m.mag, m.offset, m.datatype, out, dummy);
+            m.last_val[0] = out[0];
+            if (m.reg_count > 1) m.last_val[1] = out[1];
+
+            this->fc03_map_[rd.tcp_addr] = m;
         }
     }
 
@@ -1397,10 +1366,24 @@ void DeviceManager::initModbusAddressMapping() {
                 // 判断该key的RTU地址原始功能码，决定写回方式:
                 //   0=无RTU来源  1=FC01(线圈→FC05)  3=FC03(保持寄存器→FC06/16)
                 //   2/4=只读来源(FC02离散输入/FC04输入寄存器)→拒绝写入
-                if (dev->fc03_nameToAddr_map.find(k) != dev->fc03_nameToAddr_map.end())
+                //
+                // 优先检测 CAN 设备的可写控制键（这些键在 fc03_nameToAddr_map 中但应走 CAN 而非 RTU 写回）
+                bool is_can_device = (Config::CAN_INTERFACES.find(dev->get_com()) != Config::CAN_INTERFACES.end());
+                if (is_can_device) {
+                    static const std::unordered_set<std::string> can_ctrl_keys = {
+                        "充电机开关机", "充电机设置电压(V)", "充电机设置电流(A)"
+                    };
+                    if (can_ctrl_keys.find(k) != can_ctrl_keys.end()) {
+                        m.can_device_ctrl = true;
+                        LOG_INFO_LOC(("FC03 CAN控制键: [" + dev->get_name() + "][" + k +
+                                      "] 标记为可写 (CAN直控)").c_str());
+                    }
+                    // CAN 设备不设置 original_fc（无 RTU 写回）
+                } else if (dev->fc03_nameToAddr_map.find(k) != dev->fc03_nameToAddr_map.end()) {
                     m.original_fc = 3;
-                else if (dev->fc01_nameToAddr_map.find(k) != dev->fc01_nameToAddr_map.end())
+                } else if (dev->fc01_nameToAddr_map.find(k) != dev->fc01_nameToAddr_map.end()) {
                     m.original_fc = 1;
+                }
                 // FC02/FC04 保持 original_fc=0，syncAllFc03中跳过写回
 
                 int dummy;
@@ -1437,7 +1420,6 @@ void DeviceManager::initModbusAddressMapping() {
     if (timer_block_end > total_holding)  total_holding = timer_block_end;
     if (demand_block_end > total_holding) total_holding = demand_block_end;
     fc03_total_holding_ = total_holding;
-    fc04_total_input_ = total_input;
 
     // 初始化 last 缓存
     last_timer_block_.assign(total_timer_regs, 0);
@@ -1608,13 +1590,13 @@ void DeviceManager::modbusSyncLoop() {
 
         try {
             if (modbus_tcp_server_) {
-                syncAllFc04To(modbus_tcp_server_.get());
+                if (fc04_enabled_) syncAllFc04To(modbus_tcp_server_.get());
                 syncAllFc03To(modbus_tcp_server_.get());
                 syncTimerBlockTo(modbus_tcp_server_.get());
                 syncDemandBlockTo(modbus_tcp_server_.get());
             }
             if (modbus_rtu_server_) {
-                syncAllFc04To(modbus_rtu_server_.get());
+                if (fc04_enabled_) syncAllFc04To(modbus_rtu_server_.get());
                 syncAllFc03To(modbus_rtu_server_.get());
                 syncTimerBlockTo(modbus_rtu_server_.get());
                 syncDemandBlockTo(modbus_rtu_server_.get());
@@ -1720,7 +1702,29 @@ void DeviceManager::syncAllFc03To(ModbusServer* server) {
             // ── 客户端写入 ──
             double real = regs_to_value(cur, m.reg_count, m.mag, m.offset);
             if (m.device_name == "ems") {
-                ems_writes.push_back({m.key, real});
+                if (!m.writable) {
+                    LOG_WARNING_LOC(("FC03 拒绝写入只读EMS寄存器: [" + m.key +
+                                     "] tcp=" + std::to_string(addr)).c_str());
+                } else {
+                    ems_writes.push_back({m.key, real});
+                }
+            } else if (m.can_device_ctrl) {
+                // ── CAN 设备控制：通过虚方法派发，无需知道具体 charger 类型 ──
+                auto dev = getDeviceByName(m.device_name);
+                if (dev) {
+                    dev->updateRegisterValue(m.key, real);
+                    dev->setCanControlParam(m.key, real);
+                    auto can_ops = getCanOperators();
+                    auto op_it = can_ops.find(static_cast<int>(dev->get_com()));
+                    if (op_it != can_ops.end() && op_it->second) {
+                        dev->sendCanControlFrames(op_it->second);
+                    }
+                }
+                m.skip_count = FC03_SKIP_CYCLES;
+                LOG_INFO_LOC(("FC03 CAN控制: [" + m.device_name + "][" + m.key +
+                              "] tcp=" + std::to_string(addr) +
+                              " real=" + std::to_string(real) +
+                              " skip=" + std::to_string(FC03_SKIP_CYCLES)).c_str());
             } else if (m.original_fc >= 1) {
                 auto dev = getDeviceByName(m.device_name);
                 if (m.original_fc == 1) {

@@ -106,7 +106,7 @@
 		<hRegister address="24622" name="PCS降额系数" datatype="INT16" unit="" mag="1" offset="0" />
 		<hRegister address="24623" name="PCS降额标志" datatype="INT16" unit="" mag="1" offset="0" />
 		<hRegister address="24624" name="交流A相有功功率" datatype="INT16" unit="kW" mag="10" offset="0" />
-		<hRegister address="24625" name="交流B相有功功率" datatype="UINT16" unit="kW" mag="10" offset="0" />
+		<hRegister address="24625" name="交流B相有功功率" datatype="INT16" unit="kW" mag="10" offset="0" />
 		<hRegister address="24626" name="交流C相有功功率" datatype="INT16" unit="kW" mag="10" offset="0" />
 		<hRegister address="24627" name="交流A相视在功率" datatype="INT16" unit="kVa" mag="10" offset="0" />
 		<hRegister address="24628" name="交流B相视在功率" datatype="INT16" unit="kVa" mag="10" offset="0" />

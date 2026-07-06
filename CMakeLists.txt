@@ -70,6 +70,7 @@ set(DEVICE_SOURCES
     ${CMAKE_SOURCE_DIR}/src/devices/ac_hengdu.cpp
     ${CMAKE_SOURCE_DIR}/src/devices/dg_hgm6100.cpp
     ${CMAKE_SOURCE_DIR}/src/devices/infy_charger.cpp
+    ${CMAKE_SOURCE_DIR}/src/devices/increase_charger.cpp
 )
 
 # 控制策略层

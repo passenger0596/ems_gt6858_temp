@@ -24,10 +24,10 @@ class UnixSocketServer {
         /**
          * @brief 构造函数
          * @param socketPath Unix Socket文件路径
-         * @param devList 设备列表的引用（不持有所有权）
+         * @param devList 设备列表的拷贝（持有所有权）
          */
         UnixSocketServer(const std::string& socketPath, 
-                        const std::vector<std::shared_ptr<Device>>& devList);
+                        const std::vector<std::shared_ptr<Device>> devList);
         
         ~UnixSocketServer();
         
@@ -65,8 +65,9 @@ class UnixSocketServer {
         /**
          * @brief 处理单个客户端连接的线程函数
          * @param context 客户端上下文
+         * @param cycle_time_ms 数据发送周期时间（毫秒）
          */
-        void clientHandler(std::shared_ptr<ClientContext> context);
+        void clientHandler(std::shared_ptr<ClientContext> context,int cycle_time_ms = 500);
         
         /**
          * @brief 从客户端接收数据的线程函数

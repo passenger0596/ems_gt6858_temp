@@ -46,12 +46,6 @@ InfyCharger::InfyCharger(const std::string& name, int can_channel, int id,
     // 初始化基础 JSON 结构
     init_json_structure(name);
 
-    // 初始化 data_to_qt 为嵌套结构（与 Python 一致）
-    init_data_to_qt();
-
-    // 初始化 data_dict_
-    init_data_dict();
-
     // 初始化告警键有序列表（预分配，实际填充在 init_config() 中完成）
     alarm_keys_.resize(chargers_num_);
 
@@ -99,32 +93,15 @@ InfyCharger::InfyCharger(const std::string& name, int can_channel, int id,
 
 // ======================== init_config ========================
 void InfyCharger::init_config(const std::string& config_file) {
-    // 该方法目的只是为 充电机加载告警配置，不加载其他寄存器配置
+    LOG_INFO_LOC(("加载 InfyCharger 配置文件: " + config_file));
 
-    LOG_INFO_LOC(("加载 InfyCharger 告警配置文件: " + config_file));
-
-    pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_file(config_file.c_str());
-
-    if (!result) {
-        LOG_ERROR_LOC(("加载 InfyCharger 配置文件失败: " + config_file +
-                       ", Error: " + result.description()));
-        return;
-    }
-
-    pugi::xml_node root = doc.document_element();
-    if (!root) {
-        LOG_ERROR_LOC("InfyCharger 配置文件 XML 格式错误");
-        return;
-    }
-
-    // 调用基类告警解析（解析 dido 节点，初始化 alarm_level1/2/3 和 alarm_map）
-    parse_alarm_config(root);
+    // 调用基类 init_config：解析 function_code03 的 hRegister → data_dict_ / dev_data_keys_
+    //                      解析 dido → alarm_map / alarm_level1/2/3
+    Device::init_config(config_file);
 
     // 重新构建 alarm_keys_: 按模块号分组告警键
-    // 基类 alarm_map 保存了 {告警名, 级别} 对
     for (int i = 0; i < chargers_num_; ++i) {
-        std::string prefix = "模块" + std::to_string(i+1);
+        std::string prefix = "模块" + std::to_string(i + 1);
         alarm_keys_[i].clear();
         for (const auto& [alm_name, level] : alarm_map) {
             if (alm_name.find(prefix) == 0) {
@@ -133,99 +110,11 @@ void InfyCharger::init_config(const std::string& config_file) {
         }
     }
 
-    // data_dict_ 已在构造函数中通过 init_data_dict() 初始化
-    // data_to_qt 已在构造函数中通过 init_data_to_qt() 初始化
+    // 用嵌套的 data_to_qt 结构覆盖基类 init_config 创建的扁平数组
+    init_data_to_qt();
 
-    LOG_INFO_LOC(("InfyCharger 配置加载完成: " + std::to_string(alarm_map.size()) +
-                  " 个告警项"));
-}
-
-// ======================== init_data_dict ========================
-void InfyCharger::init_data_dict() {
-    // 与 Python charger.py 的 data_dict 结构完全一致
-
-    // 系统数据
-    {
-        RegisterData rd;
-        rd.value = 0.0; rd.mag = 10.0; rd.offset = 0;
-        rd.datatype = "FLOAT"; rd.unit = "V";
-        data_dict_["系统总电压(V)"] = rd;
-    }
-    {
-        RegisterData rd;
-        rd.value = 0.0; rd.mag = 10.0; rd.offset = 0;
-        rd.datatype = "FLOAT"; rd.unit = "A";
-        data_dict_["系统总电流(A)"] = rd;
-    }
-
-    // 每个模块的数据点
-    for (int i = 0; i < chargers_num_; ++i) {
-        std::string prefix = "模块" + std::to_string(i+1);
-
-        {
-            RegisterData rd;
-            rd.value = 0.0; rd.mag = 10.0; rd.offset = 0;
-            rd.datatype = "FLOAT"; rd.unit = "V";
-            data_dict_[prefix + "电压(V)"] = rd;
-        }
-        {
-            RegisterData rd;
-            rd.value = 0.0; rd.mag = 10.0; rd.offset = 0;
-            rd.datatype = "FLOAT"; rd.unit = "A";
-            data_dict_[prefix + "电流(A)"] = rd;
-        }
-        {
-            RegisterData rd;
-            rd.value = 0.0; rd.mag = 10.0; rd.offset = 0;
-            rd.datatype = "INT"; rd.unit = "℃";
-            data_dict_[prefix + "环温(℃)"] = rd;
-        }
-        {
-            RegisterData rd;
-            rd.value = 0.0; rd.mag = 10.0; rd.offset = 0;
-            rd.datatype = "INT"; rd.unit = "";
-            data_dict_[prefix + "状态表0"] = rd;
-        }
-        {
-            RegisterData rd;
-            rd.value = 0.0; rd.mag = 10.0; rd.offset = 0;
-            rd.datatype = "INT"; rd.unit = "";
-            data_dict_[prefix + "状态表1"] = rd;
-        }
-        {
-            RegisterData rd;
-            rd.value = 0.0; rd.mag = 10.0; rd.offset = 0;
-            rd.datatype = "INT"; rd.unit = "";
-            data_dict_[prefix + "状态表2"] = rd;
-        }
-        {
-            RegisterData rd;
-            rd.value = 0.0; rd.mag = 10.0; rd.offset = 0;
-            rd.datatype = "FLOAT"; rd.unit = "V";
-            data_dict_[prefix + "AB线电压(V)"] = rd;
-        }
-        {
-            RegisterData rd;
-            rd.value = 0.0; rd.mag = 10.0; rd.offset = 0;
-            rd.datatype = "FLOAT"; rd.unit = "V";
-            data_dict_[prefix + "BC线电压(V)"] = rd;
-        }
-        {
-            RegisterData rd;
-            rd.value = 0.0; rd.mag = 10.0; rd.offset = 0;
-            rd.datatype = "FLOAT"; rd.unit = "V";
-            data_dict_[prefix + "CA线电压(V)"] = rd;
-        }
-    }
-
-    // 更新 dev_data_keys_ 以匹配 data_dict_
-    dev_data_keys_.clear();
-    for (const auto& [key, _] : data_dict_) {
-        dev_data_keys_.push_back(key);
-    }
-
-    LOG_INFO_LOC(("InfyCharger data_dict 初始化完成: " +
-                  std::to_string(data_dict_.size()) + " 个数据点"));
+    LOG_INFO_LOC(("InfyCharger 配置加载完成: " + std::to_string(data_dict_.size()) +
+                  " 个寄存器, " + std::to_string(alarm_map.size()) + " 个告警项"));
 }
 
 // ======================== init_data_to_qt ========================
@@ -518,6 +407,22 @@ void InfyCharger::multiWriteCmdToDevice(std::shared_ptr<CanOperator> can_operato
     }
     // 委托给核心实现（立即发送一次控制帧，不等下次 read_data 周期）
     send_control_frames(*can_operator);
+}
+
+// ======================== setCanControlParam (FC03 写入路由) ========================
+void InfyCharger::setCanControlParam(const std::string& key, double value) {
+    if (key == "充电机开关机") {
+        set_on_off(static_cast<int>(value));
+    } else if (key == "充电机设置电压(V)") {
+        set_sys_voltage(value);
+    } else if (key == "充电机设置电流(A)") {
+        set_sys_current(value);
+    }
+}
+
+// ======================== sendCanControlFrames (CAN 控制帧发送) ========================
+void InfyCharger::sendCanControlFrames(std::shared_ptr<CanOperator> can_operator) {
+    multiWriteCmdToDevice(can_operator);
 }
 
 // ======================== send_control_frames (shared_ptr 重载) ========================

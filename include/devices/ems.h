@@ -37,9 +37,6 @@ public:
     // 更新EMS状态
     void update_ems();
     
-    // 比较和同步Modbus TCP保持寄存器与data_dict
-    void compare_and_synchronized(int address);
-    
     // 读取并解析JSON配置文件
     bool read_and_parse_jsonfile(const std::string& filename);
     
@@ -100,19 +97,15 @@ public:
     std::tuple<bool, int, int> check_demand_response_status();  // 检查需求响应状态
     
     // 成员变量
-    int sys_running_pos;          // 程序运行位置
-    int heartbeat;                // 心跳包
+    std::atomic<int> sys_running_pos;          // 程序运行位置
+    std::atomic<int> heartbeat;                // 心跳包
     
     json timingModeSet;           // 定时模式设置
     json demandResponseModeSet;   // 需求响应模式设置
     
-    std::unordered_map<std::string, RegisterData> tcp_data_dict;           // TCP数据字典
     json tcp_timingModeSet;       // TCP定时模式缓存
     json tcp_demandResponseModeSet; // TCP需求响应模式缓存
 
-    // TCP命令字典
-    json tcp_cmd;
-    
     // 数据到QT的映射
     json data_to_qt;
 
@@ -150,9 +143,6 @@ private:
     // 从JSON文件加载数据字典
     bool load_data_dict_from_json(const std::string& filepath);
     
-    // 从JSON文件加载TCP命令
-    bool load_tcp_cmd_from_json(const std::string& filepath);
-
     // 初始化命令映射
     void init_cmd_mapping();
     

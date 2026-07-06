@@ -12,9 +12,9 @@
 	</function_code01>
 	<function_code02 code="0x02" description="Read Discrete Input">
 		<di address="0" name="手动充电使能" datatype="BOOL" unit="" />
-		<di address="1" name="di2" datatype="BOOL" unit="" />
-		<di address="2" name="di3" datatype="BOOL" unit="" />
-		<di address="3" name="di4" datatype="BOOL" unit="" />
+		<di address="1" name="烟感告警" datatype="BOOL" unit="" />
+		<di address="2" name="温感告警" datatype="BOOL" unit="" />
+		<di address="3" name="喷淋反馈" datatype="BOOL" unit="" />
 		<di address="4" name="di5" datatype="BOOL" unit="" />
 		<di address="5" name="di6" datatype="BOOL" unit="" />
 		<di address="6" name="di7" datatype="BOOL" unit="" />
@@ -26,5 +26,9 @@
 	<function_code06 code="0x06" description="Write Single Registers" />
 	<dido code="" description="Parse dido">
 		<subdido name="电量低" level="1" />
+		<subdido name="烟感告警" level="1" />
+		<subdido name="温感告警" level="1" />
+		<subdido name="烟感、温感告警" level="2" />
+		<subdido name="喷淋反馈" level="3" />
 	</dido>
 </zhongsheng_8di8do_protocol>

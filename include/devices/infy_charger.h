@@ -73,6 +73,18 @@ public:
     void multiWriteCmdToDevice(std::shared_ptr<CanOperator> can_operator) override;
 
     /**
+     * @brief FC03 写入路由到充电机控制参数 setter
+     * @param key   控制键名（"开关机控制"/"电压设定(V)"/"电流设定(A)"）
+     * @param value 真实值
+     */
+    void setCanControlParam(const std::string& key, double value) override;
+
+    /**
+     * @brief 发送 CAN 控制帧（委托给 multiWriteCmdToDevice）
+     */
+    void sendCanControlFrames(std::shared_ptr<CanOperator> can_operator) override;
+
+    /**
      * @brief 解析并更新各模块告警状态
      * 从状态表展开位 → 匹配告警键 → 调用 handle_alarm()
      */
@@ -165,9 +177,6 @@ private:
     void parse_module_input_voltage(int module_num, const std::vector<uint8_t>& data);
 
     // ======================== 辅助方法 ========================
-
-    /// 初始化 data_dict_ (各数据点的值/单位/类型/缩放/偏移)
-    void init_data_dict();
 
     /// 初始化 data_to_qt (Qt 前端 JSON 结构，与 Python 版本一致)
     void init_data_to_qt();

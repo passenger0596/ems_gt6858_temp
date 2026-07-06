@@ -26,13 +26,13 @@ class Strategy {
         std::thread worker_thread_;   // ✨ 新增：保存线程对象
         std::thread pilot_lamp_show_thread_;     // 指示灯线程
 
-        EmsCmd ems_cmd_;
-        EjPcsCmd pcs_cmd_;
-        EjDcdcCmd dcdc_cmd_;
-        GtbmsCmd gtbms_cmd_;
-        
-        HengduAcCmd hengdu_ac_cmd_;
-        Hgm6100Cmd dg_hgm6100_cmd_;
+        // 设备命令对象：用指针 + 构造函数体内初始化，注释掉即禁用，适配不同项目
+        std::shared_ptr<EmsCmd> ems_cmd_;
+        std::shared_ptr<EjPcsCmd> pcs_cmd_;
+        std::shared_ptr<EjDcdcCmd> dcdc_cmd_;
+        std::shared_ptr<GtbmsCmd> gtbms_cmd_;
+        std::shared_ptr<HengduAcCmd> hengdu_ac_cmd_;
+        std::shared_ptr<Hgm6100Cmd> dg_hgm6100_cmd_;
 
 
         

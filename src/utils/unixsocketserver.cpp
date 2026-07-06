@@ -17,7 +17,7 @@
 
 
 UnixSocketServer::UnixSocketServer(const std::string& socketPath,
-                                   const std::vector<std::shared_ptr<Device>>& devList)
+                                   const std::vector<std::shared_ptr<Device>> devList)
     : m_socketPath(socketPath)
     , m_devList(devList)
     , m_serverFd(-1)
@@ -160,7 +160,7 @@ int UnixSocketServer::getConnectedClientsCount() const {
     return static_cast<int>(m_activeConnections.size());
 }
 
-void UnixSocketServer::clientHandler(std::shared_ptr<ClientContext> context) {
+void UnixSocketServer::clientHandler(std::shared_ptr<ClientContext> context,int cycle_time_ms) {
     try {
         // 启动接收线程
         context->receiveThread = std::make_unique<std::thread>(
@@ -172,7 +172,7 @@ void UnixSocketServer::clientHandler(std::shared_ptr<ClientContext> context) {
         while (!context->stopFlag) {
             try {
                 // 控制发送频率
-                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                std::this_thread::sleep_for(std::chrono::milliseconds(cycle_time_ms));
                 
                 // 发送数据
                 if (!sendDataToClient(context)) {

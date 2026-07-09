@@ -747,43 +747,21 @@ void DeviceManager::publishDataToRedis()
             // data_dict: 使用线程安全的访问方法获取数据副本
             json data_dict_json = json::object();
             {
-                // 对于 EMS 设备使用 json_rwlock_,其他设备使用 data_dict_rwlock_
-                if (device->get_name() == "ems") {
-                    auto ems = std::dynamic_pointer_cast<EMS>(device);
-                    if (ems) {
-                        std::shared_lock<std::shared_mutex> lock(ems->json_rwlock_);
-                        
-                        for (const auto& pair : device->data_dict_) {
-                            const std::string& key = pair.first;
-                            const RegisterData& reg_data = pair.second;
-                            
-                            json reg_json = {
-                                    {"value", reg_data.value},
-                                    {"unit", reg_data.unit},
-                                    {"datatype", reg_data.datatype},
-                                    {"mag", reg_data.mag},
-                                    {"offset", reg_data.offset}
-                            };
-                            data_dict_json[key] = reg_json;
-                        }
-                    }
-                } else {
-                    // 其他设备使用基类的 data_dict_rwlock_
-                    std::shared_lock<std::shared_mutex> lock(device->data_dict_rwlock_);
+                // 其他设备使用基类的 data_dict_rwlock_
+                std::shared_lock<std::shared_mutex> lock(device->data_dict_rwlock_);
+                
+                for (const auto& pair : device->data_dict_) {
+                    const std::string& key = pair.first;
+                    const RegisterData& reg_data = pair.second;
                     
-                    for (const auto& pair : device->data_dict_) {
-                        const std::string& key = pair.first;
-                        const RegisterData& reg_data = pair.second;
-                        
-                        json reg_json = {
-                            {"value", reg_data.value},
-                            {"unit", reg_data.unit},
-                            {"datatype", reg_data.datatype},
-                            {"mag", reg_data.mag},
-                            {"offset", reg_data.offset}
-                        };
-                        data_dict_json[key] = reg_json;
-                    }
+                    json reg_json = {
+                        {"value", reg_data.value},
+                        {"unit", reg_data.unit},
+                        {"datatype", reg_data.datatype},
+                        {"mag", reg_data.mag},
+                        {"offset", reg_data.offset}
+                    };
+                    data_dict_json[key] = reg_json;
                 }
             }  // 锁在此处释放
             

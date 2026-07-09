@@ -179,8 +179,8 @@ void EMS::update_ems() {
 // 读取并解析JSON配置文件（写操作，使用独占锁）
 bool EMS::read_and_parse_jsonfile(const std::string& filename) {
     try {
-        // 使用独占锁（写锁），因为会修改 timingModeSet、demandResponseModeSet 和 data_dict_
-        std::unique_lock<std::shared_mutex> lock(this->json_rwlock_);
+        
+
         
         std::ifstream file(filename);
         if (!file.is_open()) {
@@ -195,10 +195,12 @@ bool EMS::read_and_parse_jsonfile(const std::string& filename) {
         // 更新data_dict中的配置值
         for (auto& item : cfg_data.items()) {
             const std::string& key = item.key();
-            
+            // 使用独占锁（写锁），因为会修改 timingModeSet、demandResponseModeSet 和 data_dict_
             if (key == "timingModeSet") {
+                std::unique_lock<std::shared_mutex> lock(this->json_rwlock_);
                 this->timingModeSet = item.value();
             } else if (key == "demandResponseModeSet") {
+                std::unique_lock<std::shared_mutex> lock(this->json_rwlock_);
                 this->demandResponseModeSet = item.value();
             } else if (this->data_dict_.find(key) != this->data_dict_.end()) {
                 // 更新data_dict中的值 - 使用线程安全的 setValue
@@ -293,9 +295,7 @@ bool EMS::write_jsonfile(const json& data, const std::string& dataname,const std
 // 写入定时模式或需求响应模式JSON文件（写操作，使用独占锁）
 bool EMS::write_timerJsonFile(const json& data,const std::string& filename) {
     try {
-        // 使用独占锁（写锁），确保写入时互斥
-        std::unique_lock<std::shared_mutex> lock(this->json_rwlock_);
-        
+     
         // 读取现有配置文件
         std::ifstream in_file(filename);
         json config_data;
@@ -312,11 +312,13 @@ bool EMS::write_timerJsonFile(const json& data,const std::string& filename) {
             for (auto& item : data.items()) {
                 const std::string& key = item.key();
                 config_data[key] = item.value();
-                
+                // 使用独占锁（写锁），确保写入时互斥
                 // 同步更新内存中的JSON对象
                 if (key == "timingModeSet") {
+                    std::unique_lock<std::shared_mutex> lock(this->json_rwlock_);
                     this->timingModeSet = item.value();
                 } else if (key == "demandResponseModeSet") {
+                    std::unique_lock<std::shared_mutex> lock(this->json_rwlock_);
                     this->demandResponseModeSet = item.value();
                 }
             }

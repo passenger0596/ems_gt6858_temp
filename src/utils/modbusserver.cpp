@@ -474,7 +474,7 @@ void ModbusServer::listen_loop()
                 this->handle_client(client_fd);
             });
             client_thread.detach();
-            LOG_DEBUG_LOC("Client thread detached");
+            LOG_INFO_LOC("Client thread detached");
         }
     } else {
         // RTU 模式下，直接处理接收的请求
@@ -493,7 +493,7 @@ void ModbusServer::listen_loop()
 
 void ModbusServer::handle_client(int client_fd)
 {
-    LOG_DEBUG_LOC("handle_client started for fd=" + std::to_string(client_fd));
+    LOG_INFO_LOC("handle_client started for fd=" + std::to_string(client_fd));
 
     modbus_t* client_ctx = modbus_new_tcp("0.0.0.0", 0);
     if (!client_ctx) {
@@ -504,7 +504,7 @@ void ModbusServer::handle_client(int client_fd)
         return;
     }
 
-    LOG_DEBUG_LOC("client_ctx created: " + std::to_string(reinterpret_cast<uintptr_t>(client_ctx)));
+    LOG_INFO_LOC("client_ctx created: " + std::to_string(reinterpret_cast<uintptr_t>(client_ctx)));
 
     int rc = modbus_set_socket(client_ctx, client_fd);
     if (rc == -1) {
@@ -515,7 +515,7 @@ void ModbusServer::handle_client(int client_fd)
         return;
     }
 
-    LOG_DEBUG_LOC("Socket set successfully");
+    LOG_INFO_LOC("Socket set successfully");
 
     // 优化超时设置：增加响应超时时间以应对锁竞争
     modbus_set_response_timeout(client_ctx, 5, 0);  // 从2秒增加到5秒
@@ -523,7 +523,7 @@ void ModbusServer::handle_client(int client_fd)
 
     uint8_t req[MODBUS_TCP_MAX_ADU_LENGTH];
 
-    LOG_DEBUG_LOC("Entering receive loop");
+    LOG_INFO_LOC("Entering receive loop");
     while (!should_stop_ && running_) {
         if (!client_ctx) break;
 

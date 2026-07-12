@@ -54,7 +54,7 @@ AcHengdu::AcHengdu(const std::string& name, int com, int id)
     init_useful_indexes_from_map(this->fc02_nameToAddr_map, this->segments02_,this->parsed_registers_fc02_);
     init_useful_indexes_from_map(this->fc03_nameToAddr_map, this->segments03_,this->parsed_registers_fc03_);
     init_useful_indexes_from_map(this->fc04_nameToAddr_map, this->segments04_,this->parsed_registers_fc04_);
-    build_parsed_registers();
+    build_parsed_registers();       // 汇总4个功能码的{key,buffer_index}到parsed_registers_，用于后续解析
     
     // 预分配数据缓冲区（避免每次重新分配）
     this->data_buffer_vec01_.resize(this->segments01_.size());

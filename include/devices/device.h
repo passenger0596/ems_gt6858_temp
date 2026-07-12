@@ -146,10 +146,7 @@ public:
                 if (!name.empty()) {
                     RegisterData reg_data;
                     reg_data.address = static_cast<uint16_t>(std::stoi(coil.attribute("address").as_string()));
-                    // reg_data.mag =  static_cast<double>(std::stoi(coil.attribute("mag").as_string()));
-                    // reg_data.offset =  static_cast<uint16_t>(std::stoi(coil.attribute("offset").as_string()));
                     reg_data.datatype = coil.attribute("datatype").as_string();
-                    // reg_data.unit = coil.attribute("unit").as_string();
                     reg_data.value = 0.0;
 
                     // 存储到映射和字典中
@@ -168,10 +165,7 @@ public:
                 if (!name.empty()) {
                     RegisterData reg_data;
                     reg_data.address = static_cast<uint16_t>(std::stoi(di.attribute("address").as_string()));
-                    // reg_data.mag =  static_cast<double>(std::stoi(di.attribute("mag").as_string()));
-                    // reg_data.offset =  static_cast<uint16_t>(std::stoi(di.attribute("offset").as_string()));
                     reg_data.datatype = di.attribute("datatype").as_string();
-                    // reg_data.unit = di.attribute("unit").as_string();
                     reg_data.value = 0.0;
 
                     // 存储到映射和字典中
@@ -241,7 +235,7 @@ public:
 
         pugi::xml_node dido_node = root.child("dido");
         if (dido_node) { 
-            parse_alarm_config(root);
+            parse_alarm_config(dido_node);
         }
 
         // 预留数据缓存区空间
@@ -256,32 +250,29 @@ public:
     }
 
     // 解析告警信息 - 子类可选择性调用
-    virtual void parse_alarm_config(pugi::xml_node& root) {
-        pugi::xml_node dido_node = root.child("dido");
-        if (dido_node) {
-            for (pugi::xml_node subdido : dido_node.children("subdido")) {
-                std::string name = subdido.attribute("name").as_string();
-                int level = subdido.attribute("level").as_int(1);
+    virtual void parse_alarm_config(pugi::xml_node& dido_node) {
+        for (pugi::xml_node subdido : dido_node.children("subdido")) {
+            std::string name = subdido.attribute("name").as_string();
+            int level = subdido.attribute("level").as_int(1);
 
-                if (!name.empty()) {
-                    // 添加到总数据JSON中
-                    this->data_to_qt[name] = false;
-                    json alarm_obj = json::object();
-                        alarm_obj["value"] = false;
-                        alarm_obj["lastTriggerTime"] = "";
-                        alarm_obj["lastClearTime"] = "";
-                    // 根据级别初始化对应的告警JSON对象
-                    switch (level) {
-                        case 1: this->alarm_level1[name] = alarm_obj; break;
-                        case 2: this->alarm_level2[name] = alarm_obj; break;
-                        case 3: this->alarm_level3[name] = alarm_obj; break;
-                    }
-                    // 存储告警名称和级别的映射关系
-                    this->alarm_map.push_back({name, level});
+            if (!name.empty()) {
+                // 添加到总数据JSON中
+                this->data_to_qt[name] = false;
+                json alarm_obj = json::object();
+                    alarm_obj["value"] = false;
+                    alarm_obj["lastTriggerTime"] = "";
+                    alarm_obj["lastClearTime"] = "";
+                // 根据级别初始化对应的告警JSON对象
+                switch (level) {
+                    case 1: this->alarm_level1[name] = alarm_obj; break;
+                    case 2: this->alarm_level2[name] = alarm_obj; break;
+                    case 3: this->alarm_level3[name] = alarm_obj; break;
                 }
+                // 存储告警名称和级别的映射关系
+                this->alarm_map.push_back({name, level});
             }
-        LOG_INFO_LOC(("设备 " + name_ + "初始化告警成功: " + std::to_string(this->alarm_map.size()) + " alarms.").c_str());
         }
+        LOG_INFO_LOC(("设备 " + name_ + "初始化告警成功: " + std::to_string(this->alarm_map.size()) + " alarms.").c_str());
     }
 
     // 写单个线圈或寄存器 (功能码 05 或 06)

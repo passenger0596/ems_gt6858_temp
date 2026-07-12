@@ -97,9 +97,7 @@ void Strategy::manualModeRun() {
     // 处理 EMS 命令
     if (pcs_cmd_ && dcdc_cmd_ && gtbms_cmd_) {
         ems_cmd_->process_ems_commands(*pcs_cmd_, *dcdc_cmd_, *gtbms_cmd_);
-    } else {
-        LOG_ERROR_LOC("设备命令对象未正确初始化，无法处理 EMS 命令");
-    }
+    } 
     // 手动模式的运行逻辑
     pcs_cmd_->process_pcs_commands("pcs1");
 

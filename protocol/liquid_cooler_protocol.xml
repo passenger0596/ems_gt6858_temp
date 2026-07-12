@@ -39,5 +39,29 @@
 		<subdido name="进水压力传感器故障" level="1" />
 		<subdido name="压机电流过流保护" level="1" />
 		<subdido name="进出水压差过小保护" level="1" />
+		<subdido name="制冷出水温度过低保护" level="1" />
+		<subdido name="出水温度过高保护" level="1" />
+		<subdido name="排气温度过高保护" level="1" />
+		<subdido name="高压传感器故障" level="1" />
+		<subdido name="低压传感器故障" level="1" />
+		<subdido name="高压压力保护" level="1" />
+		<subdido name="低压压力保护" level="1" />
+		<subdido name="补水告警" level="1" />
+		<subdido name="液位开关报警" level="1" />
+		<subdido name="直流风机1失速" level="1" />
+		<subdido name="出水压力过高报警" level="1" />
+		<subdido name="驱动模块故障" level="1" />
+		<subdido name="直流母线电压超限" level="1" />
+		<subdido name="驱动模块温度超限" level="1" />
+		<subdido name="压缩机启动异常" level="1" />
+		<subdido name="压缩机失步" level="1" />
+		<subdido name="驱动模块硬件瞬时过流" level="1" />
+		<subdido name="驱动模块软件瞬时过流" level="1" />
+		<subdido name="整流侧硬件瞬时过流" level="1" />
+		<subdido name="整流侧软件瞬时过流" level="1" />
+		<subdido name="直流风机2失速" level="1" />
+		<subdido name="水泵驱动故障" level="1" />
+
+
 	</dido>
 </liquid_cooler_protocol>

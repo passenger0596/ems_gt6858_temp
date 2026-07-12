@@ -1440,19 +1440,20 @@ void DeviceManager::startModbusTcpServer() {
     std::string ip = "0.0.0.0";
     int port = 1026;
     // 设置每个设备的 FC04 ModbusTcp服务器起始地址
-    setDeviceFc04StartAddr("ems", 0);
-    setDeviceFc04StartAddr("pcs1", 1000);
-    setDeviceFc04StartAddr("dcdc1", 1300);
-    setDeviceFc04StartAddr("dcdc2", 1400);
-    setDeviceFc04StartAddr("chargers", 1500);
-    setDeviceFc04StartAddr("dtsd3366", 1600);
-    setDeviceFc04StartAddr("air_condition", 1800);
-    // board_8di8do removed: no IO module hardware on this EMS
-    setDeviceFc04StartAddr("gtbms485", 2000);
-    setDeviceFc04StartAddr("dg_hgm6100n", 3000);
+    // setDeviceFc04StartAddr("ems", 0);
+    // setDeviceFc04StartAddr("pcs1", 1000);
+    // setDeviceFc04StartAddr("dcdc1", 1300);
+    // setDeviceFc04StartAddr("dcdc2", 1400);
+    // setDeviceFc04StartAddr("chargers", 1500);
+    // setDeviceFc04StartAddr("dtsd3366", 1600);
+    // setDeviceFc04StartAddr("air_condition", 1800);
+    // // board_8di8do removed: no IO module hardware on this EMS
+    // setDeviceFc04StartAddr("gtbms485", 2000);
+    // setDeviceFc04StartAddr("dg_hgm6100n", 3000);
 
 
     // 设置每个设备的 FC03 ModbusTcp服务器起始地址（非EMS设备）
+    setDeviceFc03StartAddr("ems", 0);
     setDeviceFc03StartAddr("pcs1", 1000);
     setDeviceFc03StartAddr("dcdc1", 1300);
     setDeviceFc03StartAddr("dcdc2", 1400);
@@ -1466,7 +1467,7 @@ void DeviceManager::startModbusTcpServer() {
     initModbusTcpServer(ip, port);
 
     // 先写一次初始值
-    syncAllFc04();
+    // syncAllFc04();
     syncAllFc03();
     syncTimerBlock();
     syncDemandBlock();
@@ -1539,7 +1540,7 @@ void DeviceManager::startModbusRtuServer() {
     }
 
     // 先写一次初始值
-    syncAllFc04To(modbus_rtu_server_.get());
+    // syncAllFc04To(modbus_rtu_server_.get());
     syncAllFc03To(modbus_rtu_server_.get());
     syncTimerBlockTo(modbus_rtu_server_.get());
     syncDemandBlockTo(modbus_rtu_server_.get());

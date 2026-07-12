@@ -6,6 +6,12 @@
 #include <vector>
 #include <shared_mutex>  // C++17 读写锁支持
 #include <algorithm>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
+#include <chrono>
+#include <functional>
 #include "json.hpp"
 #include "canoperator.h"
 #include "modbusclient.h"
@@ -15,6 +21,30 @@
 
 using json = nlohmann::json;
 
+struct AlarmDebounceTimer {
+    std::thread thread_;
+    std::mutex mtx_;
+    std::condition_variable cv_;
+    std::atomic<bool> cancelled_{false};
+
+    ~AlarmDebounceTimer() {
+        cancel();
+    }
+
+    void cancel() {
+        bool expected = false;
+        if (cancelled_.compare_exchange_strong(expected, true)) {
+            cv_.notify_one();
+        }
+        if (thread_.joinable()) {
+            thread_.join();
+        }
+    }
+
+    bool is_cancelled() const {
+        return cancelled_.load();
+    }
+};
 
 struct RegisterData {
     uint16_t address = 0;
@@ -44,7 +74,7 @@ public:
     Device(const std::string& name, int com, int id)
         : name_(name), com_(com), id_(id) {}
 
-    virtual ~Device() = default;
+    virtual ~Device();
 
     virtual void parse_rawdata(const std::vector<uint16_t>& data_list) {
         parse_rawdata_generic(data_list);
@@ -443,7 +473,7 @@ public:
 
     // 字段名->总的数组的地址映射
     std::vector<ParsedRegister> parsed_registers_;
-    std::vector<std::pair<std::string, uint8_t>> alarm_map;
+    std::vector<std::pair<std::string, uint8_t>> alarm_map;     // 报警名称:等级的vector
 
     json data_to_qt;
     
@@ -557,14 +587,24 @@ public:
      * @param alarm_name 告警名称
      * @param level 告警级别 (1/2/3)
      * @param status 当前告警状态 (true=触发, false=恢复)
-     * @param now 当前时间字符串
+     * @param debounce_ms 去抖时间（毫秒），告警值需持续该时间后才确认生效，默认100ms；设为0或负数则跳过去抖直接生效
      * @note 此方法会自动处理告警触发/恢复的数据库记录和缓存更新
      * @note 派生类可以重写此方法以实现自定义告警逻辑
      */
     virtual void handle_alarm(const std::string& alarm_name, 
                              uint8_t level, 
                              bool status, 
-                             const std::string& now);
+                             int debounce_ms = 100);
+
+    /**
+     * @brief 确认告警状态变更（去抖定时器到期后调用）
+     * @param alarm_name 告警名称
+     * @param level 告警级别 (1/2/3)
+     * @param status 确认后的告警状态
+     */
+    void _confirm_alarm(const std::string& alarm_name,
+                        uint8_t level,
+                        bool status);
 
 
 
@@ -603,6 +643,13 @@ public:
 
     // 告警状态缓存，用于检测告警状态变化
     std::unordered_map<std::string, bool> alarm_cached;
+
+    // 告警去抖定时器 {alarm_name: AlarmDebounceTimer}
+    std::unordered_map<std::string, std::shared_ptr<AlarmDebounceTimer>> alarm_timers_;
+    // 告警待确认值 {alarm_name: pending_alarm_value}
+    std::unordered_map<std::string, bool> alarm_pending_values_;
+    // 保护 alarm_timers_ 和 alarm_pending_values_ 的互斥锁
+    std::mutex alarm_timer_mtx_;
 
     /// 3-arg version: fills out_parsed with LOCAL buffer indices (relative to the given segments).
     /// Does NOT touch parsed_registers_ — use build_parsed_registers() afterwards if needed.

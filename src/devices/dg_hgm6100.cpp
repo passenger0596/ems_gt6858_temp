@@ -96,9 +96,8 @@ void DgHgm6100n::update_alarm_status() {
     if (!this->alarm_level1.is_object() || this->alarm_level1.empty())
         return;
 
-    std::string now = Utils::getCurrentTimeString();
     for (const auto& [key, value] : this->alarm_level1.items()) {
         bool status = getValue<bool>(key);
-        this->handle_alarm(key, 1, status, now);
+        this->handle_alarm(key, 1, status);
     }
 }

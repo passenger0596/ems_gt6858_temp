@@ -479,8 +479,6 @@ void InfyCharger::send_control_frames(CanOperator& can_operator) {
 // ======================== update_alarm_status ========================
 void InfyCharger::update_alarm_status() {
     try {
-        std::string now = get_current_time_string();
-
         for (int i = 0; i < chargers_num_; ++i) {
             std::string prefix = "模块" + std::to_string(i);
 
@@ -513,7 +511,7 @@ void InfyCharger::update_alarm_status() {
 
             for (size_t k = 0; k < key_count; ++k) {
                 bool alarm_val = alarm_bits[k];
-                handle_alarm(keys[k], 1, alarm_val, now);
+                handle_alarm(keys[k], 1, alarm_val);
 
                 // 更新 data_to_qt 中的告警状态
                 {
@@ -526,4 +524,3 @@ void InfyCharger::update_alarm_status() {
         LOG_ERROR_LOC(("InfyCharger 解析告警失败: " + std::string(e.what())));
     }
 }
-

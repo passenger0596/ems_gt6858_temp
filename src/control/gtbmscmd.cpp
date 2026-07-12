@@ -53,7 +53,7 @@ void GtbmsCmd::process_gtbms_commands(const std::string& device_name) {
         auto& device_commands = cmd()->cmd_from_qt[device_name];
         
         if (device_map_.find(device_name) == device_map_.end()) {
-
+            LOG_ERROR_LOC("Device" + device_name + " not found");
             return;
         }
         std::shared_ptr<Device>& device = device_map_.at(device_name);

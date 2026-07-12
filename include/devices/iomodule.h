@@ -8,6 +8,11 @@
 #include "json.hpp"
 #include <vector>
 
+/**
+ * @brief 中盛8DI 8DO数字量输入输出模块类
+ * 中盛8DI 8DO数字量输入输出模块类，用于处理输入输出相关的设备数据。
+ */
+
 using json = nlohmann::json;
 
 class IOModule : public Device {

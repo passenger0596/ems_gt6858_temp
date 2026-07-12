@@ -118,7 +118,7 @@ void UnixSocketServer::startServer() {
             }
             
             // 启动客户端处理线程
-            std::thread clientThread(&UnixSocketServer::clientHandler, this, context);
+            std::thread clientThread(&UnixSocketServer::clientHandler, this, context, 500);
             clientThread.detach(); // 分离线程，由系统管理生命周期
         }
     });

@@ -146,7 +146,7 @@ void DeviceManager::createReadThreads()
     for (auto& pair : this->can_dev_map) {
         auto it = Config::CAN_INTERFACES.find(pair.first);
         if (it == Config::CAN_INTERFACES.end()) {
-            LOG_ERROR_LOC("找不到CAN接口: COM " + 
+            LOG_ERROR_LOC("找不到CAN接口:  " + 
                          std::to_string(static_cast<int>(pair.first)));
 
             continue;

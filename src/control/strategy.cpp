@@ -13,9 +13,9 @@ Strategy::Strategy(std::shared_ptr<DeviceManager> device_manager)
     this->ems_cmd_      = std::make_shared<EmsCmd>(device_manager_->device_map_);
     this->pcs_cmd_      = std::make_shared<EjPcsCmd>(device_manager_->getModbusClients(), device_manager_->device_map_);
     this->dcdc_cmd_     = std::make_shared<EjDcdcCmd>(device_manager_->getModbusClients(), device_manager_->device_map_);
-    this->gtbms_cmd_    = std::make_shared<GtbmsCmd>(device_manager_->getModbusClients(), device_manager_->device_map_);
-    this->hengdu_ac_cmd_ = std::make_shared<HengduAcCmd>(device_manager_->getModbusClients(), device_manager_->device_map_);
-    this->dg_hgm6100_cmd_ = std::make_shared<Hgm6100Cmd>(device_manager_->getModbusClients(), device_manager_->device_map_);
+    // this->gtbms_cmd_    = std::make_shared<GtbmsCmd>(device_manager_->getModbusClients(), device_manager_->device_map_);
+    // this->hengdu_ac_cmd_ = std::make_shared<HengduAcCmd>(device_manager_->getModbusClients(), device_manager_->device_map_);
+    // this->dg_hgm6100_cmd_ = std::make_shared<Hgm6100Cmd>(device_manager_->getModbusClients(), device_manager_->device_map_);
 }
 
 Strategy::~Strategy() {
@@ -95,18 +95,22 @@ void Strategy::autoModeRun(){
 
 void Strategy::manualModeRun() {
     // 处理 EMS 命令
-    ems_cmd_->process_ems_commands(*pcs_cmd_, *dcdc_cmd_, *gtbms_cmd_);
+    if (pcs_cmd_ && dcdc_cmd_ && gtbms_cmd_) {
+        ems_cmd_->process_ems_commands(*pcs_cmd_, *dcdc_cmd_, *gtbms_cmd_);
+    } else {
+        LOG_ERROR_LOC("设备命令对象未正确初始化，无法处理 EMS 命令");
+    }
     // 手动模式的运行逻辑
     pcs_cmd_->process_pcs_commands("pcs1");
 
     dcdc_cmd_->process_dcdc_commands("dcdc1");
     dcdc_cmd_->process_dcdc_commands("dcdc2");
 
-    gtbms_cmd_->process_gtbms_commands("gtbms485");
+    // gtbms_cmd_->process_gtbms_commands("gtbms485");
 
-    hengdu_ac_cmd_->process_hengdu_ac_commands("air_condition");
+    // hengdu_ac_cmd_->process_hengdu_ac_commands("air_condition");
 
-    dg_hgm6100_cmd_->process_dg_hgm6100n_commands("dg_hgm6100n");
+    // dg_hgm6100_cmd_->process_dg_hgm6100n_commands("dg_hgm6100n");
 
 }
 
@@ -758,7 +762,7 @@ bool Strategy::timerStartupProcess() {
     int count = 0;
     while (count < 32) {
         count++;
-        ems_cmd_->process_ems_commands(*pcs_cmd_, *dcdc_cmd_, *gtbms_cmd_);
+        manualModeRun();
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         
         if (pcs1_device->online_status) {
@@ -810,7 +814,7 @@ bool Strategy::demandResponseStartupProcess() {
     int count = 0;
     while (count < 32) {
         count++;
-        ems_cmd_->process_ems_commands(*pcs_cmd_, *dcdc_cmd_, *gtbms_cmd_);
+        manualModeRun();
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         
         if (pcs1_device->online_status) {

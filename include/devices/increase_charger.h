@@ -12,20 +12,13 @@
 
 /**
  * @class IncreaseCharger
- * @brief 增量充电机设备类，通过 CAN 总线通信
+ * @brief 英可瑞充电机设备类，通过 CAN 总线通信
  *
  * 完整移植自 Python increcharger.py，支持：
  * - 周期性 CAN 帧读取（各模块电压/电流/温度/状态/输入电压/电压设置/电流设置）
  * - CAN 控制帧发送（系统开关机、各模块电压电流设置）
  * - 多模块告警解析（基于状态表位展开）
  * - 断线自动重连（由 DeviceManager 管理 CAN 连接生命周期）
- *
- * CAN ID 位布局 (与 Python 注释一致):
- *   bit 28~26: 错误码，常为0，3bits
- *   bit 25~22: 设备号，4bits
- *   bit 21~16: 命令号，6bits
- *   bit 15~8:  目标地址，8bits
- *   bit 7~0:   源地址，8bits
  *
  * 发送 ID 以 0x13 开头，响应 ID 以 0x12 开头
  */
@@ -129,40 +122,25 @@ public:
 
 private:
     // ======================== 读取 CAN ID（由本设备发送，请求充电模块回传数据）========================
+    // 模块 N 的 ID = base + N
 
-    /// 读模块0/1/2状态、电压、电流 (cmd=0x01)
-    static constexpr uint32_t ID_READ_MODULE0_STATUS          = 0x1307C081;
-    static constexpr uint32_t ID_READ_MODULE1_STATUS          = 0x1307C082;
-    static constexpr uint32_t ID_READ_MODULE2_STATUS          = 0x1307C083;
-
-    /// 读模块0/1/2电压设置值 (cmd=0x01)
-    static constexpr uint32_t ID_READ_MODULE0_VOLTAGE_SETTING = 0x13010081;
-    static constexpr uint32_t ID_READ_MODULE1_VOLTAGE_SETTING = 0x13010082;
-    static constexpr uint32_t ID_READ_MODULE2_VOLTAGE_SETTING = 0x13010083;
-
-    /// 读模块0/1/2电流设置值 (cmd=0x00)
-    static constexpr uint32_t ID_READ_MODULE0_CURRENT_SETTING = 0x13010881;
-    static constexpr uint32_t ID_READ_MODULE1_CURRENT_SETTING = 0x13010882;
-    static constexpr uint32_t ID_READ_MODULE2_CURRENT_SETTING = 0x13010883;
-
-    /// 读模块0/1/2温度 (cmd=0x00)
-    static constexpr uint32_t ID_READ_MODULE0_TEMPERATURE     = 0x13008081;
-    static constexpr uint32_t ID_READ_MODULE1_TEMPERATURE     = 0x13008082;
-    static constexpr uint32_t ID_READ_MODULE2_TEMPERATURE     = 0x13008083;
-
-    /// 读模块0/1/2输入电压 (cmd=0x31)
-    static constexpr uint32_t ID_READ_MODULE0_INPUT           = 0x1307A081;
-    static constexpr uint32_t ID_READ_MODULE1_INPUT           = 0x1307A082;
-    static constexpr uint32_t ID_READ_MODULE2_INPUT           = 0x1307A083;
+    /// 读模块状态、电压、电流 (cmd=0x01), base = 0x1307C081
+    static constexpr uint32_t ID_READ_MODULE_STATUS_BASE          = 0x1307C081;
+    /// 读模块电压设置值 (cmd=0x01), base = 0x13010081
+    static constexpr uint32_t ID_READ_MODULE_VOLTAGE_SETTING_BASE = 0x13010081;
+    /// 读模块电流设置值 (cmd=0x00), base = 0x13010881
+    static constexpr uint32_t ID_READ_MODULE_CURRENT_SETTING_BASE = 0x13010881;
+    /// 读模块温度 (cmd=0x00), base = 0x13008081
+    static constexpr uint32_t ID_READ_MODULE_TEMPERATURE_BASE     = 0x13008081;
+    /// 读模块输入电压 (cmd=0x31), base = 0x1307A081
+    static constexpr uint32_t ID_READ_MODULE_INPUT_BASE           = 0x1307A081;
 
     // ======================== 写入/控制 CAN ID（由本设备发送，控制充电模块行为）========================
 
     /// 系统开关机控制
-    static constexpr uint32_t ID_WRITE_SYS_ON_OFF              = 0x1307C080;
-    /// 模块0/1/2电压电流设置
-    static constexpr uint32_t ID_WRITE_MODULE0_VOLTAGE_CURRENT = 0x1307C081;
-    static constexpr uint32_t ID_WRITE_MODULE1_VOLTAGE_CURRENT = 0x1307C082;
-    static constexpr uint32_t ID_WRITE_MODULE2_VOLTAGE_CURRENT = 0x1307C083;
+    static constexpr uint32_t ID_WRITE_SYS_ON_OFF                  = 0x1307C080;
+    /// 各模块电压电流设置, 模块 N = base + N
+    static constexpr uint32_t ID_WRITE_MODULE_VOLTAGE_CURRENT_BASE = 0x1307C081;
 
     // ======================== 响应 CAN ID（由充电模块回传，本设备接收并解析）========================
 
@@ -255,6 +233,13 @@ private:
 
     /// 告警键有序列表: 模块索引(0-based) → [告警键名列表] (与 Python alarm_keys 结构一致)
     std::vector<std::vector<std::string>> alarm_keys_;
+
+    /// 预构建的读取请求列表: (can_id, cmd_flag), 构造函数中一次性初始化
+    struct ReadRequest {
+        uint32_t can_id;
+        uint8_t cmd_flag;
+    };
+    std::vector<ReadRequest> read_requests_;
 };
 
 #endif // INCREASE_CHARGER_H

@@ -109,11 +109,10 @@ void AcHengdu::read_data(ModbusClient& mb_client)
 
 void AcHengdu::update_alarm_status(){
     if (!this->alarm_level1.empty()){
-        std::string now = Utils::getCurrentTimeString();
         for (const auto& item : this->fc02_nameToAddr_map){
             if (this->alarm_level1.contains(item.first)){
                 bool status = getValue<bool>(item.first);
-                this->handle_alarm(item.first, 1, status, now);
+                this->handle_alarm(item.first, 1, status);
             }
         }
     }

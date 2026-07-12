@@ -5,7 +5,6 @@
 #include <iomanip>
 #include <chrono>
 
-// 获取当前时间字符串的辅助函数
 static std::string get_current_time_string() {
     auto now = std::chrono::system_clock::now();
     auto time_t_now = std::chrono::system_clock::to_time_t(now);
@@ -16,11 +15,19 @@ static std::string get_current_time_string() {
     return ss.str();
 }
 
+Device::~Device() {
+    std::lock_guard<std::mutex> lock(alarm_timer_mtx_);
+    for (auto& pair : alarm_timers_) {
+        pair.second->cancel();
+    }
+    alarm_timers_.clear();
+    alarm_pending_values_.clear();
+}
+
 void Device::handle_alarm(const std::string& alarm_name, 
                          uint8_t level, 
                          bool status, 
-                         const std::string& now) {
-    // 根据告警级别选择对应的告警字典
+                         int debounce_ms) {
     json* alarm_level_json = nullptr;
     std::string level_str;
     
@@ -41,29 +48,129 @@ void Device::handle_alarm(const std::string& alarm_name,
             LOG_WARNING_LOC(("Unknown alarm level for " + alarm_name).c_str());
             return;
     }
-    
-    // 初始化告警对象（如果不存在）
+
     if (alarm_level_json->is_null()) {
         (*alarm_level_json) = json::object();
         (*alarm_level_json)["value"] = false;
         (*alarm_level_json)["lastTriggerTime"] = "";
         (*alarm_level_json)["lastClearTime"] = "";
     }
+
+    bool current_value = (*alarm_level_json)["value"].get<bool>();
+
+    if (status == current_value) {
+        std::lock_guard<std::mutex> lock(alarm_timer_mtx_);
+        auto timer_it = alarm_timers_.find(alarm_name);
+        if (timer_it != alarm_timers_.end()) {
+            timer_it->second->cancel();
+            alarm_timers_.erase(timer_it);
+            alarm_pending_values_.erase(alarm_name);
+        }
+        return;
+    }
+
+    if (debounce_ms <= 0) {
+        {
+            std::lock_guard<std::mutex> lock(alarm_timer_mtx_);
+            auto timer_it = alarm_timers_.find(alarm_name);
+            if (timer_it != alarm_timers_.end()) {
+                timer_it->second->cancel();
+                alarm_timers_.erase(timer_it);
+                alarm_pending_values_.erase(alarm_name);
+            }
+        }
+        _confirm_alarm(alarm_name, level, status);
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(alarm_timer_mtx_);
+
+    auto pending_it = alarm_pending_values_.find(alarm_name);
+    if (pending_it != alarm_pending_values_.end() && pending_it->second == status) {
+        return;
+    }
+
+    auto timer_it = alarm_timers_.find(alarm_name);
+    if (timer_it != alarm_timers_.end()) {
+        timer_it->second->cancel();
+        alarm_timers_.erase(timer_it);
+    }
+
+    alarm_pending_values_[alarm_name] = status;
+
+    auto timer = std::make_shared<AlarmDebounceTimer>();
+    Device* dev_ptr = this;
+    std::string alarm_name_copy = alarm_name;
+    uint8_t level_copy = level;
+    bool status_copy = status;
+    auto debounce_dur = std::chrono::milliseconds(debounce_ms);
+
+    timer->thread_ = std::thread([wk = std::weak_ptr<AlarmDebounceTimer>(timer),
+                                   dev_ptr,
+                                   alarm_name_copy,
+                                   level_copy,
+                                   status_copy,
+                                   debounce_dur]() {
+        auto t = wk.lock();
+        if (!t) return;
+        std::unique_lock<std::mutex> lk(t->mtx_);
+        if (t->cv_.wait_for(lk, debounce_dur) == std::cv_status::timeout) {
+            if (!t->is_cancelled()) {
+                dev_ptr->_confirm_alarm(alarm_name_copy, level_copy, status_copy);
+            }
+        }
+    });
+
+    alarm_timers_[alarm_name] = timer;
+}
+
+void Device::_confirm_alarm(const std::string& alarm_name,
+                            uint8_t level,
+                            bool status) {
+    {
+        std::lock_guard<std::mutex> lock(alarm_timer_mtx_);
+        alarm_timers_.erase(alarm_name);
+        alarm_pending_values_.erase(alarm_name);
+    }
+
+    json* alarm_level_json = nullptr;
+    std::string level_str;
     
-    // 更新告警值
+    switch (level) {
+        case 1: 
+            alarm_level_json = &this->alarm_level1[alarm_name];
+            level_str = "一级";
+            break;
+        case 2: 
+            alarm_level_json = &this->alarm_level2[alarm_name];
+            level_str = "二级";
+            break;
+        case 3: 
+            alarm_level_json = &this->alarm_level3[alarm_name];
+            level_str = "三级";
+            break;
+        default:
+            LOG_WARNING_LOC(("Unknown alarm level for " + alarm_name).c_str());
+            return;
+    }
+
+    if (alarm_level_json->is_null()) {
+        (*alarm_level_json) = json::object();
+        (*alarm_level_json)["value"] = false;
+        (*alarm_level_json)["lastTriggerTime"] = "";
+        (*alarm_level_json)["lastClearTime"] = "";
+    }
+
     (*alarm_level_json)["value"] = status;
-    
-    // 检测告警状态变化并记录到数据库
+
     auto cache_it = this->alarm_cached.find(alarm_name);
     if (cache_it == this->alarm_cached.end()) {
-        // 首次初始化，设置缓存
         this->alarm_cached[alarm_name] = status;
         
-        // 如果首次检测就是告警状态，也需要插入数据库
         if (status) {
+            std::string now = get_current_time_string();
             LOG_INFO_LOC(("Alarm detected on first check: " + alarm_name + " (Level: " + level_str + ")").c_str());
             
-            // 插入告警历史记录
             AlarmHistory alarm_record;
             alarm_record.level = level_str;
             alarm_record.alarm_time = now;
@@ -75,7 +182,6 @@ void Device::handle_alarm(const std::string& alarm_name,
                 LOG_ERROR_LOC(("Failed to insert alarm history: " + SQL_CPP.getLastError()).c_str());
             }
             
-            // 更新告警对象的触发时间
             (*alarm_level_json)["lastTriggerTime"] = now;
             (*alarm_level_json)["lastClearTime"] = "";
         }
@@ -83,10 +189,9 @@ void Device::handle_alarm(const std::string& alarm_name,
         bool cached_status = cache_it->second;
         
         if (status && !cached_status) {
-            // 告警触发：从False变为True
+            std::string now = get_current_time_string();
             LOG_INFO_LOC(("Alarm triggered: " + alarm_name + " (Level: " + level_str + ")").c_str());
             
-            // 插入告警历史记录
             AlarmHistory alarm_record;
             alarm_record.level = level_str;
             alarm_record.alarm_time = now;
@@ -98,30 +203,26 @@ void Device::handle_alarm(const std::string& alarm_name,
                 LOG_ERROR_LOC(("Failed to insert alarm history: " + SQL_CPP.getLastError()).c_str());
             }
             
-            // 更新告警对象的触发时间
             (*alarm_level_json)["lastTriggerTime"] = now;
             (*alarm_level_json)["lastClearTime"] = "";
             
-            // 更新缓存
             this->alarm_cached[alarm_name] = true;
             
         } else if (!status && cached_status) {
-            // 告警恢复：从True变为False
+            std::string now = get_current_time_string();
             LOG_INFO_LOC(("Alarm recovered: " + alarm_name + " (Level: " + level_str + ")").c_str());
             
-            // 更新告警恢复时间
             if (!SQL_CPP.updateAlarmRecoveryTime(now, this->name_, alarm_name, now)) {
                 LOG_ERROR_LOC(("Failed to update alarm recovery time: " + SQL_CPP.getLastError()).c_str());
             }
             
-            // 更新告警对象的清除时间
             (*alarm_level_json)["lastClearTime"] = now;
             
-            // 更新缓存
             this->alarm_cached[alarm_name] = false;
         }
     }
-    std::unique_lock<std::shared_mutex> lock(this->data_to_qt_rwlock_);
-    // 更新总数据中的告警状态
-    this->data_to_qt[alarm_name] = status;
+    {
+        std::unique_lock<std::shared_mutex> lock(this->data_to_qt_rwlock_);
+        this->data_to_qt[alarm_name] = status;
+    }
 }

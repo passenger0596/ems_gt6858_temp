@@ -2,6 +2,7 @@
 #include "log.h"
 #include <iostream>
 #include <algorithm>
+#include <fstream>
 
 CanOperator::CanOperator(const std::string& interface_name,
                          sockcanpp::CanId default_sender_id)
@@ -25,6 +26,20 @@ bool CanOperator::connect()
     try {
         // 创建 sockcanpp 驱动实例
         driver_ = std::make_unique<sockcanpp::CanDriver>(interface_name_, sockcanpp::CanDriver::CAN_SOCK_RAW, default_sender_id_);
+
+        // SocketCAN 的 socket+bind 即使接口 DOWN 也能成功，
+        // 必须在 bind 后检测接口 operstate 确保真正可用
+        {
+            std::ifstream state_file("/sys/class/net/" + interface_name_ + "/operstate");
+            std::string operstate;
+            if (state_file >> operstate && operstate != "up") {
+                state_file.close();
+                driver_.reset();
+                LOG_ERROR_LOC("CAN interface " + interface_name_ + " is DOWN (operstate: " + operstate + ")");
+                return false;
+            }
+        }
+
         is_connected_ = true;
         LOG_INFO_LOC("Successfully connected to CAN interface: " + interface_name_);
         return true;

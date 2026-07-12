@@ -89,7 +89,7 @@ class UnixSocketServer {
         
     private:
         std::string m_socketPath;
-        const std::vector<std::shared_ptr<Device>>& m_devList; // 设备列表引用
+        std::vector<std::shared_ptr<Device>> m_devList; // 设备列表副本（持有所有权）
         int m_serverFd{-1};
         std::atomic<bool> m_stopFlag{false};
         

@@ -268,8 +268,6 @@ void GtBms::parse_di_data(const std::vector<std::vector<uint8_t>>& segment_buffe
 }
 
 void GtBms::update_alarm_status() {
-    std::string now = Utils::getCurrentTimeString();
-    
     for (const auto& alarm_pair : alarm_map_) {
         const std::string& alarm_name = alarm_pair.first;
         uint8_t level = alarm_pair.second;
@@ -277,7 +275,7 @@ void GtBms::update_alarm_status() {
         double alarm_value = this->getValue<double>(alarm_name, 0.0);
         bool alarm_status = (alarm_value != 0.0);
         
-        this->handle_alarm(alarm_name, level, alarm_status, now);
+        this->handle_alarm(alarm_name, level, alarm_status);
     }
 }
 

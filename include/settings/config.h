@@ -50,6 +50,8 @@ namespace Config {
     const std::string INFY_CHARGER_COMMUNICATION_FILEPATH = "/opt/ems/protocol/infyCharger_protocol_V108.xml";
     const std::string INCREASE_CHARGER_COMMUNICATION_FILEPATH = "/opt/ems/protocol/increaseCharger_protocol.xml";
 
+    const std::string IOMODULE_COMMUNICATION_FILEPATH = "/opt/ems/protocol/zhongsheng_8di8do_protocol.xml";
+
 
 
 }

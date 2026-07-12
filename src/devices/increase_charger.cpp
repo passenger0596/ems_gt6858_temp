@@ -114,6 +114,26 @@ IncreaseCharger::IncreaseCharger(const std::string& name, int can_channel, int i
     last_read_send_    = std::chrono::steady_clock::now();
     last_control_send_ = std::chrono::steady_clock::now();
 
+    // 预构建读取请求列表 (chargers_num_ 个模块 × 5 种读取类型)
+    {
+        const struct {
+            uint32_t base_id;
+            uint8_t cmd_flag;
+        } read_types[] = {
+            {ID_READ_MODULE_STATUS_BASE,          0x01},
+            {ID_READ_MODULE_VOLTAGE_SETTING_BASE, 0x01},
+            {ID_READ_MODULE_CURRENT_SETTING_BASE, 0x00},
+            {ID_READ_MODULE_TEMPERATURE_BASE,     0x00},
+            {ID_READ_MODULE_INPUT_BASE,           0x31},
+        };
+        read_requests_.reserve(chargers_num_ * 5);
+        for (int i = 0; i < chargers_num_; ++i) {
+            for (const auto& rt : read_types) {
+                read_requests_.push_back({rt.base_id + static_cast<uint32_t>(i), rt.cmd_flag});
+            }
+        }
+    }
+
     LOG_INFO_LOC(("IncreaseCharger 设备初始化完成: " + name_ +
                   ", 模块数: " + std::to_string(chargers_num_)));
 }
@@ -186,6 +206,7 @@ void IncreaseCharger::read_data(CanOperator& can_operator) {
     if (!can_operator.is_connected()) {
         this->online_status = false;
         safe_set_qt_data(false);
+        LOG_ERROR_LOC(("CAN 设备未连接: " + name_));
         return;
     }
 
@@ -232,30 +253,8 @@ bool IncreaseCharger::send_all_read_frames(CanOperator& can_operator) {
         return {cmd, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     };
 
-    // 读取 CAN ID 数组: 按 (can_id, cmd_flag) 配对
-    struct ReadRequest {
-        uint32_t can_id;
-        uint8_t cmd_flag;
-    };
-
-    std::vector<ReadRequest> requests;
-
-    // 3 个模块 × 5 种读取类型 = 15 帧
-    const uint32_t id_read_status[]      = {ID_READ_MODULE0_STATUS, ID_READ_MODULE1_STATUS, ID_READ_MODULE2_STATUS};
-    const uint32_t id_read_volt_set[]    = {ID_READ_MODULE0_VOLTAGE_SETTING, ID_READ_MODULE1_VOLTAGE_SETTING, ID_READ_MODULE2_VOLTAGE_SETTING};
-    const uint32_t id_read_curr_set[]    = {ID_READ_MODULE0_CURRENT_SETTING, ID_READ_MODULE1_CURRENT_SETTING, ID_READ_MODULE2_CURRENT_SETTING};
-    const uint32_t id_read_temp[]        = {ID_READ_MODULE0_TEMPERATURE, ID_READ_MODULE1_TEMPERATURE, ID_READ_MODULE2_TEMPERATURE};
-    const uint32_t id_read_input[]       = {ID_READ_MODULE0_INPUT, ID_READ_MODULE1_INPUT, ID_READ_MODULE2_INPUT};
-
-    for (int i = 0; i < chargers_num_; ++i) {
-        requests.push_back({id_read_status[i],   0x01});  // 模块状态: cmd=0x01
-        requests.push_back({id_read_volt_set[i], 0x01});  // 电压设置: cmd=0x01
-        requests.push_back({id_read_curr_set[i], 0x00});  // 电流设置: cmd=0x00
-        requests.push_back({id_read_temp[i],     0x00});  // 温度:     cmd=0x00
-        requests.push_back({id_read_input[i],    0x31});  // 输入电压: cmd=0x31
-    }
-
-    for (const auto& req : requests) {
+    // 遍历构造函数预构建的 read_requests_, 每 500ms 调用只执行发送
+    for (const auto& req : read_requests_) {
         if (!can_operator.send_frame(req.can_id, make_payload(req.cmd_flag))) {
             all_ok = false;
         }
@@ -278,8 +277,6 @@ bool IncreaseCharger::read_and_dispatch_responses(CanOperator& can_operator) {
     for (const auto& msg : messages) {
         // 仅处理扩展帧（与 Python is_extended_id 对应）
         if (!msg.isExtendedFrameId()) {
-            this->online_status = false;
-            safe_set_qt_data(false);
             continue;
         }
 
@@ -319,7 +316,7 @@ bool IncreaseCharger::read_and_dispatch_responses(CanOperator& can_operator) {
         auto it = message_handlers_.find(arb_id);
         if (it != message_handlers_.end()) {
             try {
-                it->second(data);
+                it->second(data);       // 调用对应的解析器去解析数据
                 std::stringstream hex_ss;
                 hex_ss << "0x" << std::hex << arb_id << std::dec;
                 LOG_INFO_LOC(("IncreaseCharger 解析消息 ID=" + hex_ss.str()));
@@ -593,10 +590,13 @@ void IncreaseCharger::send_control_frames(CanOperator& can_operator) {
         write_uint24_be(payload, 1, per_module_current_ma);  // Bytes 1-3: 电流 (mA)
         write_uint32_be(payload, 4, per_module_voltage_mv);  // Bytes 4-7: 电压 (mV)
 
-        // 发送到 3 个模块
-        can_operator.send_frame(ID_WRITE_MODULE0_VOLTAGE_CURRENT, payload);
-        can_operator.send_frame(ID_WRITE_MODULE1_VOLTAGE_CURRENT, payload);
-        can_operator.send_frame(ID_WRITE_MODULE2_VOLTAGE_CURRENT, payload);
+        // 发送到每个模块
+        for (int i = 0; i < chargers_num_; ++i) {
+            can_operator.send_frame(ID_WRITE_MODULE_VOLTAGE_CURRENT_BASE + static_cast<uint32_t>(i), payload);
+            if (i < chargers_num_ - 1) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            }
+        }
 
         // ── 3. 记录变更日志 ──
         if (value_changed) {
@@ -616,8 +616,6 @@ void IncreaseCharger::send_control_frames(CanOperator& can_operator) {
 void IncreaseCharger::update_alarm_status() {
     // 与 Python increcharger.py 的 parse_alarm 完全一致
     try {
-        std::string now = get_current_time_string();
-
         // ── 1. 计算系统总电压 = max(各模块电压), 系统总电流 = sum(各模块电流) ──
         double max_voltage = 0.0;
         double total_current = 0.0;
@@ -695,7 +693,7 @@ void IncreaseCharger::update_alarm_status() {
                 size_t bit_index = alarm_start + k;
                 if (bit_index < total_alarm_list.size()) {
                     bool alarm_val = total_alarm_list[bit_index];
-                    handle_alarm(keys[k], 1, alarm_val, now);
+                    handle_alarm(keys[k], 1, alarm_val);
 
                     // 更新 data_to_qt 中的告警状态 (Python: self.data_to_qt[key] = value)
                     {

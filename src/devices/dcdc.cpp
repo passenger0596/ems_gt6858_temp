@@ -65,8 +65,6 @@ void Dcdc::update_alarm_status()
     }
 
     // 获取当前时间字符串（使用通用工具函数）
-    std::string now = Utils::getCurrentTimeString();
-    
     // ✅ 使用基类的通用告警处理方法
     for (size_t i = 0; i < this->alarm_map.size(); ++i) {
         const std::string& alarm_name = this->alarm_map[i].first;
@@ -74,7 +72,7 @@ void Dcdc::update_alarm_status()
         bool status = (i < alarm_bits.size()) ? alarm_bits[i] : false;
         
         // 调用通用方法处理告警
-        this->handle_alarm(alarm_name, level, status, now);
+        this->handle_alarm(alarm_name, level, status);
     }
 }
 

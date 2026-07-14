@@ -172,8 +172,8 @@ class DeviceManager{
         std::unordered_map<std::string, uint16_t> fc03_start_addrs_;
         // FC03: tcp_addr → mapping entry (所有设备)
         std::map<uint16_t, Fc03Mapping> fc03_map_;
-        uint16_t fc03_total_holding_ = 0;
-        uint16_t fc04_total_input_ = 0;
+        uint16_t fc03_total_holding_ = 0;       // 最终03功能码区的映射数量
+        uint16_t fc04_total_input_ = 0;         // 最终04功能码区的映射数量
         bool fc04_enabled_ = false;   // FC04默认关闭，通过setFc04Enabled启用
 
         // ── 定时模式 / 需求响应模式块映射 ──

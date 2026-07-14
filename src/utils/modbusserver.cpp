@@ -184,7 +184,7 @@ void ModbusServer::init_data_area(int num_coils,
         return;
     }
 
-    LOG_INFO_LOC("Data area initialized: coils=" + std::to_string(num_coils) +
+    LOG_INFO_LOC("Modbus Data area initialized: coils=" + std::to_string(num_coils) +
                  ", input_bits=" + std::to_string(num_input_bits) +
                  ", holding_regs=" + std::to_string(num_holding_regs) +
                  ", input_regs=" + std::to_string(num_input_regs));

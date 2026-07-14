@@ -42,10 +42,6 @@ EMS::EMS() : Device("ems", 100, 0) {
     if (!read_and_parse_jsonfile(Config::EMS_CONFIG_FILEPATH_JSON)) {
         LOG_ERROR_LOC("EMS加载配置文件：" + Config::EMS_CONFIG_FILEPATH_JSON + "失败！");
     }
-    
-    // 初始化TCP模式缓存
-    this->tcp_timingModeSet = this->timingModeSet;
-    this->tcp_demandResponseModeSet = this->demandResponseModeSet;
 
     // 初始化data_to_qt
     this->data_to_qt = {
@@ -258,7 +254,7 @@ bool EMS::write_jsonfile_nolock(const json& data, const std::string& dataname,co
                         this->setValue<double>(key, value);
                     }
                 }else {
-                    LOG_WARNING_LOC("Key not found in ems_config_params: " + key);
+                    LOG_WARNING_LOC("key不在ems_config_params.json: " + key + "，跳过写入");
                     return false;
                 }
             }
@@ -288,7 +284,7 @@ bool EMS::write_jsonfile_nolock(const json& data, const std::string& dataname,co
 
 // 写入JSON配置文件（写操作，使用独占锁）
 bool EMS::write_jsonfile(const json& data, const std::string& dataname,const std::string& filename) {
-    std::unique_lock<std::shared_mutex> lock(this->json_rwlock_);
+    std::unique_lock<std::shared_mutex> lock(this->data_dict_rwlock_);
     return write_jsonfile_nolock(data, dataname, filename);
 }
 

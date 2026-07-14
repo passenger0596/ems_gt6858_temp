@@ -102,9 +102,6 @@ public:
     
     json timingModeSet;           // 定时模式设置
     json demandResponseModeSet;   // 需求响应模式设置
-    
-    json tcp_timingModeSet;       // TCP定时模式缓存
-    json tcp_demandResponseModeSet; // TCP需求响应模式缓存
 
     // 数据到QT的映射
     json data_to_qt;

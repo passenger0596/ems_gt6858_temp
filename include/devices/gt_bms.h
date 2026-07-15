@@ -12,7 +12,7 @@
  * @brief 高特BMS设备实现类 (Modbus RTU over RS485)
  * 
  * 协议特点：
- * 1. 使用 Modbus RTU 协议，功能码02(离散输入)和04(输入寄存器)
+ * 1. 使用 Modbus RTU或TCP 协议，功能码02(离散输入)和04(输入寄存器)
  * 2. 字段映射定义在 gtBMS_485_protocol_V1.18.xml
  * 3. 包含97个告警位、基础电池数据、箱温数据、大量单体电压数据
  * 4. 寄存器地址分布：
@@ -26,7 +26,7 @@ public:
     /** 
      * @brief 构造函数
      * @param name 设备名称
-     * @param com 串口号或Modbus从站ID
+     * @param com 串口号
      * @param id Modbus从站地址
      */
     GtBms(const std::string& name, int com, int id);

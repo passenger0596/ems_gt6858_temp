@@ -1,13 +1,12 @@
 #include "acmeter_3366.h"
-
 #include "pcs.h"
-#include "dcdc.h"
+// #include "dcdc.h"
 #include "ems.h"
-#include "ac_hengdu.h"
+// #include "ac_hengdu.h"
 #include "gt_bms.h"  // 添加高特BMS头文件
-#include "dg_hgm6100.h"
-#include "infy_charger.h"
-#include "increase_charger.h"
+// #include "dg_hgm6100.h"
+// #include "infy_charger.h"
+// #include "increase_charger.h"
 #include "iomodule.h"
 #include "modbusserver.h"
 #include <thread>
@@ -65,17 +64,17 @@ class DeviceManager{
 
         // 具体设备实例
         std::shared_ptr<EMS> ems_ = nullptr;            // 恒天智信GT6856设备
-        std::shared_ptr<Pcs> pcs_ = nullptr;            // 105kW PCS设备
-        std::shared_ptr<Dcdc> dcdc1_ = nullptr;
-        std::shared_ptr<Dcdc> dcdc2_ = nullptr;
+        std::shared_ptr<Pcs> pcs15am_ = nullptr;            // 105kW PCS设备
+        // std::shared_ptr<Dcdc> dcdc1_ = nullptr;
+        // std::shared_ptr<Dcdc> dcdc2_ = nullptr;
         std::shared_ptr<ACMeter_3366> dtsd3366_ = nullptr;
         std::shared_ptr<GtBms> gt_bms_ = nullptr;  // 高特BMS设备
         
-        std::shared_ptr<AcHengdu> ac_hengdu_ = nullptr;  // ACMeter_3366设备 
-        std::shared_ptr<DgHgm6100n> dg_hgm6100_ = nullptr;  // DG_HGM6100设备
+        // std::shared_ptr<AcHengdu> ac_hengdu_ = nullptr;  // 空调设备 
+        // std::shared_ptr<DgHgm6100n> dg_hgm6100_ = nullptr;  // DG_HGM6100设备
 
-        std::shared_ptr<InfyCharger> chargers_ = nullptr;  // 英飞源充电器设备
-        std::shared_ptr<IncreaseCharger> increase_charger_ = nullptr;  // 英可瑞充电器设备
+        // std::shared_ptr<InfyCharger> chargers_ = nullptr;  // 英飞源充电器设备
+        // std::shared_ptr<IncreaseCharger> increase_charger_ = nullptr;  // 英可瑞充电器设备
 
         std::shared_ptr<IOModule> iomodule_ = nullptr;  // 中盛8DI 8DO数字量输入输出模块设备
 

@@ -9,8 +9,9 @@ import os
 from datetime import datetime, timedelta
 import gzip
 
-# 扁平目录结构：所有 Python 模块在同一目录下
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# 所有 Python 模块在同一目录下，使用 __file__ 确保路径不受 CWD 影响
+_BASE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, _BASE)
 
 from logger import running_logger
 import config
@@ -19,7 +20,7 @@ import config
 
 def _load_mqtt_config():
     """从 JSON 文件加载 MQTT 配置，换项目只需修改 cfg/mqtt_config.json"""
-    cfg_path = './cfg/mqtt_config.json'
+    cfg_path = os.path.join(_BASE, 'cfg', 'mqtt_config.json')
     try:
         with open(cfg_path, 'r', encoding='utf-8') as f:
             return json.load(f)
@@ -39,7 +40,7 @@ FULL_DATA_INTERVAL  = _mqtt_cfg.get('full_data_interval_s', 60)
 DELTA_DATA_INTERVAL = _mqtt_cfg.get('delta_data_interval_s', 2.0)
 COMPRESSION_ENABLED = _mqtt_cfg.get('compression_enabled', False)
 COMPRESSION_LEVEL   = _mqtt_cfg.get('compression_level', 1)
-INIT_FILE_PATH      = _mqtt_cfg.get('init_file_path', './mqtt_init.json')
+INIT_FILE_PATH      = _mqtt_cfg.get('init_file_path', os.path.join(_BASE, 'mqtt_init.json'))
 EMS_SPECIAL_POINTS  = _mqtt_cfg.get('ems_special_points', {})
 
 # 设备 MQTT 偏移和告警偏移（可从配置覆盖，也可自动推导）

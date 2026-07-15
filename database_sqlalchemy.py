@@ -7,6 +7,7 @@ from logger import running_logger
 import datetime
 import gc
 import json
+import os
 import config
 
 # 假设 bms.py 中的 GtBms 类已定义，如果未导入，请添加：
@@ -15,8 +16,9 @@ import config
 # 2. 创建数据库引擎（使用config中配置的路径）
 engine = create_engine(config.MAIN_DATABASE_FILEPATH, echo=False)
 running_logger.info(f"数据库引擎初始化，使用路径: {config.MAIN_DATABASE_FILEPATH}")
+_DB_BASE = os.path.dirname(os.path.abspath(__file__))
 engine_log = create_engine(
-    'sqlite:///operation_log.db',
+    f'sqlite:///{os.path.join(_DB_BASE, "operation_log.db")}',
     connect_args={'timeout': 30},  # 增加超时时间
     echo=False
 )

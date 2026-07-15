@@ -14,9 +14,11 @@ namespace Config {
     // };
 
     const std::unordered_map<uint8_t, std::string> SERIAL_PORTS = {
-        {0, "/dev/ttyS3"},
-        {1, "/dev/ttyS4"},
-        {8, "192.168.1.100:502"}
+        {0, "/dev/ttyS1"},
+        {1, "/dev/ttyS2"},
+        {2, "/dev/ttyS3"},
+        {3, "/dev/ttyS4"},
+        {8, "192.168.1.105:502"}
 
     };
 

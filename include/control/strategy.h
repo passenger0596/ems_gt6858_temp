@@ -28,11 +28,8 @@ class Strategy {
 
         // 设备命令对象：用指针 + 构造函数体内初始化，注释掉即禁用，适配不同项目
         std::shared_ptr<EmsCmd> ems_cmd_;
-        std::shared_ptr<EjPcsCmd> pcs_cmd_;
-        std::shared_ptr<EjDcdcCmd> dcdc_cmd_;
+        std::shared_ptr<EjPcs15AmCmd> pcs15am_cmd_;
         std::shared_ptr<GtbmsCmd> gtbms_cmd_;
-        std::shared_ptr<HengduAcCmd> hengdu_ac_cmd_;
-        std::shared_ptr<Hgm6100Cmd> dg_hgm6100_cmd_;
 
 
         

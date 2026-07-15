@@ -84,6 +84,7 @@ set(CONTROL_SOURCES
     ${CMAKE_SOURCE_DIR}/src/control/hgm6100cmd.cpp
     ${CMAKE_SOURCE_DIR}/src/control/hengduaccmd.cpp
     ${CMAKE_SOURCE_DIR}/src/control/gtbmscmd.cpp
+    ${CMAKE_SOURCE_DIR}/src/control/frontendcontroller.cpp
     ${CMAKE_SOURCE_DIR}/src/control/strategy.cpp
 )
 

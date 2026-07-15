@@ -2,8 +2,9 @@ from loguru import logger
 import os
 import sys
 
-# 配置日志目录
-LOG_DIR = "./logs"
+# 配置日志目录（基于 logger.py 所在目录，不受 CWD 影响）
+_LOG_BASE = os.path.dirname(os.path.abspath(__file__))
+LOG_DIR = os.path.join(_LOG_BASE, 'logs')
 if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)
 

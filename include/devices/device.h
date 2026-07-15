@@ -66,6 +66,7 @@ public:
         uint16_t num_regs;
     };
 
+    // data_dict字段名 -> 读取回来的整个数组buffer索引
     struct ParsedRegister {
         std::string key;
         uint16_t buffer_index;
@@ -434,7 +435,7 @@ public:
 
     std::vector<std::string> dev_data_keys_;
 
-    std::vector<uint16_t> data_buffer;  // 缓存从设备读取的数据
+    std::vector<uint16_t> data_buffer;  // 缓存从设备读取的所有功能码数据
 
     // 段读取策略
     std::vector<RegisterSegment> segments01_;
@@ -833,7 +834,8 @@ public:
     bool read_fc03_segments(ModbusClient& mb_client,
                             const std::vector<RegisterSegment>& segments,
                             std::vector<std::vector<uint16_t>>& buffer_vec,
-                            std::vector<uint16_t>& data_buffer) {
+                            std::vector<uint16_t>& data_buffer,
+                            int poll_interval_ms = 0) {
         if (!mb_client.is_connected()) return false;
 
         mb_client.set_slave(this->id_);
@@ -857,6 +859,8 @@ public:
                             segments[i].start_addr + segments[i].num_regs - 1);
                 return false;
             }
+            // 每次读取间隔休眠poll_interval_ms毫秒
+            std::this_thread::sleep_for(std::chrono::milliseconds(poll_interval_ms));
         }
 
         for (const auto& buf : buffer_vec) {
@@ -890,7 +894,7 @@ public:
         return true;
     }
 
-    bool read_all_registers(ModbusClient& mb_client){
+    bool read_all_registers(ModbusClient& mb_client,int poll_interval_ms = 0){
         this->data_buffer.clear();
         bool success = true;
 
@@ -906,7 +910,7 @@ public:
         if (!this->fc02_nameToAddr_map.empty())
             success =read_fc02_segments(mb_client, this->segments02_, this->data_buffer_vec02_, this->data_buffer);
         if (!this->fc03_nameToAddr_map.empty())
-            success =read_fc03_segments(mb_client, this->segments03_, this->data_buffer_vec03_, this->data_buffer);
+            success =read_fc03_segments(mb_client, this->segments03_, this->data_buffer_vec03_, this->data_buffer,poll_interval_ms);
         if (!this->fc04_nameToAddr_map.empty())
             success =read_fc04_segments(mb_client, this->segments04_, this->data_buffer_vec04_, this->data_buffer);
         return success;

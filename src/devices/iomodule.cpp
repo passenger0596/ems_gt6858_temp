@@ -11,6 +11,14 @@
 #include <algorithm>
 #include "log.h"
 
+/*
+ * @class IOModule:中盛8DI 8DO继电器输出模块
+ * @brief构造函数
+ * * @param name 设备名称
+ * @param com 通信端口（Modbus）
+ * @param id 设备ID
+ **/
+
 IOModule::IOModule(const std::string& name, int com, int id)
     : Device(name, com, id) {
     this->name_ = name;

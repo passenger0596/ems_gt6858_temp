@@ -1,40 +1,42 @@
 from multiprocessing import Queue
 import os
 
+# 项目根目录（config.py 所在目录），所有路径基于此，不受 CWD 影响
+_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # ubuntu环境的目录
-EJPCS_COMMUNICATION_FILEPATH = './protocol/ejPCS_protocol_V.1.24.xml'
-EJDCDC_COMMUNICATION_FILEPATH = './protocol/ejDCDC_protocol_V2.2.xml'
-GTBMS_COMMUNICATION_FILEPATH = './protocol/gtBMS_protocol.xml'
-SOCKET_PATH = './ems_local.socket'
-SQLITE3_DATABASE_FILEPATH = './db/test.db'
-KND4040_COMMUNICATION_FILEPATH = './protocol/kndIO4040_protocol.xml'
-KND2080_COMMUNICATION_FILEPATH = './protocol/kndIO2080_protocol.xml'
-DTSD_3366D_COMMUNICATION_FILEPATH = './protocol/DTSD3366D_protocol.xml'
-GTBMS485_COMMUNICATION_FILEPATH = './protocol/gtBMS_485_protocol_V1.5.xml'
-AC_COMMUNICATION_FILEPATH = './protocol/AC_hengdu_protocol_V1.3.xml'
-SANHUA_COOLER_FILEPATH = './protocol/sanhua_cooler_protocol.xml'
-LIQUID_COOLER_FILEPATH = './protocol/liquid_cooler_protocol.xml'
-GTBMS485_V118_COMMUNICATION_FILEPATH = './protocol/gtBMS_485_protocol_V1.18.xml'
-EPCS15_AM_COMMUNICATION_FILEPATH = './protocol/EPCS15-AM_protocol_V.3.0.xml'
-WEA1610_FILEPATH = './protocol/WEA1610_protocol.xml'
-BMS_UHOME_COMMUNICATION_FILEPATH = './protocol/uhomeBMS_protocol_v1.xml'
-INFY_CHARGER_COMMUNICATION_FILEPATH = './protocol/infyCharger_protocol_V108.xml'
-HGM6100N_COMMUNICATION_FILEPATH = './protocol/HGM6100N_protocol.xml'
+EJPCS_COMMUNICATION_FILEPATH = os.path.join(_ROOT, 'protocol', 'ejPCS_protocol_V.1.24.xml')
+EJDCDC_COMMUNICATION_FILEPATH = os.path.join(_ROOT, 'protocol', 'ejDCDC_protocol_V2.2.xml')
+GTBMS_COMMUNICATION_FILEPATH = os.path.join(_ROOT, 'protocol', 'gtBMS_protocol.xml')
+SOCKET_PATH = os.path.join(_ROOT, 'ems_local.socket')
+SQLITE3_DATABASE_FILEPATH = os.path.join(_ROOT, 'db', 'test.db')
+KND4040_COMMUNICATION_FILEPATH = os.path.join(_ROOT, 'protocol', 'kndIO4040_protocol.xml')
+KND2080_COMMUNICATION_FILEPATH = os.path.join(_ROOT, 'protocol', 'kndIO2080_protocol.xml')
+DTSD_3366D_COMMUNICATION_FILEPATH = os.path.join(_ROOT, 'protocol', 'DTSD3366D_protocol.xml')
+GTBMS485_COMMUNICATION_FILEPATH = os.path.join(_ROOT, 'protocol', 'gtBMS_485_protocol_V1.5.xml')
+AC_COMMUNICATION_FILEPATH = os.path.join(_ROOT, 'protocol', 'AC_hengdu_protocol_V1.3.xml')
+SANHUA_COOLER_FILEPATH = os.path.join(_ROOT, 'protocol', 'sanhua_cooler_protocol.xml')
+LIQUID_COOLER_FILEPATH = os.path.join(_ROOT, 'protocol', 'liquid_cooler_protocol.xml')
+GTBMS485_V118_COMMUNICATION_FILEPATH = os.path.join(_ROOT, 'protocol', 'gtBMS_485_protocol_V1.18.xml')
+EPCS15_AM_COMMUNICATION_FILEPATH = os.path.join(_ROOT, 'protocol', 'EPCS15-AM_protocol_V.3.0.xml')
+WEA1610_FILEPATH = os.path.join(_ROOT, 'protocol', 'WEA1610_protocol.xml')
+BMS_UHOME_COMMUNICATION_FILEPATH = os.path.join(_ROOT, 'protocol', 'uhomeBMS_protocol_v1.xml')
+INFY_CHARGER_COMMUNICATION_FILEPATH = os.path.join(_ROOT, 'protocol', 'infyCharger_protocol_V108.xml')
+HGM6100N_COMMUNICATION_FILEPATH = os.path.join(_ROOT, 'protocol', 'HGM6100N_protocol.xml')
 
-GTBMS_PROTECTION_FILEPATH = './protocol/gtbms_protection.json'
+GTBMS_PROTECTION_FILEPATH = os.path.join(_ROOT, 'protocol', 'gtbms_protection.json')
 
 
-EMS_CONFIG_FILEPATH = './cfg/ems_configure_param.json'  # 系统运行的配置参数json文件
-EMS_DATA_DICT_FILEPATH = './cfg/ems_data_dict.json'
-EMS_TCP_CMD_FILEPATH = './cfg/ems_tcp_cmd.json'
-TEMP_FILEPATH = './cfg/temp.json'
-CONTROL_COMMAND_FILEPATH = './cfg/control_command.json'
-MQTT_CMD_FILEPATH = './cfg/mqtt_cmd.json'
-MQTT_CMD_MAPPING_FILEPATH = './cfg/mqtt_cmd_mapping.json'
+EMS_CONFIG_FILEPATH = os.path.join(_ROOT, 'cfg', 'ems_configure_param.json')  # 系统运行的配置参数json文件
+EMS_DATA_DICT_FILEPATH = os.path.join(_ROOT, 'cfg', 'ems_data_dict.json')
+EMS_TCP_CMD_FILEPATH = os.path.join(_ROOT, 'cfg', 'ems_tcp_cmd.json')
+TEMP_FILEPATH = os.path.join(_ROOT, 'cfg', 'temp.json')
+CONTROL_COMMAND_FILEPATH = os.path.join(_ROOT, 'cfg', 'control_command.json')
+MQTT_CMD_FILEPATH = os.path.join(_ROOT, 'cfg', 'mqtt_cmd.json')
+MQTT_CMD_MAPPING_FILEPATH = os.path.join(_ROOT, 'cfg', 'mqtt_cmd_mapping.json')
 MQTT_CONTROL_TOPIC = 'cloud/action/xyc2026001/control'
 FRONTEND_CONTROL_TOPIC = 'frontend/control'
-IEC104_MAPPING_FILEPATH = './cfg/iec104_mapping.json'
+IEC104_MAPPING_FILEPATH = os.path.join(_ROOT, 'cfg', 'iec104_mapping.json')
 
 
 TCP_DEVICE_IP = '192.168.1.98'      # modbus tcp设备ip
@@ -94,7 +96,7 @@ RK2676B_SERIAL_LIST = [ {'port': '/dev/ttyS1', 'baudrate': 9600, 'type': 'master
 # 待检查的TF卡数据库路径
 CHECK_DB_PATH = '/home/ubuntu/mnt/ems_project/tfcard_db/storage_system.db'
 # 默认本地数据库路径
-DEFAULT_DB_PATH = './storage_system.db'
+DEFAULT_DB_PATH = os.path.join(_ROOT, 'storage_system.db')
 # DI/DO GPIO 编号字典已移除：此 EMS 无 DI/DO 硬件
 
 # 判断TF卡路径是否存在（优先使用TF卡数据库）

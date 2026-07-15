@@ -9,8 +9,8 @@ import os
 import io
 import csv # 增加原生 csv 模块支持
 
-# 扁平目录结构：所有 Python 模块在同一目录下
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# app.py / config.py / database_sqlalchemy.py 均在项目根目录，无需额外 sys.path
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))       # /opt/ems/
 sys.path.insert(0, BASE_DIR)
 from config import dev_nameToChinese_dict
 from database_sqlalchemy import engine
@@ -299,8 +299,9 @@ def _get_zh_info(device, command):
 def get_control_commands():
     """获取所有设备可用的控制命令列表（含中文名和当前值 key）"""
     try:
-        from config import CONTROL_COMMAND_FILEPATH
-        with open(CONTROL_COMMAND_FILEPATH, 'r', encoding='utf-8') as f:
+        # 使用 BASE_DIR 确保在任何目录启动都能找到 cfg/
+        control_cmd_path = os.path.join(BASE_DIR, 'cfg', 'control_command.json')
+        with open(control_cmd_path, 'r', encoding='utf-8') as f:
             control_dict = json.load(f)
 
         result = {}
@@ -328,6 +329,8 @@ def get_control_commands():
 
         return jsonify(result)
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
 
@@ -594,8 +597,6 @@ def auth_logout():
 def export_protocol_xlsx():
     """生成 Modbus TCP 协议 xlsx 文档并下载"""
     try:
-        import sys
-        sys.path.insert(0, BASE_DIR)
         from generate_modbus_protocol_xlsx import generate_xlsx
         import tempfile
 
@@ -612,8 +613,7 @@ def export_protocol_xlsx():
 def export_mqtt_protocol_xlsx():
     """生成 MQTT 协议 xlsx 文档并下载"""
     try:
-        import sys, tempfile
-        sys.path.insert(0, BASE_DIR)
+        import tempfile
         from generate_mqtt_protocol_xlsx import generate_xlsx
         tmp = tempfile.NamedTemporaryFile(suffix='.xlsx', delete=False)
         tmp.close()
@@ -645,11 +645,8 @@ def get_alarm_history():
         page = int(request.args.get('page', 1))
         page_size = int(request.args.get('page_size', 50))
 
-        # 使用与 SQLAlchemy 一致的相对路径（进程 CWD 即项目根目录）
-        db_path = os.path.join(os.getcwd(), 'alarmHistory.db')
-        if not os.path.exists(db_path):
-            # 回退：尝试 backend/../ 路径
-            db_path = os.path.join(BASE_DIR, 'alarmHistory.db')
+        # alarmHistory.db 位于项目根目录
+        db_path = os.path.join(BASE_DIR, 'alarmHistory.db')
         if not os.path.exists(db_path):
             return jsonify({'records': [], 'total': 0, 'msg': f'数据库文件不存在: {db_path}'})
 

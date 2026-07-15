@@ -6,7 +6,8 @@
 """
 
 import sys, os, json, xml.etree.ElementTree as ET
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+_BASE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, _BASE)
 
 try:
     from openpyxl import Workbook
@@ -78,7 +79,7 @@ def parse_xml_registers(xml_path):
 
 def load_ems_tcp_cmd():
     """从 ems_tcp_cmd.json 加载 EMS 的 TCP 命令映射"""
-    path = getattr(config, 'EMS_TCP_CMD_FILEPATH', './cfg/ems_tcp_cmd.json')
+    path = getattr(config, 'EMS_TCP_CMD_FILEPATH', os.path.join(_BASE, 'cfg', 'ems_tcp_cmd.json'))
     if not os.path.exists(path):
         return {}
     with open(path, 'r', encoding='utf-8') as f:

@@ -2,6 +2,7 @@
 #include "devicemanager.h"
 #include "strategy.h"
 #include "unixsocketserver.h"
+#include "frontendcontroller.h"
 #include "config.h"
 #include "log.h"
 #include <iostream>
@@ -61,6 +62,9 @@ int main() {
 
         // 启动云端控制订阅（与Python端保持一致）
         device_manager->startSubscribeCloudControl();
+
+        // 启动前端控制器（订阅 Redis frontend/control 频道，对应 Python ems-victory 的 frontend_controller.py）
+        FrontendController::getInstance()->start();
         
         // 设置控制消息回调（可选）
         // device_manager->setControlMessageCallback([](const std::string& channel, const std::string& message) {
@@ -100,6 +104,9 @@ int main() {
         
         // 先停止策略线程
         strategy->stopThread();
+
+        // 停止前端控制器
+        FrontendController::getInstance()->stop();
 
         // 停止Socket服务器
         socket_server->stopServer();

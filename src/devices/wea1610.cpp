@@ -24,7 +24,7 @@ Wea1610::Wea1610(const std::string& name, int com, int id)
     for (const auto& pair : this->fc03_nameToAddr_map) {
         all_addresses.push_back(pair.second);
     }
-    this->segments03_ = Device::generate_segments_from_addresses(all_addresses, 100);
+    this->segments03_ = Device::generate_segments_from_addresses(all_addresses, 60);
 
     init_useful_indexes_from_map(this->fc03_nameToAddr_map, this->segments03_);
 

@@ -22,8 +22,8 @@ Pcs_15am::Pcs_15am(const std::string& name, int com, int id)
     Device::init_json_structure(name);
     // 加载配置，使用PCS专用的配置文件路径（此处假定配置常量已定义，实际可能需要根据项目调整）
     init_config(Config::EJPCS_15AM_COMMUNICATION_FILEPATH);
-    // 初始化有用索引映射
     
+    // 初始化有用索引映射
     std::vector<uint16_t> all_addresses;
     for (const auto& pair : this->fc03_nameToAddr_map) {
         all_addresses.push_back(pair.second);
@@ -86,12 +86,12 @@ void Pcs_15am::read_data(ModbusClient& mb_client)
     }
 
     try {
-        if (read_all_registers(mb_client)) {
+        if (read_all_registers(mb_client,50)) {
             parse_rawdata(this->data_buffer);
             this->reconnect_counter = 0;
         } else {
             this->reconnect_counter++;
-            if (this->reconnect_counter>3){
+            if (this->reconnect_counter>10){
                 safe_set_qt_data(false);
                 this->online_status = false;
                 this->reconnect_counter = 0;

@@ -45,7 +45,7 @@ void EjPcs15AmCmd::pcs_reset_dc(std::shared_ptr<Device>& device,const std::strin
     int com = device->get_com();
     std::shared_ptr<ModbusClient>& mb_client = this->modbus_clients_[com];
     // DC复位: 通过控制配置字实现 (地址: 24597)
-    device->writeCmdToDevice(mb_client,"06",24597,0x0001);
+    device->writeCmdToDevice(mb_client,"06",24597,1);
     LOG_INFO_LOC("EJPCS15-AM " + device->get_name() + " DC复位指令已发送");
 }
 

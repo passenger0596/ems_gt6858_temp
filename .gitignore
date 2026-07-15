@@ -3,3 +3,6 @@ build/
 bin/
 docs/
 ./API_SWITCH_GUIDE.md
+__pycache__/
+.claude/
+scripts/

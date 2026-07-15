@@ -21,24 +21,23 @@
 DeviceManager::DeviceManager() {
     // 初始化所有设备实例
     this->ems_ = EMS::instance();
-    this->pcs_ = std::make_shared<Pcs>("pcs1", 0, 1);
-    this->dcdc1_ = std::make_shared<Dcdc>("dcdc1", 1, 1);
-    this->dcdc2_ = std::make_shared<Dcdc>("dcdc2", 1, 2);
-    // 创建高特BMS设备（假设使用串口5，Modbus从站地址为1）
-    // this->gt_bms_ = std::make_shared<GtBms>("gtbms485", 2, 1);
-    // this->ac_hengdu_ = std::make_shared<AcHengdu>("air_condition", 3, 1);
+    this->pcs15am_ = std::make_shared<Pcs>("pcs1", 0, 1);
+    // 创建高特BMS设备（假设使用串口8，为Modbus TCP，Modbus从站地址为1）
+    this->gt_bms_ = std::make_shared<GtBms>("gtbms485", 8, 1);  
+    this->iomodule_ = std::make_shared<IOModule>("board_8di8do", 1, 20);
+    this->dtsd3366_ = std::make_shared<ACMeter_3366>("dtsd3366", 2, 1);
     
-    // this->dtsd3366_ = std::make_shared<ACMeter_3366>("dtsd3366", 4, 1);
+
+    // this->ac_hengdu_ = std::make_shared<AcHengdu>("air_condition", 3, 1);
     // this->dg_hgm6100_ = std::make_shared<DgHgm6100n>("dg_hgm6100n", 5, 1);
     // this->iomodule_ = std::make_shared<IOModule>("board_8di8do", 7, 20);
-
-    this->chargers_ = std::make_shared<InfyCharger>("chargers", 17, 1);
-    this->chargers_->init_config(Config::INFY_CHARGER_COMMUNICATION_FILEPATH);
+    // this->chargers_ = std::make_shared<InfyCharger>("chargers", 17, 1);
+    // this->chargers_->init_config(Config::INFY_CHARGER_COMMUNICATION_FILEPATH);
     
     
     
-    this->devices_ = {this->ems_, this->pcs_, this->dcdc1_, this->dcdc2_, this->chargers_
-                    //   this->gt_bms_, this->ac_hengdu_
+    this->devices_ = {this->ems_, this->pcs15am_, this->dtsd3366_,
+                    this->iomodule_, this->gt_bms_, 
                       }; 
     
     for (auto& device : this->devices_) {
@@ -498,11 +497,11 @@ void DeviceManager::runningLogShowThread() {
             LOG_INFO_LOC(("系统离线设备: " + offline_str).c_str());
             
             // PCS实时功率 - 使用线程安全访问
-            auto pcs_device = this->getDeviceByName("pcs1");
-            if (pcs_device) {
+            auto pcs15am_device = this->getDeviceByName("pcs1");
+            if (pcs15am_device) {
                 // 使用线程安全的 getValue 方法
-                double pcs_power = pcs_device->getValue<double>("模块交流总有功功率", 0.0);
-                LOG_INFO_LOC(("PCS实时功率: " + std::to_string(pcs_power) + "kW").c_str());
+                double pcs15am_power = pcs15am_device->getValue<double>("模块交流总有功功率", 0.0);
+                LOG_INFO_LOC(("PCS实时功率: " + std::to_string(pcs15am_power) + "kW").c_str());
             }  // PCS锁在此处释放
             
             LOG_INFO_LOC(("[" + current_time + "] " + std::string(50, '*')).c_str());

@@ -305,7 +305,7 @@ class EmsCmd {
         void set_multi_cfg(const json& cfg_name); // 设置多个配置项的函数声明
         void set_timingMode(const json& timingMode_cfg); // 设置定时模式配置的函数声明
         void set_demandResponseMode(const json& demandResponseMode_cfg);    // 设置需求响应模式配置的函数声明
-        void process_ems_commands(EjPcsCmd& pcs_cmd,EjDcdcCmd& dcdc_cmd,GtbmsCmd& gtbms_cmd); // 处理EMS相关命令的函数声明
+        void process_ems_commands(EjPcs15AmCmd& pcs_cmd,GtbmsCmd& gtbms_cmd); // 处理EMS相关命令的函数声明
     private:
         std::shared_ptr<EMS> ems = nullptr;
         std::unordered_map<std::string, std::shared_ptr<Device>> device_map_;

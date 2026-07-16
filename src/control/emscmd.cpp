@@ -102,7 +102,7 @@ void EmsCmd::set_demandResponseMode(const json& demandResponseMode_cfg) {
 }
 
 
-void EmsCmd::process_ems_commands(EjPcsCmd& pcs_cmd,EjDcdcCmd& dcdc_cmd,GtbmsCmd& gtbms_cmd) { 
+void EmsCmd::process_ems_commands(EjPcs15AmCmd& pcs_cmd,GtbmsCmd& gtbms_cmd) { 
     try {
         auto& device_commands = cmd()->cmd_from_qt["ems"];
 
@@ -123,10 +123,6 @@ void EmsCmd::process_ems_commands(EjPcsCmd& pcs_cmd,EjDcdcCmd& dcdc_cmd,GtbmsCmd
             this->ems->setValue<double>("开机", 0);
             if (this->device_map_["pcs1"])
                 pcs_cmd.pcs_on_off("off","手动",this->device_map_["pcs1"]);
-            if (this->device_map_["dcdc1"])
-                dcdc_cmd.dcdc_on_off("off","手动",this->device_map_["dcdc1"]);
-            if (this->device_map_["dcdc2"])
-                dcdc_cmd.dcdc_on_off("off","手动",this->device_map_["dcdc2"]);
             if (this->device_map_["gtbms485"])
                 gtbms_cmd.gtbms_vol_on_off("off","手动",this->device_map_["gtbms485"]);
             

@@ -12,6 +12,13 @@ using json = nlohmann::json;
 class DeviceManager; // 前向声明
 class Device;        // 前向声明
 
+enum RunMode { 
+    MANUAL = 1, 
+    AUTO = 2, 
+    TIMER = 3,
+    DEMAND_RESPONSE = 4,
+    };
+
 
 class Strategy {
     public:

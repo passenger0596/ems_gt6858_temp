@@ -47,7 +47,6 @@ void Strategy::runningThread() {
 void Strategy::sysRun() {
     while (keep_running_) {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        // LOG_INFO_LOC("sysRun运行中...");
         auto ems = EMS::instance();
         // 使用线程安全的 getValue 方法
         int current_mode = static_cast<int>(ems->getValue<double>("系统运行模式", 1));
@@ -63,19 +62,20 @@ void Strategy::sysRun() {
         }else{
             // 根据当前模式执行相应的逻辑
             switch (current_mode) {
-                case 1:  // 手动模式
+                case RunMode::MANUAL:  // 手动模式
                     manualModeRun();
                     break;
-                case 2:  // 自动模式
+                case RunMode::AUTO:  // 自动模式
                     autoModeRun();
                     break;
-                case 3:  // 周计划/定时模式
+                case RunMode::TIMER:  // 周计划/定时模式
                     weeklyPlanModeRun();
                     break;
-                case 4:  // 需求响应模式
+                case RunMode::DEMAND_RESPONSE:  // 需求响应模式
                     demandResponseModeRun();
                     break;
                 default:
+                    LOG_WARNING_LOC("未定义运行模式: " + std::to_string(current_mode));
                     manualModeRun();
                     break;
             }
@@ -93,11 +93,11 @@ void Strategy::autoModeRun(){
 
 void Strategy::manualModeRun() {
     // 处理 EMS 命令
-    if (pcs_cmd_ && dcdc_cmd_ && gtbms_cmd_) {
-        ems_cmd_->process_ems_commands(*pcs_cmd_, *dcdc_cmd_, *gtbms_cmd_);
+    if (pcs15am_cmd_ && gtbms_cmd_) {
+        ems_cmd_->process_ems_commands(*pcs15am_cmd_, *gtbms_cmd_);
     } 
     // 手动模式的运行逻辑
-    pcs_cmd_->process_pcs_commands("pcs1");
+    pcs15am_cmd_->process_pcs_commands("pcs1");
 
     // dcdc_cmd_->process_dcdc_commands("dcdc1");
     // dcdc_cmd_->process_dcdc_commands("dcdc2");
@@ -138,175 +138,175 @@ void Strategy::weeklyPlanModeRun() {
             
             manualModeRun();
 
-            if (ems->getValue<double>("开机", 0) <1.0) break;
+        //     if (ems->getValue<double>("开机", 0) <1.0) break;
             
-            // 检查模式是否改变
-            int current_mode = static_cast<int>(ems->getValue<double>("系统运行模式", 1));
-            if (current_mode != 3) {
-                LOG_INFO_LOC("周定时模式退出, 准备切换至模式: " + std::to_string(current_mode));
-                break;
-            }
+        //     // 检查模式是否改变
+        //     int current_mode = static_cast<int>(ems->getValue<double>("系统运行模式", 1));
+        //     if (current_mode != 3) {
+        //         LOG_INFO_LOC("周定时模式退出, 准备切换至模式: " + std::to_string(current_mode));
+        //         break;
+        //     }
             
-            // 热管理和水泵管理
-            // thermalManager();
-            // waterPumpManager();
+        //     // 热管理和水泵管理
+        //     // thermalManager();
+        //     // waterPumpManager();
             
-            // 轮询告警
-            uint16_t alarm_level = pollingAlarm();
+        //     // 轮询告警
+        //     uint16_t alarm_level = pollingAlarm();
             
-            if (alarm_level == 0 || alarm_level == 1) {
-                ems->sys_running_pos.store(16);
-                fault_occurred = false;
+        //     if (alarm_level == 0 || alarm_level == 1) {
+        //         ems->sys_running_pos.store(16);
+        //         fault_occurred = false;
                 
-                // 检查充放电状态
-                auto [should_run_week_plan, week_plan_power_need] = ems->check_charge_status();
-                ems->shouldRunWeekPlan = should_run_week_plan;
+        //         // 检查充放电状态
+        //         auto [should_run_week_plan, week_plan_power_need] = ems->check_charge_status();
+        //         ems->shouldRunWeekPlan = should_run_week_plan;
                 
-                if (should_run_week_plan) {
-                    if (week_plan_power_need < 0) {
-                        // 充电模式
-                        ems->sys_running_pos.store(30);
-                        ems->weekPlanPower_need = ems->get_max_charge_power(week_plan_power_need);
-                        double pcs_power = pcs1_device->getValue<double>("有功功率设置", 0);
-                        // 检查保护条件 - 使用线程安全的 getValue
-                        if ((ems->getValue<double>("使能单体电压保护", 0) > 0.5 && 
-                             ems->reach_setting_upper_cell_voltage(bms_device)) ||
-                            (ems->getValue<double>("使能SOC保护", 0) > 0.5 && 
-                             ems->check_soc_is_end_charge(bms_device)) ||
-                            ems->fully_charged_confirm(bms_device)) {
-                            allow_charge = false;
-                        }
+        //         if (should_run_week_plan) {
+        //             if (week_plan_power_need < 0) {
+        //                 // 充电模式
+        //                 ems->sys_running_pos.store(30);
+        //                 ems->weekPlanPower_need = ems->get_max_charge_power(week_plan_power_need);
+        //                 double pcs_power = pcs1_device->getValue<double>("有功功率设置", 0);
+        //                 // 检查保护条件 - 使用线程安全的 getValue
+        //                 if ((ems->getValue<double>("使能单体电压保护", 0) > 0.5 && 
+        //                      ems->reach_setting_upper_cell_voltage(bms_device)) ||
+        //                     (ems->getValue<double>("使能SOC保护", 0) > 0.5 && 
+        //                      ems->check_soc_is_end_charge(bms_device)) ||
+        //                     ems->fully_charged_confirm(bms_device)) {
+        //                     allow_charge = false;
+        //                 }
                         
-                        if (!allow_charge) {
-                            ems->sys_running_pos.store(31);
+        //                 if (!allow_charge) {
+        //                     ems->sys_running_pos.store(31);
                             
-                            // 如果正在充电，停止充电 - 使用线程安全的 getValue
-                            if (pcs_power < 0 || ems->weekPlanPower_need < 0) {
-                                if (static_cast<int>(last_sent_pcs_power_) != 0) {
-                                    pcs_cmd_->pcs_set_power(0, "定时", pcs1_device);
-                                    last_sent_pcs_power_ = 0;
-                                }
-                            }
+        //                     // 如果正在充电，停止充电 - 使用线程安全的 getValue
+        //                     if (pcs_power < 0 || ems->weekPlanPower_need < 0) {
+        //                         if (static_cast<int>(last_sent_pcs_power_) != 0) {
+        //                             pcs_cmd_->pcs_set_power(0, "定时", pcs1_device);
+        //                             last_sent_pcs_power_ = 0;
+        //                         }
+        //                     }
                             
-                            // 检查是否回落到回差范围
-                            if (ems->check_charge_rd_recover(bms_device)) {
-                                allow_charge = true;
-                            }
-                        } else {
-                            ems->sys_running_pos.store(32);
-                            if (static_cast<int>(last_sent_pcs_power_) != static_cast<int>(ems->weekPlanPower_need)) {
-                                // 设置充电功率
-                                pcs_cmd_->pcs_set_power(ems->weekPlanPower_need, "定时", pcs1_device);
-                                last_sent_pcs_power_ = ems->weekPlanPower_need;
-                            }
+        //                     // 检查是否回落到回差范围
+        //                     if (ems->check_charge_rd_recover(bms_device)) {
+        //                         allow_charge = true;
+        //                     }
+        //                 } else {
+        //                     ems->sys_running_pos.store(32);
+        //                     if (static_cast<int>(last_sent_pcs_power_) != static_cast<int>(ems->weekPlanPower_need)) {
+        //                         // 设置充电功率
+        //                         pcs_cmd_->pcs_set_power(ems->weekPlanPower_need, "定时", pcs1_device);
+        //                         last_sent_pcs_power_ = ems->weekPlanPower_need;
+        //                     }
                             
-                            // 开启PCS - 使用线程安全的 getValue
-                            double pcs_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
-                            if (pcs_switch != 1) {
-                                pcs_cmd_->pcs_on_off("on", "定时", pcs1_device);
-                            }
+        //                     // 开启PCS - 使用线程安全的 getValue
+        //                     double pcs_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
+        //                     if (pcs_switch != 1) {
+        //                         pcs_cmd_->pcs_on_off("on", "定时", pcs1_device);
+        //                     }
                             
-                        }
-                    } else {
-                            // 放电模式
-                            ems->sys_running_pos.store(33);
-                            ems->weekPlanPower_need = ems->get_max_discharge_power(week_plan_power_need);
-                            double pcs_power = pcs1_device->getValue<double>("有功功率设置", 0);
+        //                 }
+        //             } else {
+        //                     // 放电模式
+        //                     ems->sys_running_pos.store(33);
+        //                     ems->weekPlanPower_need = ems->get_max_discharge_power(week_plan_power_need);
+        //                     double pcs_power = pcs1_device->getValue<double>("有功功率设置", 0);
                             
-                            // 检查保护条件 - 使用线程安全的 getValue
-                            if ((ems->getValue<double>("使能单体电压保护", 0) > 0.5 && 
-                                ems->fall_to_setting_lower_cell_voltage(bms_device)) ||
-                                (ems->getValue<double>("使能SOC保护", 0) > 0.5 && 
-                                ems->check_soc_is_end_discharge(bms_device)) ||
-                                ems->fully_discharged_confirm(bms_device)) {
-                                allow_discharge = false;
-                            }
+        //                     // 检查保护条件 - 使用线程安全的 getValue
+        //                     if ((ems->getValue<double>("使能单体电压保护", 0) > 0.5 && 
+        //                         ems->fall_to_setting_lower_cell_voltage(bms_device)) ||
+        //                         (ems->getValue<double>("使能SOC保护", 0) > 0.5 && 
+        //                         ems->check_soc_is_end_discharge(bms_device)) ||
+        //                         ems->fully_discharged_confirm(bms_device)) {
+        //                         allow_discharge = false;
+        //                     }
                             
-                            if (!allow_discharge) {
-                                // 如果正在放电，停止放电
+        //                     if (!allow_discharge) {
+        //                         // 如果正在放电，停止放电
                                 
-                                if (pcs_power > 0 || ems->weekPlanPower_need > 0) {
-                                    if (static_cast<int>(last_sent_pcs_power_) != 0) {
-                                        pcs_cmd_->pcs_set_power(0, "定时", pcs1_device);
-                                        last_sent_pcs_power_ = 0;
-                                    }
-                                }
+        //                         if (pcs_power > 0 || ems->weekPlanPower_need > 0) {
+        //                             if (static_cast<int>(last_sent_pcs_power_) != 0) {
+        //                                 pcs_cmd_->pcs_set_power(0, "定时", pcs1_device);
+        //                                 last_sent_pcs_power_ = 0;
+        //                             }
+        //                         }
                                 
-                                // 检查是否回落到回差范围
-                                if (ems->check_discharge_rd_recover(bms_device)) {
-                                    allow_discharge = true;
-                                }
-                            } else {
-                                if (static_cast<int>(last_sent_pcs_power_) != static_cast<int>(ems->weekPlanPower_need)) {
-                                    // 设置放电功率
-                                    pcs_cmd_->pcs_set_power(ems->weekPlanPower_need, 
-                                                    "定时", pcs1_device);
-                                    last_sent_pcs_power_ = ems->weekPlanPower_need;
-                                }
+        //                         // 检查是否回落到回差范围
+        //                         if (ems->check_discharge_rd_recover(bms_device)) {
+        //                             allow_discharge = true;
+        //                         }
+        //                     } else {
+        //                         if (static_cast<int>(last_sent_pcs_power_) != static_cast<int>(ems->weekPlanPower_need)) {
+        //                             // 设置放电功率
+        //                             pcs_cmd_->pcs_set_power(ems->weekPlanPower_need, 
+        //                                             "定时", pcs1_device);
+        //                             last_sent_pcs_power_ = ems->weekPlanPower_need;
+        //                         }
                                 
-                                // 开启PCS
-                                double pcs_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
-                                if (pcs_switch != 1) {
-                                    pcs_cmd_->pcs_on_off("on", "定时", pcs1_device);
-                                }
-                            }
+        //                         // 开启PCS
+        //                         double pcs_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
+        //                         if (pcs_switch != 1) {
+        //                             pcs_cmd_->pcs_on_off("on", "定时", pcs1_device);
+        //                         }
+        //                     }
 
-                        }
+        //                 }
                     
-                } else {
-                    // 不在计划时段，关闭PCS
-                    ems->sys_running_pos.store(34);
+        //         } else {
+        //             // 不在计划时段，关闭PCS
+        //             ems->sys_running_pos.store(34);
                     
-                    double pcs_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
-                    if (pcs_switch != 0) {
-                        pcs_cmd_->pcs_on_off("off", "定时", pcs1_device);
-                    }
+        //             double pcs_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
+        //             if (pcs_switch != 0) {
+        //                 pcs_cmd_->pcs_on_off("off", "定时", pcs1_device);
+        //             }
                     
-                    // 重置上次发送的功率值
-                    if (static_cast<int>(last_sent_pcs_power_) != 0) {
-                        last_sent_pcs_power_ = 0;
-                    }
-                }
-            } else if (alarm_level == 2) {
-                // 二级告警
-                ems->sys_running_pos.store(17);
-                alarmLv2Protect();
+        //             // 重置上次发送的功率值
+        //             if (static_cast<int>(last_sent_pcs_power_) != 0) {
+        //                 last_sent_pcs_power_ = 0;
+        //             }
+        //         }
+        //     } else if (alarm_level == 2) {
+        //         // 二级告警
+        //         ems->sys_running_pos.store(17);
+        //         alarmLv2Protect();
                 
-                if (!fault_occurred) {
-                    fault_happen_time = std::chrono::steady_clock::now();
-                    fault_occurred = true;
-                }
+        //         if (!fault_occurred) {
+        //             fault_happen_time = std::chrono::steady_clock::now();
+        //             fault_occurred = true;
+        //         }
                 
-                auto current_time = std::chrono::steady_clock::now();
-                auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
-                    current_time - fault_happen_time).count();
+        //         auto current_time = std::chrono::steady_clock::now();
+        //         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
+        //             current_time - fault_happen_time).count();
                 
-                // 180秒后自动恢复
-                if (elapsed > 180) {
-                    pcs_cmd_->pcs_reset(pcs1_device, "定时");
+        //         // 180秒后自动恢复
+        //         if (elapsed > 180) {
+        //             pcs_cmd_->pcs_reset(pcs1_device, "定时");
                     
-                    // 使用线程安全的 setValue 方法
-                    ems->setValue<double>("系统状态", 2);
-                    ems->setValue<double>("系统告警等级", 0);
-                    fault_occurred = false;
+        //             // 使用线程安全的 setValue 方法
+        //             ems->setValue<double>("系统状态", 2);
+        //             ems->setValue<double>("系统告警等级", 0);
+        //             fault_occurred = false;
                     
-                    LOG_INFO_LOC("定时系统二级告警自恢复完成");
-                    std::this_thread::sleep_for(std::chrono::seconds(1));
-                }
-            } else {
-                // 三级告警
-                ems->sys_running_pos.store(18);
-                alarmLv3Protect();
+        //             LOG_INFO_LOC("定时系统二级告警自恢复完成");
+        //             std::this_thread::sleep_for(std::chrono::seconds(1));
+        //         }
+        //     } else {
+        //         // 三级告警
+        //         ems->sys_running_pos.store(18);
+        //         alarmLv3Protect();
                 
-                // 使用线程安全的 setValue 方法
-                ems->setValue<double>("开机", 0);
-                ems->setValue<double>("系统运行模式", 1);  // 返回手动模式
+        //         // 使用线程安全的 setValue 方法
+        //         ems->setValue<double>("开机", 0);
+        //         ems->setValue<double>("系统运行模式", 1);  // 返回手动模式
                 
-                LOG_INFO_LOC("三级告警，退出周计划模式");
-                break;
-            }
+        //         LOG_INFO_LOC("三级告警，退出周计划模式");
+        //         break;
+        //     }
             
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        //     std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
         
     } catch (const std::exception& e) {
@@ -338,217 +338,217 @@ void Strategy::demandResponseModeRun() {
             // 处理手动命令
             manualModeRun();
 
-            if (ems->getValue<double>("开机", 0) <1.0) break;
+            // if (ems->getValue<double>("开机", 0) <1.0) break;
             
-            // 检查模式是否改变 - 使用线程安全的 getValue
-            int current_mode = static_cast<int>(ems->getValue<double>("系统运行模式", 1));
-            if (current_mode != 4) {
-                LOG_INFO_LOC("Demand response mode exited, current mode: " + std::to_string(current_mode));
-                break;
-            }
+            // // 检查模式是否改变 - 使用线程安全的 getValue
+            // int current_mode = static_cast<int>(ems->getValue<double>("系统运行模式", 1));
+            // if (current_mode != 4) {
+            //     LOG_INFO_LOC("Demand response mode exited, current mode: " + std::to_string(current_mode));
+            //     break;
+            // }
             
-            // 热管理和水泵管理
-            // thermalManager();
-            // waterPumpManager();
+            // // 热管理和水泵管理
+            // // thermalManager();
+            // // waterPumpManager();
             
-            // 轮询告警
-            uint16_t alarm_level = pollingAlarm();
+            // // 轮询告警
+            // uint16_t alarm_level = pollingAlarm();
             
-            if (alarm_level == 0 || alarm_level == 1) {
-                ems->sys_running_pos.store(20);
-                fault_occurred = false;
+            // if (alarm_level == 0 || alarm_level == 1) {
+            //     ems->sys_running_pos.store(20);
+            //     fault_occurred = false;
 
-                // 检查需求响应状态
-                auto [should_run_demand_response, demand_power_need, reactive_power] = 
-                    ems->check_demand_response_status();
-                ems->shouldRunDemandResponse = should_run_demand_response;
+            //     // 检查需求响应状态
+            //     auto [should_run_demand_response, demand_power_need, reactive_power] = 
+            //         ems->check_demand_response_status();
+            //     ems->shouldRunDemandResponse = should_run_demand_response;
                 
-                if (should_run_demand_response) {
-                    if (demand_power_need < 0) {
-                        // 充电模式
-                        ems->sys_running_pos.store(40);
-                        ems->demandPower_need = ems->get_max_charge_power(demand_power_need);
+            //     if (should_run_demand_response) {
+            //         if (demand_power_need < 0) {
+            //             // 充电模式
+            //             ems->sys_running_pos.store(40);
+            //             ems->demandPower_need = ems->get_max_charge_power(demand_power_need);
                         
-                        // 检查保护条件 - 使用线程安全的 getValue
-                        if ((ems->getValue<double>("使能单体电压保护", 0) > 0.5 && 
-                             ems->reach_setting_upper_cell_voltage(bms_device)) ||
-                            (ems->getValue<double>("使能SOC保护", 0) > 0.5 && 
-                             ems->check_soc_is_end_charge(bms_device)) ||
-                            ems->fully_charged_confirm(bms_device)) {
-                            allow_charge = false;
-                        }
+            //             // 检查保护条件 - 使用线程安全的 getValue
+            //             if ((ems->getValue<double>("使能单体电压保护", 0) > 0.5 && 
+            //                  ems->reach_setting_upper_cell_voltage(bms_device)) ||
+            //                 (ems->getValue<double>("使能SOC保护", 0) > 0.5 && 
+            //                  ems->check_soc_is_end_charge(bms_device)) ||
+            //                 ems->fully_charged_confirm(bms_device)) {
+            //                 allow_charge = false;
+            //             }
                         
-                        if (!allow_charge) {
-                            // 如果正在充电，停止充电 - 使用线程安全的 getValue
-                            double pcs_power = pcs1_device->getValue<double>("下设有功充电/放电功率", 0);
-                            if (pcs_power < 0) {
-                                pcs_cmd_->pcs_set_power(0, "需求响应", pcs1_device);
-                            }
+            //             if (!allow_charge) {
+            //                 // 如果正在充电，停止充电 - 使用线程安全的 getValue
+            //                 double pcs_power = pcs1_device->getValue<double>("下设有功充电/放电功率", 0);
+            //                 if (pcs_power < 0) {
+            //                     pcs_cmd_->pcs_set_power(0, "需求响应", pcs1_device);
+            //                 }
                             
-                            // 清除无功功率
-                            double q_power = pcs1_device->getValue<double>("无功功率补偿功率设置", 0);
-                            if (q_power != 0) {
-                                pcs_cmd_->pcs_set_reactivePower(0, "需求响应", pcs1_device);
-                            }
+            //                 // 清除无功功率
+            //                 double q_power = pcs1_device->getValue<double>("无功功率补偿功率设置", 0);
+            //                 if (q_power != 0) {
+            //                     pcs_cmd_->pcs_set_reactivePower(0, "需求响应", pcs1_device);
+            //                 }
                             
-                            // 检查是否回落到回差范围
-                            if (ems->check_charge_rd_recover(bms_device)) {
-                                allow_charge = true;
-                            }
-                        } else {
-                            // 设置有功功率
-                            pcs_cmd_->pcs_set_power(static_cast<int>(ems->demandPower_need), 
-                                                  "需求响应", pcs1_device);
+            //                 // 检查是否回落到回差范围
+            //                 if (ems->check_charge_rd_recover(bms_device)) {
+            //                     allow_charge = true;
+            //                 }
+            //             } else {
+            //                 // 设置有功功率
+            //                 pcs_cmd_->pcs_set_power(static_cast<int>(ems->demandPower_need), 
+            //                                       "需求响应", pcs1_device);
                             
-                            // 设置无功功率
-                            pcs_cmd_->pcs_set_reactivePower(reactive_power, "需求响应", pcs1_device);
+            //                 // 设置无功功率
+            //                 pcs_cmd_->pcs_set_reactivePower(reactive_power, "需求响应", pcs1_device);
                             
-                            // 开启PCS - 使用线程安全的 getValue
-                            double pcs_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
-                            if (pcs_switch != 1) {
-                                pcs_cmd_->pcs_on_off("on", "需求响应", pcs1_device);
-                            }
-                        }
-                    } else {
-                        // 放电模式
-                        ems->sys_running_pos.store(41);
-                        ems->demandPower_need = ems->get_max_discharge_power(demand_power_need);
+            //                 // 开启PCS - 使用线程安全的 getValue
+            //                 double pcs_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
+            //                 if (pcs_switch != 1) {
+            //                     pcs_cmd_->pcs_on_off("on", "需求响应", pcs1_device);
+            //                 }
+            //             }
+            //         } else {
+            //             // 放电模式
+            //             ems->sys_running_pos.store(41);
+            //             ems->demandPower_need = ems->get_max_discharge_power(demand_power_need);
                         
-                        // 检查保护条件 - 使用线程安全的 getValue
-                        if ((ems->getValue<double>("使能单体电压保护", 0) > 0.5 && 
-                             ems->fall_to_setting_lower_cell_voltage(bms_device)) ||
-                            (ems->getValue<double>("使能SOC保护", 0) > 0.5 && 
-                             ems->check_soc_is_end_discharge(bms_device)) ||
-                            ems->fully_discharged_confirm(bms_device)) {
-                            allow_discharge = false;
+            //             // 检查保护条件 - 使用线程安全的 getValue
+            //             if ((ems->getValue<double>("使能单体电压保护", 0) > 0.5 && 
+            //                  ems->fall_to_setting_lower_cell_voltage(bms_device)) ||
+            //                 (ems->getValue<double>("使能SOC保护", 0) > 0.5 && 
+            //                  ems->check_soc_is_end_discharge(bms_device)) ||
+            //                 ems->fully_discharged_confirm(bms_device)) {
+            //                 allow_discharge = false;
                             
-                            double pcs_power = pcs1_device->getValue<double>("下设有功充电/放电功率", 0);
-                            if (pcs_power > 0) {
-                                pcs_cmd_->pcs_set_power(0, "需求响应", pcs1_device);
-                            }
+            //                 double pcs_power = pcs1_device->getValue<double>("下设有功充电/放电功率", 0);
+            //                 if (pcs_power > 0) {
+            //                     pcs_cmd_->pcs_set_power(0, "需求响应", pcs1_device);
+            //                 }
                             
-                            // 清除无功功率
-                            double q_power = pcs1_device->getValue<double>("无功功率补偿功率设置", 0);
-                            if (q_power != 0) {
-                                pcs_cmd_->pcs_set_reactivePower(0, "需求响应", pcs1_device);
-                            }
-                        }
+            //                 // 清除无功功率
+            //                 double q_power = pcs1_device->getValue<double>("无功功率补偿功率设置", 0);
+            //                 if (q_power != 0) {
+            //                     pcs_cmd_->pcs_set_reactivePower(0, "需求响应", pcs1_device);
+            //                 }
+            //             }
                         
-                        if (!allow_discharge) {
-                            // 如果正在放电，停止放电
-                            double pcs_power = pcs1_device->getValue<double>("下设有功充电/放电功率", 0);
-                            if (pcs_power > 0) {
-                                pcs_cmd_->pcs_set_power(0, "需求响应", pcs1_device);
-                            }
+            //             if (!allow_discharge) {
+            //                 // 如果正在放电，停止放电
+            //                 double pcs_power = pcs1_device->getValue<double>("下设有功充电/放电功率", 0);
+            //                 if (pcs_power > 0) {
+            //                     pcs_cmd_->pcs_set_power(0, "需求响应", pcs1_device);
+            //                 }
                             
-                            // 检查是否回落到回差范围
-                            if (ems->check_discharge_rd_recover(bms_device)) {
-                                allow_discharge = true;
-                            }
-                        } else {
-                            // 设置有功功率
-                            pcs_cmd_->pcs_set_power(static_cast<int>(ems->demandPower_need), 
-                                                  "需求响应", pcs1_device);
+            //                 // 检查是否回落到回差范围
+            //                 if (ems->check_discharge_rd_recover(bms_device)) {
+            //                     allow_discharge = true;
+            //                 }
+            //             } else {
+            //                 // 设置有功功率
+            //                 pcs_cmd_->pcs_set_power(static_cast<int>(ems->demandPower_need), 
+            //                                       "需求响应", pcs1_device);
                             
-                            // 设置无功功率
-                            pcs_cmd_->pcs_set_reactivePower(reactive_power, "需求响应", pcs1_device);
+            //                 // 设置无功功率
+            //                 pcs_cmd_->pcs_set_reactivePower(reactive_power, "需求响应", pcs1_device);
                             
-                            // 开启PCS
-                            double pcs_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
-                            if (pcs_switch != 1) {
-                                pcs_cmd_->pcs_on_off("on", "需求响应", pcs1_device);
-                            }
+            //                 // 开启PCS
+            //                 double pcs_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
+            //                 if (pcs_switch != 1) {
+            //                     pcs_cmd_->pcs_on_off("on", "需求响应", pcs1_device);
+            //                 }
                             
-                        }
-                    }
-                } else {
-                    // 不在需求响应时段，检查是否在周计划时段
-                    auto [should_run_week_plan, week_plan_power_need] = ems->check_charge_status();
+            //             }
+            //         }
+            //     } else {
+            //         // 不在需求响应时段，检查是否在周计划时段
+            //         auto [should_run_week_plan, week_plan_power_need] = ems->check_charge_status();
                     
-                    if (should_run_week_plan) {
-                        // 执行周计划逻辑（简化版，与weeklyPlanModeRun类似）
-                        if (week_plan_power_need < 0) {
-                            ems->weekPlanPower_need = ems->get_max_charge_power(week_plan_power_need);
-                            pcs_cmd_->pcs_set_power(static_cast<int>(ems->weekPlanPower_need), 
-                                                  "定时", pcs1_device);
+            //         if (should_run_week_plan) {
+            //             // 执行周计划逻辑（简化版，与weeklyPlanModeRun类似）
+            //             if (week_plan_power_need < 0) {
+            //                 ems->weekPlanPower_need = ems->get_max_charge_power(week_plan_power_need);
+            //                 pcs_cmd_->pcs_set_power(static_cast<int>(ems->weekPlanPower_need), 
+            //                                       "定时", pcs1_device);
                             
-                            // 使用线程安全的 getValue
-                            double pcs_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
-                            if (pcs_switch != 1) {
-                                pcs_cmd_->pcs_on_off("on", "定时", pcs1_device);
-                            }
+            //                 // 使用线程安全的 getValue
+            //                 double pcs_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
+            //                 if (pcs_switch != 1) {
+            //                     pcs_cmd_->pcs_on_off("on", "定时", pcs1_device);
+            //                 }
                             
-                        } else if (week_plan_power_need > 0) {
-                            ems->weekPlanPower_need = ems->get_max_discharge_power(week_plan_power_need);
-                            pcs_cmd_->pcs_set_power(static_cast<int>(ems->weekPlanPower_need), 
-                                                  "定时", pcs1_device);
+            //             } else if (week_plan_power_need > 0) {
+            //                 ems->weekPlanPower_need = ems->get_max_discharge_power(week_plan_power_need);
+            //                 pcs_cmd_->pcs_set_power(static_cast<int>(ems->weekPlanPower_need), 
+            //                                       "定时", pcs1_device);
                             
-                            double pcs_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
-                            if (pcs_switch != 1) {
-                                pcs_cmd_->pcs_on_off("on", "定时", pcs1_device);
-                            }
+            //                 double pcs_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
+            //                 if (pcs_switch != 1) {
+            //                     pcs_cmd_->pcs_on_off("on", "定时", pcs1_device);
+            //                 }
 
-                        } else {
-                            // 关闭PCS
-                            double pcs_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
-                            if (pcs_switch != 0) {
-                                pcs_cmd_->pcs_on_off("off", "定时", pcs1_device);
-                            }
+            //             } else {
+            //                 // 关闭PCS
+            //                 double pcs_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
+            //                 if (pcs_switch != 0) {
+            //                     pcs_cmd_->pcs_on_off("off", "定时", pcs1_device);
+            //                 }
                             
 
-                        }
-                    } else {
-                        // 既不在需求响应时段也不在周计划时段，关闭PCS
-                        ems->sys_running_pos.store(34);
+            //             }
+            //         } else {
+            //             // 既不在需求响应时段也不在周计划时段，关闭PCS
+            //             ems->sys_running_pos.store(34);
                         
-                        double pcs_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
-                        if (pcs_switch != 0) {
-                            pcs_cmd_->pcs_on_off("off", "定时", pcs1_device);
-                        }
+            //             double pcs_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
+            //             if (pcs_switch != 0) {
+            //                 pcs_cmd_->pcs_on_off("off", "定时", pcs1_device);
+            //             }
                         
 
-                    }
-                }
-            } else if (alarm_level == 2) {
-                // 二级告警
-                ems->sys_running_pos.store(21);
-                alarmLv2Protect();
+            //         }
+            //     }
+            // } else if (alarm_level == 2) {
+            //     // 二级告警
+            //     ems->sys_running_pos.store(21);
+            //     alarmLv2Protect();
                 
-                if (!fault_occurred) {
-                    fault_happen_time = std::chrono::steady_clock::now();
-                    fault_occurred = true;
-                }
+            //     if (!fault_occurred) {
+            //         fault_happen_time = std::chrono::steady_clock::now();
+            //         fault_occurred = true;
+            //     }
                 
-                auto current_time = std::chrono::steady_clock::now();
-                auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
-                    current_time - fault_happen_time).count();
+            //     auto current_time = std::chrono::steady_clock::now();
+            //     auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
+            //         current_time - fault_happen_time).count();
                 
-                // 60秒后自动恢复
-                if (elapsed > 60) {
-                    pcs_cmd_->pcs_reset(pcs1_device, "定时");
+            //     // 60秒后自动恢复
+            //     if (elapsed > 60) {
+            //         pcs_cmd_->pcs_reset(pcs1_device, "定时");
                     
-                    // 使用线程安全的 setValue
-                    ems->setValue<double>("系统告警等级", 0);
-                    fault_occurred = false;
+            //         // 使用线程安全的 setValue
+            //         ems->setValue<double>("系统告警等级", 0);
+            //         fault_occurred = false;
                     
-                    LOG_INFO_LOC("需求响应模式系统二级告警自恢复完成");
-                    std::this_thread::sleep_for(std::chrono::seconds(1));
-                }
-            } else {
-                // 三级告警
-                ems->sys_running_pos.store(22);
-                alarmLv3Protect();
+            //         LOG_INFO_LOC("需求响应模式系统二级告警自恢复完成");
+            //         std::this_thread::sleep_for(std::chrono::seconds(1));
+            //     }
+            // } else {
+            //     // 三级告警
+            //     ems->sys_running_pos.store(22);
+            //     alarmLv3Protect();
                 
-                // 使用线程安全的 setValue
-                ems->setValue<double>("开机", 0);
-                ems->setValue<double>("系统告警等级", 3);
-                ems->setValue<double>("系统运行模式", 1);  // 返回手动模式
+            //     // 使用线程安全的 setValue
+            //     ems->setValue<double>("开机", 0);
+            //     ems->setValue<double>("系统告警等级", 3);
+            //     ems->setValue<double>("系统运行模式", 1);  // 返回手动模式
                 
-                LOG_INFO_LOC("三级告警，退出需求响应模式");
-                break;
-            }
+            //     LOG_INFO_LOC("三级告警，退出需求响应模式");
+            //     break;
+            // }
             
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            // std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
         
     } catch (const std::exception& e) {
@@ -684,7 +684,7 @@ void Strategy::alarmLv2Protect() {
             // 使用线程安全的 getValue 方法
             double pcs1_switch = pcs1_device->getValue<double>("开机、关机指令", 0);
             if (pcs1_switch != 0) {
-                pcs_cmd_->pcs_on_off("off", "保护", pcs1_device);
+                pcs15am_cmd_->pcs_on_off("off", "保护", pcs1_device);
             }
         }
         
@@ -710,7 +710,7 @@ void Strategy::alarmLv3Protect() {
     
     try {
         if (pcs1_device) {
-            pcs_cmd_->pcs_on_off("off", "保护", pcs1_device);
+            pcs15am_cmd_->pcs_on_off("off", "保护", pcs1_device);
         }    
         
         std::this_thread::sleep_for(std::chrono::milliseconds(100));

@@ -3,6 +3,7 @@
 
 #include "json.hpp"
 #include <atomic>
+#include <chrono>
 #include <memory>
 
 #include "command.h"
@@ -11,13 +12,6 @@ using json = nlohmann::json;
 
 class DeviceManager; // 前向声明
 class Device;        // 前向声明
-
-enum RunMode { 
-    MANUAL = 1, 
-    AUTO = 2, 
-    TIMER = 3,
-    DEMAND_RESPONSE = 4,
-    };
 
 
 class Strategy {
@@ -46,6 +40,10 @@ class Strategy {
         void weeklyPlanModeRun();
         void demandResponseModeRun();
         void autoModeRun();
+
+        // 模式管理
+        void enterMode(int mode);
+        void exitMode(int mode);
         
         // 辅助函数
         void thermalManager();
@@ -59,6 +57,21 @@ class Strategy {
         void pilotLampShowThread();     // 指示灯线程函数
 
         double last_sent_pcs_power_{0.0};  // 记录上次发送的PCS功率值
+
+        // 状态机模式追踪
+        int last_mode_{-1};
+
+        // 周计划/定时模式持久状态
+        bool timer_allow_charge_{true};
+        bool timer_allow_discharge_{true};
+        std::chrono::steady_clock::time_point timer_fault_happen_time_{};
+        bool timer_fault_occurred_{false};
+
+        // 需求响应模式持久状态
+        bool demand_allow_charge_{true};
+        bool demand_allow_discharge_{true};
+        std::chrono::steady_clock::time_point demand_fault_happen_time_{};
+        bool demand_fault_occurred_{false};
 };
 
 

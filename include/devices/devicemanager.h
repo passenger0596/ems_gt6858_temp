@@ -18,6 +18,14 @@
 class ModbusClient;
 class CanOperator;
 
+enum RunMode { 
+    MANUAL = 1, 
+    AUTO = 2, 
+    TIMER = 3,
+    DEMAND_RESPONSE = 4,
+    };
+
+
 class DeviceManager{
     public:
         DeviceManager();

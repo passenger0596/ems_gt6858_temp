@@ -442,9 +442,9 @@ void DeviceManager::runningLogShowThread() {
             heartbeat = ems->heartbeat.load();
             {
                 std::shared_lock<std::shared_mutex> lock(ems->json_rwlock_);
-                if (run_mode == 3) {
+                if (run_mode == RunMode::TIMER) {
                     weekPlanPower_need = ems->weekPlanPower_need;
-                } else if (run_mode == 4) {
+                } else if (run_mode == RunMode::DEMAND_RESPONSE) {
                     demandPower_need = ems->demandPower_need;
                 }
             }
@@ -461,9 +461,9 @@ void DeviceManager::runningLogShowThread() {
 
             LOG_INFO_LOC(("系统告警等级: " + std::to_string(alarm_level)).c_str());
 
-            if (run_mode == 3) {
+            if (run_mode == RunMode::TIMER) {
                 LOG_INFO_LOC(("系统功率需求: " + std::to_string(weekPlanPower_need) + "kW").c_str());
-            } else if (run_mode == 4) {
+            } else if (run_mode == RunMode::DEMAND_RESPONSE) {
                 LOG_INFO_LOC(("系统功率需求: " + std::to_string(demandPower_need) + "kW").c_str());
             }
             
@@ -512,17 +512,12 @@ void DeviceManager::runningLogShowThread() {
         
         // 每10秒输出一次
         for (int i = 0; i < 100; ++i) {
-
-            if (this->stop_running_log_) {
-                break;
+            if (this->stop_running_log_)  break;
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
-
-        if (this->stop_running_log_) {
-            break;
-        }
+        if (this->stop_running_log_) break;
+        
     }
 
     LOG_INFO_LOC("运行日志显示线程已停止");

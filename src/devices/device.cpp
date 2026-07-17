@@ -226,3 +226,72 @@ void Device::_confirm_alarm(const std::string& alarm_name,
         this->data_to_qt[alarm_name] = status;
     }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// 控制指令去重/防抖（与 Python device.py should_skip_control / mark_control_sent 一致）
+// ═══════════════════════════════════════════════════════════════
+
+bool Device::should_skip_control(const std::string& control_key, double value, double interval_s) {
+    try {
+        // interval_s 无效或非正数：不做去重，直接标记并允许发送
+        if (interval_s <= 0.0) {
+            mark_control_sent(control_key, value);
+            return false;
+        }
+
+        std::lock_guard<std::mutex> lock(control_cache_mtx_);
+
+        auto it = control_cached_.find(control_key);
+        if (it == control_cached_.end()) {
+            // 首次发送该控制键
+            control_cached_[control_key] = {value, std::chrono::steady_clock::now()};
+            return false;
+        }
+
+        const auto& cached = it->second;
+        if (cached.value != value) {
+            // 值与上次不同，允许发送
+            control_cached_[control_key] = {value, std::chrono::steady_clock::now()};
+            return false;
+        }
+
+        // 值相同，检查时间间隔
+        auto now = std::chrono::steady_clock::now();
+        double elapsed = std::chrono::duration<double>(now - cached.timestamp).count();
+
+        if (elapsed < interval_s) {
+            // 在间隔时间内，跳过
+            return true;
+        }
+
+        // 超过间隔时间，允许发送并更新时间戳
+        control_cached_[control_key] = {value, now};
+        return false;
+
+    } catch (const std::exception& e) {
+        LOG_ERROR_LOC(("should_skip_control 异常: " + std::string(e.what())).c_str());
+        return false;  // 异常时允许发送，保证控制可用
+    }
+}
+
+void Device::mark_control_sent(const std::string& control_key, double value) {
+    try {
+        std::lock_guard<std::mutex> lock(control_cache_mtx_);
+        control_cached_[control_key] = {value, std::chrono::steady_clock::now()};
+    } catch (const std::exception& e) {
+        LOG_ERROR_LOC(("mark_control_sent 异常: " + std::string(e.what())).c_str());
+    }
+}
+
+void Device::clear_control_cache(const std::string& control_key) {
+    try {
+        std::lock_guard<std::mutex> lock(control_cache_mtx_);
+        if (control_key.empty()) {
+            control_cached_.clear();
+        } else {
+            control_cached_.erase(control_key);
+        }
+    } catch (const std::exception& e) {
+        LOG_ERROR_LOC(("clear_control_cache 异常: " + std::string(e.what())).c_str());
+    }
+}

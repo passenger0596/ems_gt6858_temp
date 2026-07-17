@@ -65,7 +65,8 @@ set(DEVICE_SOURCES
     ${CMAKE_SOURCE_DIR}/src/devices/ems.cpp
     ${CMAKE_SOURCE_DIR}/src/devices/gt_bms.cpp
     ${CMAKE_SOURCE_DIR}/src/devices/pcs.cpp
-    # ${CMAKE_SOURCE_DIR}/src/devices/pcs_15am.cpp
+    ${CMAKE_SOURCE_DIR}/src/devices/pcs_15am.cpp
+    ${CMAKE_SOURCE_DIR}/src/devices/iomodule.cpp
     # ${CMAKE_SOURCE_DIR}/src/devices/wea1610.cpp
     ${CMAKE_SOURCE_DIR}/src/devices/ac_hengdu.cpp
     ${CMAKE_SOURCE_DIR}/src/devices/dg_hgm6100.cpp
@@ -76,7 +77,7 @@ set(DEVICE_SOURCES
 # 控制策略层
 set(CONTROL_SOURCES
     ${CMAKE_SOURCE_DIR}/src/control/ejpcscmd.cpp
-    # ${CMAKE_SOURCE_DIR}/src/control/ejpcs15amcmd.cpp
+    ${CMAKE_SOURCE_DIR}/src/control/ejpcs15amcmd.cpp
     ${CMAKE_SOURCE_DIR}/src/control/ejdcdc.cpp
     ${CMAKE_SOURCE_DIR}/src/control/emscmd.cpp
     ${CMAKE_SOURCE_DIR}/src/control/mqttcontroller.cpp

@@ -59,6 +59,12 @@ struct RegisterData {
     bool writable = false;       // FC03 是否可写
 };
 
+// 控制指令缓存条目，用于避免重复发送相同的控制指令
+struct ControlCacheEntry {
+    double value;
+    std::chrono::steady_clock::time_point timestamp;
+};
+
 class Device {
 public:
     struct RegisterSegment {
@@ -598,6 +604,33 @@ public:
                         uint8_t level,
                         bool status);
 
+    /**
+     * @brief 检查是否应该跳过控制指令发送（防抖/去重）
+     *
+     * 若同一 control_key 在 interval_s 秒内已发送过相同的 value，
+     * 则返回 true 表示应跳过本次发送。
+     * 若值已变化或超过时间间隔，则自动标记缓存并返回 false 表示可以发送。
+     *
+     * @param control_key 控制指令的唯一标识（如 "pcs_on_off", "set_temperature" 等）
+     * @param value 要发送的控制值
+     * @param interval_s 时间间隔（秒），在此时间内相同值的指令将被跳过，默认 2.0 秒
+     * @return true=应该跳过发送, false=可以发送（缓存已自动更新）
+     */
+    bool should_skip_control(const std::string& control_key, double value, double interval_s = 2.0);
+
+    /**
+     * @brief 标记控制指令已发送，更新缓存时间戳和值
+     * @param control_key 控制指令的唯一标识
+     * @param value 已发送的控制值
+     */
+    void mark_control_sent(const std::string& control_key, double value);
+
+    /**
+     * @brief 清除控制指令缓存
+     * @param control_key 可选，指定要清除的缓存键。如果为空字符串（默认），则清除所有缓存
+     */
+    void clear_control_cache(const std::string& control_key = "");
+
 
 
 
@@ -642,6 +675,10 @@ public:
     std::unordered_map<std::string, bool> alarm_pending_values_;
     // 保护 alarm_timers_ 和 alarm_pending_values_ 的互斥锁
     std::mutex alarm_timer_mtx_;
+
+    // 控制指令缓存，用于避免在短时间内重复发送相同值的控制指令
+    std::unordered_map<std::string, ControlCacheEntry> control_cached_;
+    mutable std::mutex control_cache_mtx_;
 
     /// 3-arg version: fills out_parsed with LOCAL buffer indices (relative to the given segments).
     /// Does NOT touch parsed_registers_ — use build_parsed_registers() afterwards if needed.
